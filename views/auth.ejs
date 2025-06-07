@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Login | TETRA</title>
+  <title>Email OTP Verification | TETRA</title>
   <link rel="stylesheet" href="/styles.css" />
   <style>
     :root {
@@ -25,7 +25,7 @@
       justify-content: center;
       padding: 2rem;
     }
-    .login-container {
+    .otp-container {
       background: var(--glass-bg);
       border: 1px solid var(--border-color);
       border-radius: 30px;
@@ -40,6 +40,11 @@
       font-size: 2rem;
       margin-bottom: 1.5rem;
       text-shadow: 0 0 10px rgba(0, 122, 255, 0.2);
+    }
+    p {
+      margin-bottom: 1.5rem;
+      font-size: 1rem;
+      color: rgba(255, 255, 255, 0.8);
     }
     form {
       display: flex;
@@ -63,9 +68,15 @@
       transition: border-color 0.3s ease;
       width: 100%;
       box-sizing: border-box;
+      text-align: center;
+      letter-spacing: 0.3em;
+      font-weight: 600;
     }
     input::placeholder {
       color: rgba(255, 255, 255, 0.6);
+      letter-spacing: normal;
+      font-weight: normal;
+      text-align: left;
     }
     input:focus {
       border-color: var(--accent-blue);
@@ -88,70 +99,64 @@
     .btn:hover {
       background-color: #005fd9;
     }
-    .signup-link {
+    .resend-link {
       margin-top: 1rem;
-      text-align: center;
       font-size: 0.9rem;
+      text-align: center;
       color: rgba(255, 255, 255, 0.7);
+      cursor: pointer;
+      user-select: none;
     }
-    .signup-link a {
+    .resend-link:hover {
       color: var(--accent-blue);
-      text-decoration: none;
-      font-weight: 600;
-    }
-    .signup-link a:hover {
       text-decoration: underline;
     }
-    .error-message {
-      background-color: #ff4d4d;
-      padding: 0.5rem 1rem;
-      border-radius: 10px;
-      margin-bottom: 1rem;
-      font-weight: 600;
-      text-align: center;
-      color: white;
-    }
     @media (max-width: 450px) {
-      .login-container {
+      .otp-container {
         padding: 2rem 1.5rem;
       }
     }
   </style>
 </head>
 <body>
-  <div class="login-container">
-    <h1>Login to TETRA</h1>
-
-
-    <form method="POST" action="/login">
-      <label for="username">Username</label>
+  <div class="otp-container">
+    <h1>Verify Your Email</h1>
+    <p>Please enter the 6-digit code sent to your email address.</p>
+    <form id="otpForm" method="POST" action="/verify-otp">
+      <label for="otp">OTP Code</label>
       <input
         type="text"
-        id="username"
-        name="username"
-        placeholder="Your username"
+        id="otp"
+        name="otp"
+        maxlength="6"
+        minlength="6"
+        placeholder="Enter the code"
+        pattern="\d{6}"
         required
-        minlength="3"
-        maxlength="30"
-        autofocus
+        autocomplete="off"
+        inputmode="numeric"
       />
-
-      <label for="password">Password</label>
-      <input
-        type="password"
-        id="password"
-        name="password"
-        placeholder="Your password"
-        required
-        minlength="8"
-      />
-
-      <button type="submit" class="btn">Log In</button>
+      <button type="submit" class="btn">Verify</button>
     </form>
-
-    <p class="signup-link">
-      Don't have an account? <a href="/signup">Sign up</a>
-    </p>
+    <p class="resend-link" id="resendOtp">Didn't receive the code? Resend</p>
   </div>
+
+  <script>
+    const resendLink = document.getElementById('resendOtp');
+    resendLink.addEventListener('click', () => {
+      alert('A new OTP has been sent to your email.');
+      // You can replace this alert with actual AJAX call to resend OTP
+    });
+
+    // Optional: Add client-side validation for OTP input on submit
+    const otpForm = document.getElementById('otpForm');
+    otpForm.addEventListener('submit', e => {
+      const otp = otpForm.otp.value.trim();
+      if (!/^\d{6}$/.test(otp)) {
+        e.preventDefault();
+        alert('Please enter a valid 6-digit OTP code.');
+      }
+    });
+  </script>
 </body>
 </html>

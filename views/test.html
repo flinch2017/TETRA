@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Test Hamburger Menu</title>
+  <style>
+    body {
+      margin: 0; font-family: sans-serif;
+    }
+    .nav-links {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #222;
+      color: white;
+      padding: 2rem;
+      border-radius: 10px;
+      text-align: center;
+      z-index: 1001;
+    }
+    .nav-links.open {
+      display: block;
+    }
+    #navOverlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 1000;
+    }
+    #navOverlay.show {
+      display: block;
+    }
+    #hamburger {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      background: #007aff;
+      border: none;
+      padding: 0.5rem 1rem;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 1100;
+    }
+  </style>
+</head>
+<body>
+
+<button id="hamburger">Menu</button>
+
+<nav class="nav-links" id="navLinks">
+  <a href="#">Home</a><br/>
+  <a href="#">Explore</a><br/>
+  <a href="#">Upload</a><br/>
+  <a href="#">Charts</a><br/>
+  <a href="#">Community</a><br/>
+  <a href="#">Login</a>
+</nav>
+
+<div id="navOverlay"></div>
+
+<script>
+  const hamburger = document.getElementById('hamburger');
+  const navLinks = document.getElementById('navLinks');
+  const navOverlay = document.getElementById('navOverlay');
+
+  function toggleMenu() {
+    navLinks.classList.toggle('open');
+    navOverlay.classList.toggle('show');
+  }
+
+  hamburger.addEventListener('click', toggleMenu);
+  navOverlay.addEventListener('click', toggleMenu);
+</script>
+
+</body>
+</html>

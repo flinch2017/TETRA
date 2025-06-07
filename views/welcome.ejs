@@ -21,13 +21,19 @@
       color: white;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
       min-height: 100vh;
-      padding: 2rem;
     }
 
-    .container {
+    section {
+      padding: 100px 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .hero-container,
+    .description-container {
       background: var(--glass-bg);
       border: 1px solid var(--border-color);
       border-radius: 30px;
@@ -35,16 +41,23 @@
       box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
       backdrop-filter: blur(12px);
       text-align: center;
-      max-width: 420px;
+      max-width: 600px;
       width: 100%;
+    }
+
+    h1, h2 {
+      font-weight: 600;
+      text-shadow: 0 0 10px rgba(0, 122, 255, 0.2);
     }
 
     h1 {
       font-size: 2.6rem;
       margin-bottom: 0.5rem;
-      font-weight: 600;
-      color: #ffffff;
-      text-shadow: 0 0 10px rgba(0, 122, 255, 0.2);
+    }
+
+    h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
     }
 
     p {
@@ -69,13 +82,87 @@
     .btn:hover {
       background-color: #005fd9;
     }
+
+    footer {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 2rem 1rem;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 0.9rem;
+      margin-top: auto;
+    }
+
+    footer a {
+      color: var(--accent-blue);
+      text-decoration: none;
+      margin: 0 0.5rem;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 2rem;
+      }
+
+      h2 {
+        font-size: 1.5rem;
+      }
+
+      .hero-container,
+      .description-container {
+        padding: 2rem 1.5rem;
+      }
+
+      .btn {
+        width: 100%;
+        font-size: 1rem;
+      }
+    }
+
+
+
+    
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Welcome to <%= appName %> 🎶</h1>
-    <p>Stream, share, and discover your favorite music</p>
-    <a class="btn" href="/signup">Get Started</a>
-  </div>
+  <!-- Header -->
+  <%- include('partials/header') %>
+
+  <!-- Hero Section -->
+  <section>
+    <div class="hero-container">
+      <h1>Welcome to <%= appName %></h1>
+      <p>Stream, share, and discover your favorite music</p>
+      <a class="btn" href="/signup">Get Started</a>
+    </div>
+  </section>
+
+  <!-- Description Section -->
+  <section>
+    <div class="description-container">
+      <h2>Why TETRA?</h2>
+      <p>TETRA is your all-in-one platform for experiencing music like never before. Release singles, albums, and remixes, track your impact on charts, and connect with fans across the world. Whether you're a creator or a listener, this is your stage.</p>
+    </div>
+  </section>
+
+  <!-- Footer Section -->
+  <footer>
+    <p>© 2025 Tetra Music, under Dossier Creatives</p>
+    <p>
+      Contact:
+      <a href="mailto:contact@tetra.com">contact@tetra.com</a> |
+      <a href="https://twitter.com">X (formerly Twitter)</a> |
+      <a href="https://instagram.com">Instagram</a>
+    </p>
+  </footer>
+
+  
+
+
+
 </body>
 </html>

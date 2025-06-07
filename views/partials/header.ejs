@@ -1,0 +1,95 @@
+<style>
+  .tetra-header {
+    background: linear-gradient(90deg, #0f0c29, #302b63, #24243e);
+    padding: 1rem 0;
+    color: white;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  .header-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    width: 100%;
+  }
+
+  .tetra-header .logo a {
+    font-size: 1.5rem;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    letter-spacing: 2px;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 1.5rem;
+  }
+
+  .nav-links a {
+    color: #ddd;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+  }
+
+  .nav-links a:hover {
+    color: #fff;
+  }
+
+  .user-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .btn-login {
+    background: var(--accent-blue);
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background 0.3s;
+  }
+
+  .btn-login:hover {
+    background: #005fd9;
+  }
+
+  .profile-pic {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #fff;
+  }
+</style>
+
+<header class="tetra-header">
+  <div class="header-container">
+    <div class="logo">
+      <a href="/"><strong>TETRA</strong></a>
+    </div>
+
+    <nav class="nav-links">
+      <a href="/">Home</a>
+      <a href="/explore">Explore</a>
+      <a href="/upload">Upload</a>
+      <a href="/charts">Charts</a>
+      <a href="/community">Community</a>
+    </nav>
+
+    <div class="user-actions">
+      <a href="/login" class="btn-login">Login</a>
+    </div>
+  </div>
+</header>

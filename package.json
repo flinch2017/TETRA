@@ -21,7 +21,9 @@
     "express-session": "^1.18.1",
     "helmet": "^8.1.0",
     "method-override": "^3.0.0",
-    "pg": "^8.16.0"
+    "nodemailer": "^7.0.3",
+    "pg": "^8.16.0",
+    "tetra": "file:"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
