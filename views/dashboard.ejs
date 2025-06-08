@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Music Dashboard | TETRA</title>
+  <link rel="stylesheet" href="/styles.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #0a0f2c;
+      color: white;
+    }
+
+    header {
+      background: #050a1f;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #007aff;
+    }
+
+    .newsfeed {
+      padding: 2rem;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .post {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .post img {
+      width: 100%;
+      border-radius: 10px;
+      margin-top: 1rem;
+    }
+
+    .post h3 {
+      margin: 0 0 0.5rem;
+      font-size: 1.2rem;
+      color: #ffffff;
+    }
+
+    .post p {
+      font-size: 0.95rem;
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    .timestamp {
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.5);
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">TETRA</div>
+    <div><a href="/logout" style="color: #fff; text-decoration: none;">Logout</a></div>
+  </header>
+
+  <main class="newsfeed">
+    <!-- Post 1 -->
+    <div class="post">
+      <h3>@auroradreams released a new single: "Electric Sunrise"</h3>
+      <p>Check out this synth-pop masterpiece blending retro vibes with modern beats. Now streaming everywhere.</p>
+      <img src="/uploads/electric-sunrise-cover.jpg" alt="Electric Sunrise Cover" />
+      <div class="timestamp">Posted 2h ago</div>
+    </div>
+
+    <!-- Post 2 -->
+    <div class="post">
+      <h3>@bassline_rico dropped a teaser for his upcoming EP!</h3>
+      <p>Rico is coming back with a 5-track EP titled "Pulse", expect heavy bass and slick production. </p>
+      <img src="/uploads/pulse-teaser.jpg" alt="Pulse Teaser" />
+      <div class="timestamp">Posted 5h ago</div>
+    </div>
+
+    <!-- Post 3 -->
+    <div class="post">
+      <h3>@vibequeen posted behind-the-scenes from her album shoot</h3>
+      <p>A raw look into the creative process. Her new album drops next month!</p>
+      <img src="/uploads/vibequeen-bts.jpg" alt="Behind the scenes" />
+      <div class="timestamp">Posted 1d ago</div>
+    </div>
+  </main>
+</body>
+</html>

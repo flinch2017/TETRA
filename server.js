@@ -10,6 +10,7 @@ const helmet = require('helmet');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
+const cron = require('node-cron');
 
 
 dotenv.config();
@@ -62,6 +63,18 @@ async function userExists(username, email) {
   return result.rows.length > 0;
 }
 
+cron.schedule('*/3 * * * *', async () => {
+  try {
+    const result = await pool.query(
+      `DELETE FROM users WHERE verified = false AND otp_expires <= NOW()`
+    );
+    console.log(`Deleted ${result.rowCount} unverified expired users`);
+  } catch (err) {
+    console.error('Error deleting expired unverified users:', err);
+  }
+});
+
+
 // Routes
 app.get('/', (req, res) => {
   res.render('welcome', { appName: 'TETRA' });
@@ -75,8 +88,50 @@ app.get('/login', (req, res) => {
   res.render('login');
 });
 
+app.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    if (!username || !password) {
+      return res.render('login', { error: 'All fields are required.' });
+    }
+
+    const userResult = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
+
+    if (userResult.rowCount === 0) {
+      return res.render('login', { error: 'Username not found.' });
+    }
+
+    const user = userResult.rows[0];
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
+      return res.render('login', { error: 'Incorrect password.' });
+    }
+
+    if (!user.verified) {
+      return res.redirect(`/auth?email=${encodeURIComponent(user.email)}`);
+    }
+
+    req.session.user = {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+    };
+
+    res.redirect('/dashboard');
+  } catch (error) {
+    console.error('Login error:', error);
+    res.render('login', { error: 'Internal server error. Please try again later.' });
+  }
+});
+
+
+
 app.get('/auth', (req, res) => {
-  res.render('auth');
+  const email = req.query.email; // safely extract email from URL query
+  res.render('auth', { email, error: null });
 });
 
 
@@ -88,6 +143,17 @@ app.post('/signup', async (req, res) => {
     if (!username || !email || !password || !confirmPassword) {
       return res.render('signup', { error: 'All fields are required.' });
     }
+
+    // Username validation: lowercase letters, numbers, or allowed symbols, no spaces
+    // Adjust the allowed symbols as needed. Here I allow underscore, hyphen, and dot:
+    const usernameRegex = /^[a-z0-9._-]+$/;
+    if (!usernameRegex.test(username)) {
+      return res.render('signup', {
+        error:
+          'Username can only contain lowercase letters, numbers, and symbols (._-), and no spaces.'
+      });
+    }
+
     if (password !== confirmPassword) {
       return res.render('signup', { error: 'Passwords do not match.' });
     }
@@ -123,12 +189,12 @@ app.post('/signup', async (req, res) => {
 
     // Setup Nodemailer transporter (use your SMTP credentials)
     let transporter = nodemailer.createTransport({
-      host: "smtp.ethereal.email",   // your SMTP host
+      host: "smtp.gmail.com",   // your SMTP host
       port: 587,
       secure: false,                  // your SMTP port
       auth: {
-        user: "bryce.huel@ethereal.email",  // your SMTP username
-        pass: "tEH5SzYGTKMaXgEQ41"      // your SMTP password
+        user: "thedossiercreatives@gmail.com",  // your SMTP username
+        pass: "riso kltz lhbk jyvv"      // your SMTP password
       }
     });
 
@@ -148,6 +214,85 @@ app.post('/signup', async (req, res) => {
     console.error('Signup error:', error);
     res.render('signup', { error: 'Internal Server Error. Please try again later.' });
   }
+});
+
+
+
+app.post('/verify-otp', async (req, res) => {
+  const { email } = req.query;
+  const { otp } = req.body;
+
+  if (!otp) {
+    return res.render('auth', {
+      error: 'Please enter the OTP.',
+      email
+    });
+  }
+
+  try {
+    const result = await pool.query(
+      `SELECT * FROM users WHERE email = $1`,
+      [email]
+    );
+
+    if (result.rowCount === 0) {
+      return res.render('auth', {
+        error: 'User not found.',
+        email
+      });
+    }
+
+    const user = result.rows[0];
+
+    // Check if OTP matches and has not expired
+    if (user.otp !== otp || new Date(user.otp_expires) < new Date()) {
+      return res.render('auth', {
+        error: 'Invalid or expired OTP. Please try again.',
+        email
+      });
+    }
+
+    // Mark user as verified
+    await pool.query(
+      `UPDATE users SET verified = true, otp = NULL, otp_expires = NULL WHERE email = $1`,
+      [email]
+    );
+
+    // Create session
+    req.session.user = {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+    };
+
+    res.redirect('/dashboard');
+  } catch (err) {
+    console.error('OTP verification error:', err);
+    res.render('auth', {
+      error: 'Something went wrong. Please try again later.',
+      email
+    });
+  }
+});
+
+
+app.get('/dashboard', (req, res) => {
+  if (!req.session.user) {
+    return res.redirect('/login'); // redirect to login if session not found
+  }
+
+  res.render('dashboard', { user: req.session.user });
+});
+
+
+app.get('/logout', (req, res) => {
+  req.session.destroy(err => {
+    if (err) {
+      console.error('Logout error:', err);
+      return res.status(500).send('Could not log out. Please try again.');
+    }
+    res.redirect('/login'); // or any other page after logout
+  });
 });
 
 

@@ -121,8 +121,12 @@
 <body>
   <div class="otp-container">
     <h1>Verify Your Email</h1>
+    <div class="error-message" id="errorMessage" style="<%= error ? 'display: block;' : 'display: none;' %>">
+  <%= error || '' %>
+</div>
     <p>Please enter the 6-digit code sent to your email address.</p>
-    <form id="otpForm" method="POST" action="/verify-otp">
+    <form id="otpForm" method="POST" action="/verify-otp?email=<%= email %>">
+
       <label for="otp">OTP Code</label>
       <input
         type="text"
