@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Pricing Plans</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+  <!-- Stripe.js -->
+<script src="https://js.stripe.com/v3/"></script>
+
+<!-- PayPal JS SDK -->
+<script src="https://www.paypal.com/sdk/js?client-id=AebJ2wnGUtsUgHN_DbPYpcrr6VFml3-MMRKq1VNu9rRFHl4kLpVmiFdRCZnDtiwq1gXLUR6eBxKTVkzy&currency=USD"></script>
+
+  <style>
+    /* Animated gradient background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #0f0f0f, #1a1a1a, #131313, #0c0c0c);
+      background-size: 300% 300%;
+      animation: gradientMove 20s ease infinite;
+      z-index: -3;
+    }
+
+    /* Grainy noise overlay */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('https://www.transparenttextures.com/patterns/asfalt-dark.png');
+      opacity: 0.08;
+      z-index: -2;
+      pointer-events: none;
+    }
+
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Firefly effect */
+    .firefly {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 6px;
+      height: 6px;
+      background: #facc15;
+      border-radius: 50%;
+      box-shadow: 0 0 8px 2px #facc15;
+      opacity: 0.8;
+      animation: fly 20s linear infinite;
+      z-index: -1;
+    }
+
+    @keyframes fly {
+      0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.5;
+      }
+      25% {
+        transform: translate(-200px, -300px) scale(0.8);
+        opacity: 1;
+      }
+      50% {
+        transform: translate(300px, -100px) scale(1.2);
+        opacity: 0.7;
+      }
+      75% {
+        transform: translate(-150px, 200px) scale(1);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.5;
+      }
+    }
+
+    /* Randomize firefly positions and delays */
+    .firefly:nth-child(1) { top: 20%; left: 30%; animation-delay: 0s; }
+    .firefly:nth-child(2) { top: 60%; left: 70%; animation-delay: 3s; }
+    .firefly:nth-child(3) { top: 40%; left: 20%; animation-delay: 6s; }
+    .firefly:nth-child(4) { top: 80%; left: 50%; animation-delay: 9s; }
+    .firefly:nth-child(5) { top: 30%; left: 80%; animation-delay: 12s; }
+    .firefly:nth-child(6) { top: 50%; left: 60%; animation-delay: 15s; }
+    .firefly:nth-child(7) { top: 70%; left: 40%; animation-delay: 18s; }
+  </style>
+</head>
+<body class="text-gray-100">
+
+  <!-- Fireflies -->
+  <div class="firefly"></div>
+  <div class="firefly"></div>
+  <div class="firefly"></div>
+  <div class="firefly"></div>
+  <div class="firefly"></div>
+  <div class="firefly"></div>
+  <div class="firefly"></div>
+
+  <div class="min-h-screen flex flex-col items-center justify-center py-10 px-4">
+    <h1 class="text-4xl font-bold mb-6 text-white">Choose Your Artist Plan</h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      
+      <!-- Basic Artist Plan -->
+      <div class="bg-gray-900 rounded-2xl shadow-xl p-6 w-80 text-center border border-gray-700 hover:shadow-2xl transition">
+        <h2 class="text-2xl font-semibold mb-2 text-white">Basic Artist</h2>
+        <p class="text-gray-400 mb-4">Perfect for new creators</p>
+        <p class="text-4xl font-bold text-blue-400 mb-4">$5/year</p>
+        <ul class="mb-6 space-y-2 text-sm text-gray-300">
+          <li>🎵 Stream all public music</li>
+          <li>📀 Release 3 Singles and 1 EP</li>
+          <li>⏱ 48 hours release verification support</li>
+        </ul>
+        <button class="bg-gray-800 text-white px-4 py-2 rounded-full hover:bg-gray-700">Subscribe</button>
+      </div>
+
+      <!-- Mid Artist Plan -->
+      <div class="bg-gray-900 rounded-2xl shadow-xl p-6 w-80 text-center border-2 border-blue-500 transform scale-105 hover:shadow-2xl transition">
+        <h2 class="text-2xl font-semibold mb-2 text-white">Mid Artist</h2>
+        <p class="text-gray-400 mb-4">Upload, release & grow</p>
+        <p class="text-4xl font-bold text-blue-400 mb-4">$10/year</p>
+        <ul class="mb-6 space-y-2 text-sm text-gray-300">
+          <li>🎵 Stream all public music</li>
+          <li>📀 Release 6 Singles, 2 EPs, and 1 Album</li>
+          <li>⏱ 36 hours release verification support</li>
+          <li>💬 Socialize/Post to feed</li>
+          <li>📻 Tetra Radio/Playlisting Request</li>
+        </ul>
+        <button onclick="payWithStripe('mid')" class="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600">
+  Subscribe
+</button>
+<div id="paypal-button-container-mid" class="mt-4"></div>
+
+
+      </div>
+
+      <!-- A-Lister Plan -->
+      <div class="bg-gray-900 rounded-2xl shadow-xl p-6 w-80 text-center border border-gray-700 hover:shadow-2xl transition">
+        <h2 class="text-2xl font-semibold mb-2 text-white">A-Lister</h2>
+        <p class="text-gray-400 mb-4">For serious artists & pros</p>
+        <p class="text-4xl font-bold text-blue-400 mb-4">$25/year</p>
+        <ul class="mb-6 space-y-2 text-sm text-gray-300">
+          <li>🎵 Stream all public music</li>
+          <li>📀 Release 12 Singles, 4 EPs, and 2 Albums</li>
+          <li>⏱ 12 hours release verification support</li>
+          <li>💬 Socialize/Post to feed</li>
+          <li>📻 Tetra Radio/Playlisting Request</li>
+          <li>🏆 Exclusive Tetra Title Eligibility</li>
+          <li>🌍 Tetra Artist Global Ranking</li>
+          <li>🛍 Merch Support</li>
+        </ul>
+        <button class="bg-gray-800 text-white px-4 py-2 rounded-full hover:bg-gray-700">Subscribe</button>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+
+<script>
+  // Stripe setup
+  const stripe = Stripe("pk_test_51Rc3suRcmymA4MNb3xRNNBlhZcBsSP2DkZpiA7q1NtgCKFEvc8FQ7dqK7GWFOkuoRKnAjYkOVardSHk7YLBt4cja00ifoXyPUU");
+
+  function payWithStripe(plan) {
+    fetch(`/create-checkout-session?plan=${plan}`, { method: 'POST' })
+      .then(res => res.json())
+      .then(data => stripe.redirectToCheckout({ sessionId: data.id }))
+      .catch(err => console.error(err));
+  }
+
+  // PayPal Buttons
+  ['basic', 'mid', 'pro'].forEach(plan => {
+    const containerId = `paypal-button-container-${plan}`;
+    if (document.getElementById(containerId)) {
+      paypal.Buttons({
+        createOrder: function (data, actions) {
+          return fetch(`/create-paypal-order?plan=${plan}`, { method: 'POST' })
+            .then(res => res.json())
+            .then(order => order.id);
+        },
+        onApprove: function (data, actions) {
+          return fetch(`/capture-paypal-order?orderID=${data.orderID}`)
+            .then(res => res.json())
+            .then(() => window.location.href = '/dashboard');
+        }
+      }).render(`#${containerId}`);
+    }
+  });
+</script>
+
+</html>

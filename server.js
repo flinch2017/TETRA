@@ -11,6 +11,13 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
 const cron = require('node-cron');
+const stripe = require('stripe')('sk_test_51Rc3suRcmymA4MNbBS85bMjLg7nFgBGeviOfnHDrd3Y2kZS9oxM39xwJpAANectLnlzZ9H0NVg8JBad8BPfMFxby00yZKq4myf'); // Replace with your real secret key
+
+const YOUR_DOMAIN = 'http://localhost:3000'; // Or your real deployed domain
+
+
+
+
 
 
 dotenv.config();
@@ -75,6 +82,45 @@ cron.schedule('*/3 * * * *', async () => {
 });
 
 
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: [
+        "'self'",
+        "'unsafe-inline'", // Only if you use inline scripts
+        "https://js.stripe.com",
+        "https://www.paypal.com",
+        "https://www.sandbox.paypal.com"
+      ],
+      styleSrc: [
+        "'self'",
+        "'unsafe-inline'", // Needed for Tailwind + style attributes
+        "https://cdn.jsdelivr.net"
+      ],
+      imgSrc: [
+        "'self'",
+        "data:",
+        "https://www.transparenttextures.com",
+        "https://www.paypalobjects.com"
+      ],
+      frameSrc: [
+        "'self'",
+        "https://js.stripe.com",
+        "https://www.paypal.com",
+        "https://www.sandbox.paypal.com"
+      ],
+      connectSrc: [
+        "'self'",
+        "https://api.stripe.com",
+        "https://www.paypal.com",
+        "https://www.sandbox.paypal.com"
+      ]
+    }
+  }
+}));
+
+
 // Routes
 app.get('/', (req, res) => {
   res.render('welcome', { appName: 'TETRA' });
@@ -113,6 +159,7 @@ app.post('/login', async (req, res) => {
       return res.redirect(`/auth?email=${encodeURIComponent(user.email)}`);
     }
 
+    // Create session
     req.session.user = {
       id: user.id,
       username: user.username,
@@ -120,12 +167,21 @@ app.post('/login', async (req, res) => {
       role: user.role,
     };
 
+    // Check if the user has not subscribed to a plan
+if (!user.plan || user.plan === 'none') {
+  return res.redirect('/pricing');
+}
+
+
+    // Otherwise, go to dashboard
     res.redirect('/dashboard');
+    
   } catch (error) {
     console.error('Login error:', error);
     res.render('login', { error: 'Internal server error. Please try again later.' });
   }
 });
+
 
 
 
@@ -265,7 +321,8 @@ app.post('/verify-otp', async (req, res) => {
       email: user.email,
     };
 
-    res.redirect('/dashboard');
+    res.redirect('/pricing');
+
   } catch (err) {
     console.error('OTP verification error:', err);
     res.render('auth', {
@@ -275,14 +332,82 @@ app.post('/verify-otp', async (req, res) => {
   }
 });
 
+// GET route for pricing page
+app.get('/pricing', (req, res) => {
+  res.render('pricing'); // This assumes you have a 'pricing.ejs' file in your views folder
+});
 
-app.get('/dashboard', (req, res) => {
+app.post('/create-checkout-session', async (req, res) => {
+  const plan = req.query.plan;
+
+  const priceMap = {
+    basic: 'price_1Rc4CvRcmymA4MNb353I1peP',
+    mid: 'price_1Rc42LRcmymA4MNbvTbLGQ5R',
+    pro: 'price_1Rc4DMRcmymA4MNbytNN6qe3'
+  };
+
+  const session = await stripe.checkout.sessions.create({
+    payment_method_types: ['card'],
+    line_items: [{
+      price: priceMap[plan],
+      quantity: 1
+    }],
+    mode: 'payment',
+    success_url: `${YOUR_DOMAIN}/payment-success?plan=${plan}`,
+    cancel_url: `${YOUR_DOMAIN}/pricing`
+  });
+
+  res.json({ id: session.id });
+});
+
+app.post('/create-paypal-order', async (req, res) => {
+  const plan = req.query.plan;
+  const amountMap = { basic: 5, mid: 10, pro: 25 };
+
+  const order = await paypalClient.createOrder(amountMap[plan]);
+  res.json({ id: order.id });
+});
+
+app.get('/payment-success', async (req, res) => {
+  const plan = req.query.plan;
+  const userId = req.session.user.id;
+
+  await pool.query('UPDATE users SET plan = $1 WHERE id = $2', [plan, userId]);
+
+  res.redirect('/dashboard');
+});
+
+
+
+app.get('/dashboard', async (req, res) => {
   if (!req.session.user) {
-    return res.redirect('/login'); // redirect to login if session not found
+    return res.redirect('/login'); // Redirect if not logged in
   }
 
-  res.render('dashboard', { user: req.session.user });
+  try {
+    const result = await pool.query(
+      'SELECT plan FROM users WHERE id = $1',
+      [req.session.user.id]
+    );
+
+    if (result.rowCount === 0) {
+      return res.redirect('/login'); // In case user no longer exists
+    }
+
+    const userPlan = result.rows[0].plan;
+
+    if (!userPlan || userPlan === 'none') {
+      return res.redirect('/pricing');
+    }
+
+    res.render('dashboard', { user: req.session.user });
+
+  } catch (error) {
+    console.error('Dashboard error:', error);
+    res.status(500).send('Something went wrong.');
+  }
 });
+
 
 
 app.get('/logout', (req, res) => {
