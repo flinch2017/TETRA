@@ -163,6 +163,7 @@
     </div>
   </div>
 
+
 </body>
 
 <script>
@@ -187,10 +188,13 @@
             .then(order => order.id);
         },
         onApprove: function (data, actions) {
-          return fetch(`/capture-paypal-order?orderID=${data.orderID}`)
-            .then(res => res.json())
-            .then(() => window.location.href = '/dashboard');
-        }
+  return fetch(`/capture-paypal-order?orderID=${data.orderID}&plan=${plan}`, {
+    method: 'POST'
+  })
+    .then(res => res.json())
+    .then(() => window.location.href = '/dashboard');
+}
+
       }).render(`#${containerId}`);
     }
   });

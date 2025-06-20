@@ -15,6 +15,16 @@ const stripe = require('stripe')('sk_test_51Rc3suRcmymA4MNbBS85bMjLg7nFgBGeviOfn
 
 const YOUR_DOMAIN = 'http://localhost:3000'; // Or your real deployed domain
 
+const paypal = require('@paypal/checkout-server-sdk');
+
+// Set up PayPal environment
+let environment = new paypal.core.SandboxEnvironment(
+  'AebJ2wnGUtsUgHN_DbPYpcrr6VFml3-MMRKq1VNu9rRFHl4kLpVmiFdRCZnDtiwq1gXLUR6eBxKTVkzy', // Your client ID
+  'EMYhrrYUC5OlGbjjokuzpYt5NXHGATodEXOVzFn8lBCOmkm1Wx-lsD6Y0dYimsYl0vpw-T2CVpf45gRl' // Your PayPal sandbox secret
+);
+let paypalClient = new paypal.core.PayPalHttpClient(environment);
+
+
 
 
 
@@ -364,9 +374,27 @@ app.post('/create-paypal-order', async (req, res) => {
   const plan = req.query.plan;
   const amountMap = { basic: 5, mid: 10, pro: 25 };
 
-  const order = await paypalClient.createOrder(amountMap[plan]);
-  res.json({ id: order.id });
+  try {
+    const request = new paypal.orders.OrdersCreateRequest();
+    request.prefer('return=representation');
+    request.requestBody({
+      intent: 'CAPTURE',
+      purchase_units: [{
+        amount: {
+          currency_code: 'USD',
+          value: amountMap[plan].toString()
+        }
+      }]
+    });
+
+    const response = await paypalClient.execute(request);
+    res.json({ id: response.result.id });
+  } catch (error) {
+    console.error('PayPal order creation failed:', error);
+    res.status(500).send('Failed to create PayPal order');
+  }
 });
+
 
 app.get('/payment-success', async (req, res) => {
   const plan = req.query.plan;
@@ -376,6 +404,34 @@ app.get('/payment-success', async (req, res) => {
 
   res.redirect('/dashboard');
 });
+
+app.post('/capture-paypal-order', async (req, res) => {
+  const orderID = req.query.orderID;
+  const plan = req.query.plan;
+  const userId = req.session.user?.id;
+
+  if (!userId || !plan) {
+    return res.status(400).json({ error: 'Missing user or plan information' });
+  }
+
+  try {
+    const request = new paypal.orders.OrdersCaptureRequest(orderID);
+    request.requestBody({});
+
+    const response = await paypalClient.execute(request);
+    console.log("PayPal capture response:", response);
+
+    // Update the user's plan
+    await pool.query('UPDATE users SET plan = $1 WHERE id = $2', [plan, userId]);
+
+    res.json({ status: 'success' });
+  } catch (err) {
+    console.error('PayPal capture failed:', err);
+    res.status(500).json({ error: 'Capture failed' });
+  }
+});
+
+
 
 
 
