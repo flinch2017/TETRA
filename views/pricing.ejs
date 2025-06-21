@@ -3,15 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <title>Pricing Plans</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
-  <!-- Stripe.js -->
-<script src="https://js.stripe.com/v3/"></script>
 
-<!-- PayPal JS SDK -->
-<script src="https://www.paypal.com/sdk/js?client-id=AebJ2wnGUtsUgHN_DbPYpcrr6VFml3-MMRKq1VNu9rRFHl4kLpVmiFdRCZnDtiwq1gXLUR6eBxKTVkzy&currency=USD"></script>
+  <!-- Stripe.js -->
+  <script src="https://js.stripe.com/v3/"></script>
+
+  <!-- PayPal JS SDK -->
+  <script src="https://www.paypal.com/sdk/js?client-id=AebJ2wnGUtsUgHN_DbPYpcrr6VFml3-MMRKq1VNu9rRFHl4kLpVmiFdRCZnDtiwq1gXLUR6eBxKTVkzy&currency=USD"></script>
 
   <style>
-    /* Animated gradient background */
     body::before {
       content: '';
       position: fixed;
@@ -25,7 +26,6 @@
       z-index: -3;
     }
 
-    /* Grainy noise overlay */
     body::after {
       content: '';
       position: fixed;
@@ -45,7 +45,6 @@
       100% { background-position: 0% 50%; }
     }
 
-    /* Firefly effect */
     .firefly {
       position: fixed;
       top: 50%;
@@ -61,29 +60,13 @@
     }
 
     @keyframes fly {
-      0% {
-        transform: translate(0, 0) scale(1);
-        opacity: 0.5;
-      }
-      25% {
-        transform: translate(-200px, -300px) scale(0.8);
-        opacity: 1;
-      }
-      50% {
-        transform: translate(300px, -100px) scale(1.2);
-        opacity: 0.7;
-      }
-      75% {
-        transform: translate(-150px, 200px) scale(1);
-        opacity: 1;
-      }
-      100% {
-        transform: translate(0, 0) scale(1);
-        opacity: 0.5;
-      }
+      0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+      25% { transform: translate(-200px, -300px) scale(0.8); opacity: 1; }
+      50% { transform: translate(300px, -100px) scale(1.2); opacity: 0.7; }
+      75% { transform: translate(-150px, 200px) scale(1); opacity: 1; }
+      100% { transform: translate(0, 0) scale(1); opacity: 0.5; }
     }
 
-    /* Randomize firefly positions and delays */
     .firefly:nth-child(1) { top: 20%; left: 30%; animation-delay: 0s; }
     .firefly:nth-child(2) { top: 60%; left: 70%; animation-delay: 3s; }
     .firefly:nth-child(3) { top: 40%; left: 20%; animation-delay: 6s; }
@@ -93,6 +76,7 @@
     .firefly:nth-child(7) { top: 70%; left: 40%; animation-delay: 18s; }
   </style>
 </head>
+
 <body class="text-gray-100">
 
   <!-- Fireflies -->
@@ -104,13 +88,13 @@
   <div class="firefly"></div>
   <div class="firefly"></div>
 
-  <div class="min-h-screen flex flex-col items-center justify-center py-10 px-4">
+  <div class="min-h-screen flex flex-col items-center justify-center py-10 px-4 max-w-7xl mx-auto">
     <h1 class="text-4xl font-bold mb-6 text-white">Choose Your Artist Plan</h1>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      
+    <div class="w-full grid grid-cols-1 lg:grid-cols-3 gap-8">
+
       <!-- Basic Artist Plan -->
-      <div class="bg-gray-900 rounded-2xl shadow-xl p-6 w-80 text-center border border-gray-700 hover:shadow-2xl transition">
+      <div class="bg-gray-900 rounded-2xl shadow-xl p-6 w-full max-w-xs mx-auto text-center">
         <h2 class="text-2xl font-semibold mb-2 text-white">Basic Artist</h2>
         <p class="text-gray-400 mb-4">Perfect for new creators</p>
         <p class="text-4xl font-bold text-blue-400 mb-4">$5/year</p>
@@ -119,11 +103,11 @@
           <li>📀 Release 3 Singles and 1 EP</li>
           <li>⏱ 48 hours release verification support</li>
         </ul>
-        <button class="bg-gray-800 text-white px-4 py-2 rounded-full hover:bg-gray-700">Subscribe</button>
+        <div id="paypal-button-container-basic"></div>
       </div>
 
       <!-- Mid Artist Plan -->
-      <div class="bg-gray-900 rounded-2xl shadow-xl p-6 w-80 text-center border-2 border-blue-500 transform scale-105 hover:shadow-2xl transition">
+      <div class="bg-gray-900 rounded-2xl shadow-xl p-6 w-full max-w-xs mx-auto text-center">
         <h2 class="text-2xl font-semibold mb-2 text-white">Mid Artist</h2>
         <p class="text-gray-400 mb-4">Upload, release & grow</p>
         <p class="text-4xl font-bold text-blue-400 mb-4">$10/year</p>
@@ -134,16 +118,12 @@
           <li>💬 Socialize/Post to feed</li>
           <li>📻 Tetra Radio/Playlisting Request</li>
         </ul>
-        <button onclick="payWithStripe('mid')" class="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600">
-  Subscribe
-</button>
-<div id="paypal-button-container-mid" class="mt-4"></div>
-
-
+        <button onclick="payWithStripe('mid')" class="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600">Pay with Stripe</button>
+        <div id="paypal-button-container-mid" class="mt-4"></div>
       </div>
 
       <!-- A-Lister Plan -->
-      <div class="bg-gray-900 rounded-2xl shadow-xl p-6 w-80 text-center border border-gray-700 hover:shadow-2xl transition">
+      <div class="bg-gray-900 rounded-2xl shadow-xl p-6 w-full max-w-xs mx-auto text-center">
         <h2 class="text-2xl font-semibold mb-2 text-white">A-Lister</h2>
         <p class="text-gray-400 mb-4">For serious artists & pros</p>
         <p class="text-4xl font-bold text-blue-400 mb-4">$25/year</p>
@@ -157,47 +137,73 @@
           <li>🌍 Tetra Artist Global Ranking</li>
           <li>🛍 Merch Support</li>
         </ul>
-        <button class="bg-gray-800 text-white px-4 py-2 rounded-full hover:bg-gray-700">Subscribe</button>
+        <div id="paypal-button-container-pro"></div>
       </div>
 
     </div>
   </div>
 
+  <script>
+    const stripe = Stripe("pk_test_51Rc3suRcmymA4MNb3xRNNBlhZcBsSP2DkZpiA7q1NtgCKFEvc8FQ7dqK7GWFOkuoRKnAjYkOVardSHk7YLBt4cja00ifoXyPUU");
+
+    function payWithStripe(plan) {
+      fetch(`/create-checkout-session?plan=${plan}`, { method: 'POST' })
+        .then(res => res.json())
+        .then(data => stripe.redirectToCheckout({ sessionId: data.id }))
+        .catch(err => console.error(err));
+    }
+
+    ['basic', 'mid', 'pro'].forEach(plan => {
+      const containerId = `paypal-button-container-${plan}`;
+      if (document.getElementById(containerId)) {
+        paypal.Buttons({
+  style: {
+    layout: 'vertical',
+    color: 'blue',
+    shape: 'pill',
+    label: 'paypal'
+  },
+  commit: true,
+
+  createOrder: async function (data, actions) {
+    try {
+      const res = await fetch(`/create-paypal-order?plan=${plan}`, {
+        method: 'POST'
+      });
+      const order = await res.json();
+      if (!order.id) throw new Error("Invalid order response");
+      return order.id;
+    } catch (error) {
+      console.error('Create order failed:', error);
+      alert('Failed to create PayPal order. Please try again.');
+    }
+  },
+
+  onApprove: async function (data, actions) {
+    try {
+      const res = await fetch(`/capture-paypal-order?orderID=${data.orderID}&plan=${plan}`, {
+        method: 'POST'
+      });
+      const result = await res.json();
+      window.location.href = '/dashboard';
+    } catch (error) {
+      console.error('Capture failed:', error);
+      alert('Failed to complete PayPal payment. Please try again.');
+    }
+  },
+
+  onError: function (err) {
+    console.error('PayPal error', err);
+    alert('There was a problem processing your PayPal payment. Please try again.');
+  }
+}).render(`#${containerId}`);
+
+
+      }
+    });
+  </script>
+
+
 
 </body>
-
-<script>
-  // Stripe setup
-  const stripe = Stripe("pk_test_51Rc3suRcmymA4MNb3xRNNBlhZcBsSP2DkZpiA7q1NtgCKFEvc8FQ7dqK7GWFOkuoRKnAjYkOVardSHk7YLBt4cja00ifoXyPUU");
-
-  function payWithStripe(plan) {
-    fetch(`/create-checkout-session?plan=${plan}`, { method: 'POST' })
-      .then(res => res.json())
-      .then(data => stripe.redirectToCheckout({ sessionId: data.id }))
-      .catch(err => console.error(err));
-  }
-
-  // PayPal Buttons
-  ['basic', 'mid', 'pro'].forEach(plan => {
-    const containerId = `paypal-button-container-${plan}`;
-    if (document.getElementById(containerId)) {
-      paypal.Buttons({
-        createOrder: function (data, actions) {
-          return fetch(`/create-paypal-order?plan=${plan}`, { method: 'POST' })
-            .then(res => res.json())
-            .then(order => order.id);
-        },
-        onApprove: function (data, actions) {
-  return fetch(`/capture-paypal-order?orderID=${data.orderID}&plan=${plan}`, {
-    method: 'POST'
-  })
-    .then(res => res.json())
-    .then(() => window.location.href = '/dashboard');
-}
-
-      }).render(`#${containerId}`);
-    }
-  });
-</script>
-
 </html>

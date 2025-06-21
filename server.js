@@ -1,4 +1,6 @@
 // server.js
+const https = require('https');
+const fs = require('fs');
 const express = require('express');
 const session = require('express-session');
 const pgSession = require('connect-pg-simple')(session);
@@ -370,9 +372,22 @@ app.post('/create-checkout-session', async (req, res) => {
   res.json({ id: session.id });
 });
 
+app.get('/payment-success', async (req, res) => {
+  const plan = req.query.plan;
+  const userId = req.session.user.id;
+
+  await pool.query('UPDATE users SET plan = $1 WHERE id = $2', [plan, userId]);
+
+  res.redirect('/dashboard');
+});
+
 app.post('/create-paypal-order', async (req, res) => {
   const plan = req.query.plan;
   const amountMap = { basic: 5, mid: 10, pro: 25 };
+
+  if (!amountMap[plan]) {
+    return res.status(400).json({ error: 'Invalid plan type' });
+  }
 
   try {
     const request = new paypal.orders.OrdersCreateRequest();
@@ -391,27 +406,20 @@ app.post('/create-paypal-order', async (req, res) => {
     res.json({ id: response.result.id });
   } catch (error) {
     console.error('PayPal order creation failed:', error);
-    res.status(500).send('Failed to create PayPal order');
+    res.status(500).json({ error: 'Failed to create PayPal order' });
   }
 });
 
 
-app.get('/payment-success', async (req, res) => {
-  const plan = req.query.plan;
-  const userId = req.session.user.id;
 
-  await pool.query('UPDATE users SET plan = $1 WHERE id = $2', [plan, userId]);
-
-  res.redirect('/dashboard');
-});
 
 app.post('/capture-paypal-order', async (req, res) => {
   const orderID = req.query.orderID;
   const plan = req.query.plan;
   const userId = req.session.user?.id;
 
-  if (!userId || !plan) {
-    return res.status(400).json({ error: 'Missing user or plan information' });
+  if (!orderID || !plan || !userId) {
+    return res.status(400).json({ error: 'Missing orderID, plan, or user session' });
   }
 
   try {
@@ -421,7 +429,7 @@ app.post('/capture-paypal-order', async (req, res) => {
     const response = await paypalClient.execute(request);
     console.log("PayPal capture response:", response);
 
-    // Update the user's plan
+    // Save the user's plan in DB
     await pool.query('UPDATE users SET plan = $1 WHERE id = $2', [plan, userId]);
 
     res.json({ status: 'success' });
@@ -430,6 +438,7 @@ app.post('/capture-paypal-order', async (req, res) => {
     res.status(500).json({ error: 'Capture failed' });
   }
 });
+
 
 
 
@@ -478,7 +487,11 @@ app.get('/logout', (req, res) => {
 
 
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`🎵 TETRA running at http://localhost:${PORT}`);
+const sslOptions = {
+  key: fs.readFileSync(path.join(__dirname, 'certs', 'localhost-key.pem')),
+  cert: fs.readFileSync(path.join(__dirname, 'certs', 'localhost.pem')),
+};
+
+https.createServer(sslOptions, app).listen(PORT, () => {
+  console.log(`HTTPS Server running at https://localhost:${PORT}`);
 });
