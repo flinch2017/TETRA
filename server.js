@@ -15,16 +15,16 @@ const nodemailer = require('nodemailer');
 const cron = require('node-cron');
 const stripe = require('stripe')('sk_test_51Rc3suRcmymA4MNbBS85bMjLg7nFgBGeviOfnHDrd3Y2kZS9oxM39xwJpAANectLnlzZ9H0NVg8JBad8BPfMFxby00yZKq4myf'); // Replace with your real secret key
 
-const YOUR_DOMAIN = 'http://localhost:3000'; // Or your real deployed domain
+const YOUR_DOMAIN = 'https://localhost:3000'; // Or your real deployed domain
 
 const paypal = require('@paypal/checkout-server-sdk');
 
-// Set up PayPal environment
-let environment = new paypal.core.SandboxEnvironment(
-  'AebJ2wnGUtsUgHN_DbPYpcrr6VFml3-MMRKq1VNu9rRFHl4kLpVmiFdRCZnDtiwq1gXLUR6eBxKTVkzy', // Your client ID
-  'EMYhrrYUC5OlGbjjokuzpYt5NXHGATodEXOVzFn8lBCOmkm1Wx-lsD6Y0dYimsYl0vpw-T2CVpf45gRl' // Your PayPal sandbox secret
+let environment = new paypal.core.LiveEnvironment(
+  "AYYBUX4vbKrzzXijC0CpoWHt8HEyX5y76qwy9K39X2CY-O1p3msMxe3y8W4V9V4KdXlUg0jxVyum2oXi",
+  "EMJat2KB46kTVzM6DRQeRXgPbvEevl179Gz5KWn_nDVA8oHLB-qQ7HGpa2JGUOqsKc6fDPcFOGaAELhF"
 );
-let paypalClient = new paypal.core.PayPalHttpClient(environment);
+let client = new paypal.core.PayPalHttpClient(environment);
+
 
 
 
@@ -383,9 +383,9 @@ app.get('/payment-success', async (req, res) => {
 
 app.post('/create-paypal-order', async (req, res) => {
   const plan = req.query.plan;
-  const amountMap = { basic: 5, mid: 10, pro: 25 };
+  const allowedPlans = ['basic', 'mid', 'pro'];
 
-  if (!amountMap[plan]) {
+  if (!allowedPlans.includes(plan)) {
     return res.status(400).json({ error: 'Invalid plan type' });
   }
 
@@ -396,19 +396,22 @@ app.post('/create-paypal-order', async (req, res) => {
       intent: 'CAPTURE',
       purchase_units: [{
         amount: {
-          currency_code: 'USD',
-          value: amountMap[plan].toString()
+          currency_code: 'PHP',       // ✅ Set currency to PHP
+          value: "1.00"               // ✅ Flat rate ₱1.00 for all plans
         }
       }]
     });
 
-    const response = await paypalClient.execute(request);
+    const response = await client.execute(request);
+
     res.json({ id: response.result.id });
   } catch (error) {
     console.error('PayPal order creation failed:', error);
     res.status(500).json({ error: 'Failed to create PayPal order' });
   }
 });
+
+
 
 
 
@@ -426,7 +429,8 @@ app.post('/capture-paypal-order', async (req, res) => {
     const request = new paypal.orders.OrdersCaptureRequest(orderID);
     request.requestBody({});
 
-    const response = await paypalClient.execute(request);
+    const response = await client.execute(request);
+
     console.log("PayPal capture response:", response);
 
     // Save the user's plan in DB
