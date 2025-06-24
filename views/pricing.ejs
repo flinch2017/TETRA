@@ -10,7 +10,7 @@
   <script src="https://js.stripe.com/v3/"></script>
 
   <!-- PayPal JS SDK -->
-  <script src="https://www.paypal.com/sdk/js?client-id=AYYBUX4vbKrzzXijC0CpoWHt8HEyX5y76qwy9K39X2CY-O1p3msMxe3y8W4V9V4KdXlUg0jxVyum2oXi&currency=PHP"></script>
+  <script src="https://www.paypal.com/sdk/js?client-id=AZ3vwRr1sqKm0Fm3jQAP8nkMmkCjaYvGxuSYRBaNvfRNOGSdqAJ_xUXKkn8go9a8eS7oegV6lSFkYorj&currency=USD"></script>
 
   <style>
     body::before {
@@ -118,7 +118,7 @@
           <li>💬 Socialize/Post to feed</li>
           <li>📻 Tetra Radio/Playlisting Request</li>
         </ul>
-        <button onclick="payWithStripe('mid')" class="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600">Pay with Stripe</button>
+
         <div id="paypal-button-container-mid" class="mt-4"></div>
       </div>
 
@@ -144,64 +144,54 @@
   </div>
 
   <script>
-    const stripe = Stripe("pk_test_51Rc3suRcmymA4MNb3xRNNBlhZcBsSP2DkZpiA7q1NtgCKFEvc8FQ7dqK7GWFOkuoRKnAjYkOVardSHk7YLBt4cja00ifoXyPUU");
+  ['basic', 'mid', 'pro'].forEach(plan => {
+    const containerId = `paypal-button-container-${plan}`;
+    if (document.getElementById(containerId)) {
+      paypal.Buttons({
+        style: {
+          layout: 'vertical',
+          color: 'blue',
+          shape: 'pill',
+          label: 'paypal'
+        },
+        commit: true,
 
-    function payWithStripe(plan) {
-      fetch(`/create-checkout-session?plan=${plan}`, { method: 'POST' })
-        .then(res => res.json())
-        .then(data => stripe.redirectToCheckout({ sessionId: data.id }))
-        .catch(err => console.error(err));
+        createOrder: async function (data, actions) {
+          try {
+            const res = await fetch(`/create-paypal-order?plan=${plan}`, {
+              method: 'POST'
+            });
+            const order = await res.json();
+            if (!order.id) throw new Error("Invalid order response");
+            return order.id;
+          } catch (error) {
+            console.error('Create order failed:', error);
+            alert('Failed to create PayPal order. Please try again.');
+          }
+        },
+
+        onApprove: async function (data, actions) {
+          try {
+            const res = await fetch(`/capture-paypal-order?orderID=${data.orderID}&plan=${plan}`, {
+              method: 'POST'
+            });
+            const result = await res.json();
+            window.location.href = '/dashboard';
+          } catch (error) {
+            console.error('Capture failed:', error);
+            alert('Failed to complete PayPal payment. Please try again.');
+          }
+        },
+
+        onError: function (err) {
+          console.error('PayPal error', err);
+          alert('There was a problem processing your PayPal payment. Please try again.');
+        }
+      }).render(`#${containerId}`);
     }
+  });
+</script>
 
-    ['basic', 'mid', 'pro'].forEach(plan => {
-      const containerId = `paypal-button-container-${plan}`;
-      if (document.getElementById(containerId)) {
-        paypal.Buttons({
-  style: {
-    layout: 'vertical',
-    color: 'blue',
-    shape: 'pill',
-    label: 'paypal'
-  },
-  commit: true,
-
-  createOrder: async function (data, actions) {
-    try {
-      const res = await fetch(`/create-paypal-order?plan=${plan}`, {
-        method: 'POST'
-      });
-      const order = await res.json();
-      if (!order.id) throw new Error("Invalid order response");
-      return order.id;
-    } catch (error) {
-      console.error('Create order failed:', error);
-      alert('Failed to create PayPal order. Please try again.');
-    }
-  },
-
-  onApprove: async function (data, actions) {
-    try {
-      const res = await fetch(`/capture-paypal-order?orderID=${data.orderID}&plan=${plan}`, {
-        method: 'POST'
-      });
-      const result = await res.json();
-      window.location.href = '/dashboard';
-    } catch (error) {
-      console.error('Capture failed:', error);
-      alert('Failed to complete PayPal payment. Please try again.');
-    }
-  },
-
-  onError: function (err) {
-    console.error('PayPal error', err);
-    alert('There was a problem processing your PayPal payment. Please try again.');
-  }
-}).render(`#${containerId}`);
-
-
-      }
-    });
-  </script>
 
 
 

@@ -13,17 +13,20 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
 const cron = require('node-cron');
+const crypto = require('crypto');
+const moment = require('moment');
 const stripe = require('stripe')('sk_test_51Rc3suRcmymA4MNbBS85bMjLg7nFgBGeviOfnHDrd3Y2kZS9oxM39xwJpAANectLnlzZ9H0NVg8JBad8BPfMFxby00yZKq4myf'); // Replace with your real secret key
 
 const YOUR_DOMAIN = 'https://localhost:3000'; // Or your real deployed domain
 
 const paypal = require('@paypal/checkout-server-sdk');
 
-let environment = new paypal.core.LiveEnvironment(
-  "AYYBUX4vbKrzzXijC0CpoWHt8HEyX5y76qwy9K39X2CY-O1p3msMxe3y8W4V9V4KdXlUg0jxVyum2oXi",
-  "EMJat2KB46kTVzM6DRQeRXgPbvEevl179Gz5KWn_nDVA8oHLB-qQ7HGpa2JGUOqsKc6fDPcFOGaAELhF"
+let environment = new paypal.core.SandboxEnvironment(
+  "AZ3vwRr1sqKm0Fm3jQAP8nkMmkCjaYvGxuSYRBaNvfRNOGSdqAJ_xUXKkn8go9a8eS7oegV6lSFkYorj",
+  "ECDyl6qPiT5vgCFu0VlDHPZWNTj_4aivacNjo02gNjT63dzvTHeomI6r5IO6v07dExweU1pX6V3gNucb"
 );
-let client = new paypal.core.PayPalHttpClient(environment);
+
+const client = new paypal.core.PayPalHttpClient(environment);
 
 
 
@@ -312,7 +315,7 @@ app.post('/verify-otp', async (req, res) => {
 
     const user = result.rows[0];
 
-    // Check if OTP matches and has not expired
+    // Check if OTP matches and is not expired
     if (user.otp !== otp || new Date(user.otp_expires) < new Date()) {
       return res.render('auth', {
         error: 'Invalid or expired OTP. Please try again.',
@@ -320,17 +323,35 @@ app.post('/verify-otp', async (req, res) => {
       });
     }
 
-    // Mark user as verified
+    // Generate 20-character acode: YYYYMMDD-XXXXXXXX
+    const generateUniqueAcode = async () => {
+      const date = new Date();
+      const yyyy = date.getFullYear().toString();
+      const mm = String(date.getMonth() + 1).padStart(2, '0');
+      const dd = String(date.getDate()).padStart(2, '0');
+      const datePart = `${yyyy}${mm}${dd}`;
+      
+      while (true) {
+        const randomPart = crypto.randomBytes(4).toString('hex'); // 8 chars
+        const acode = `${datePart}-${randomPart}`;
+        const check = await pool.query('SELECT 1 FROM users WHERE acode = $1', [acode]);
+        if (check.rowCount === 0) return acode;
+      }
+    };
+
+    const acode = await generateUniqueAcode();
+
+    // Mark user as verified and save acode
     await pool.query(
-      `UPDATE users SET verified = true, otp = NULL, otp_expires = NULL WHERE email = $1`,
-      [email]
+      `UPDATE users SET verified = true, otp = NULL, otp_expires = NULL, acode = $1 WHERE email = $2`,
+      [acode, email]
     );
 
     // Create session
     req.session.user = {
       id: user.id,
       username: user.username,
-      email: user.email,
+      email: user.email
     };
 
     res.redirect('/pricing');
@@ -389,6 +410,13 @@ app.post('/create-paypal-order', async (req, res) => {
     return res.status(400).json({ error: 'Invalid plan type' });
   }
 
+  // Define prices in USD
+  const prices = {
+    basic: "5.00",
+    mid: "10.00",
+    pro: "25.00"
+  };
+
   try {
     const request = new paypal.orders.OrdersCreateRequest();
     request.prefer('return=representation');
@@ -396,8 +424,8 @@ app.post('/create-paypal-order', async (req, res) => {
       intent: 'CAPTURE',
       purchase_units: [{
         amount: {
-          currency_code: 'PHP',       // ✅ Set currency to PHP
-          value: "1.00"               // ✅ Flat rate ₱1.00 for all plans
+          currency_code: 'USD',       // 💵 Use USD for these values
+          value: prices[plan]
         }
       }]
     });
@@ -410,6 +438,7 @@ app.post('/create-paypal-order', async (req, res) => {
     res.status(500).json({ error: 'Failed to create PayPal order' });
   }
 });
+
 
 
 
@@ -433,8 +462,11 @@ app.post('/capture-paypal-order', async (req, res) => {
 
     console.log("PayPal capture response:", response);
 
-    // Save the user's plan in DB
-    await pool.query('UPDATE users SET plan = $1 WHERE id = $2', [plan, userId]);
+    // Save the user's plan and subscription date (with timezone)
+    await pool.query(
+      'UPDATE users SET plan = $1, sub_date = NOW() AT TIME ZONE \'Asia/Manila\' WHERE id = $2',
+      [plan, userId]
+    );
 
     res.json({ status: 'success' });
   } catch (err) {
@@ -448,33 +480,62 @@ app.post('/capture-paypal-order', async (req, res) => {
 
 
 
+
 app.get('/dashboard', async (req, res) => {
   if (!req.session.user) {
     return res.redirect('/login'); // Redirect if not logged in
   }
 
   try {
-    const result = await pool.query(
+    // 1. Check the user's plan
+    const userResult = await pool.query(
       'SELECT plan FROM users WHERE id = $1',
       [req.session.user.id]
     );
 
-    if (result.rowCount === 0) {
-      return res.redirect('/login'); // In case user no longer exists
+    if (userResult.rowCount === 0) {
+      return res.redirect('/login');
     }
 
-    const userPlan = result.rows[0].plan;
+    const userPlan = userResult.rows[0].plan;
 
     if (!userPlan || userPlan === 'none') {
       return res.redirect('/pricing');
     }
 
-    res.render('dashboard', { user: req.session.user });
+    // 2. Fetch posts ordered by most recent
+    const postsResult = await pool.query(
+      `SELECT p.*, u.username
+       FROM posts p
+       JOIN users u ON u.acode = p.acode
+       ORDER BY p.date DESC`
+    );
+
+    const posts = postsResult.rows.map(post => ({
+      post_id: post.post_id,
+      username: post.username,
+      caption: post.caption,
+      images: post.image || [],
+      tracks: post.track || [],
+      videos: post.video || [],
+      timeAgo: moment(post.date).fromNow()
+    }));
+
+    // 3. Render the dashboard with posts
+    res.render('dashboard', {
+      user: req.session.user,
+      posts
+    });
 
   } catch (error) {
     console.error('Dashboard error:', error);
     res.status(500).send('Something went wrong.');
   }
+});
+
+
+app.get('/create-post', (req, res) => {
+  res.render('posting'); // Make sure create-post.ejs exists in your views directory
 });
 
 

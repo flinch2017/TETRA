@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Create Post | TETRA</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #0a0f2c;
+      color: white;
+    }
+
+    .form-container {
+      width: 100%;
+      max-width: 600px;
+      margin: 3rem auto;
+      background: rgba(20, 25, 50, 0.9);
+      border-radius: 20px;
+      padding: 2.5rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    h2 {
+      margin-bottom: 2rem;
+      text-align: center;
+      font-size: 1.9rem;
+      color: #ffffff;
+      letter-spacing: 1px;
+    }
+
+    label {
+      display: block;
+      margin-top: 1.5rem;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: #b8c8ff;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 0.9rem 1rem;
+      border-radius: 10px;
+      border: none;
+      font-size: 1rem;
+      background: #141c3a;
+      color: white;
+      resize: vertical;
+      box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.25);
+    }
+
+    .file-label {
+      display: inline-block;
+      margin-top: 0.75rem;
+      background-color: #1f2a50;
+      padding: 0.65rem 1.2rem;
+      border-radius: 10px;
+      cursor: pointer;
+      color: #a6c0ff;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+    }
+
+    .file-label:hover {
+      background-color: #27345d;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .preview-container {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      margin-top: 1rem;
+      padding-bottom: 0.5rem;
+      flex-wrap: nowrap;
+    }
+
+    .preview-wrapper {
+      position: relative;
+      display: inline-block;
+    }
+
+    .preview-wrapper img,
+    .preview-wrapper video {
+      max-height: 100px;
+      border-radius: 10px;
+      object-fit: cover;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .remove-btn {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background-color: rgba(0, 0, 0, 0.7);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      font-size: 0.8rem;
+      cursor: pointer;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .button-group {
+      margin-top: 2.2rem;
+      display: flex;
+      justify-content: center;
+    }
+
+    button[type="submit"] {
+      background-color: #007aff;
+      color: white;
+      border: none;
+      padding: 0.85rem 2.2rem;
+      border-radius: 12px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button[type="submit"]:hover {
+      background-color: #005fc1;
+    }
+
+    .back {
+      display: block;
+      margin-top: 2rem;
+      text-align: center;
+      color: #7baaff;
+      text-decoration: none;
+      font-size: 0.95rem;
+    }
+
+    .back:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 600px) {
+  .form-container {
+    padding: 1.5rem;
+    margin: 1.5rem 1rem;
+    border-radius: 14px;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  label {
+    font-size: 0.9rem;
+  }
+
+  textarea {
+    font-size: 0.95rem;
+    padding: 0.75rem 0.9rem;
+  }
+
+  .file-label {
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .preview-wrapper img,
+  .preview-wrapper video {
+    max-height: 80px;
+  }
+
+  button[type="submit"] {
+    width: 100%;
+    font-size: 0.95rem;
+    padding: 0.75rem;
+  }
+
+  .button-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .back {
+    font-size: 0.9rem;
+    margin-top: 1.5rem;
+  }
+}
+
+  </style>
+  <style>
+  header {
+  background: #050a1f;
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #007aff;
+}
+
+ @media (max-width: 600px) {
+  html, body {
+    overflow-x: hidden;
+  }
+
+  .form-container {
+    max-width: 100%;
+    padding: 1rem;
+    margin: 1rem;
+    border-radius: 12px;
+  }
+
+  h2 {
+    font-size: 1.4rem;
+    line-height: 1.3;
+  }
+
+  label {
+    font-size: 0.9rem;
+    margin-top: 1rem;
+  }
+
+  textarea {
+    font-size: 0.95rem;
+    padding: 0.75rem;
+  }
+
+  .file-label {
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .preview-container {
+    padding-bottom: 0.5rem;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .preview-wrapper img,
+  .preview-wrapper video {
+    max-height: 70px;
+    width: auto;
+  }
+
+  .remove-btn {
+    top: -6px;
+    right: -6px;
+    width: 22px;
+    height: 22px;
+    font-size: 0.75rem;
+  }
+
+  .button-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  button[type="submit"] {
+    width: 100%;
+    font-size: 1rem;
+    padding: 0.75rem;
+  }
+
+  .back {
+    font-size: 0.9rem;
+    margin-top: 1.5rem;
+  }
+
+  header {
+    padding: 1rem;
+  }
+
+  .logo {
+    font-size: 1.25rem;
+  }
+}
+
+</style>
+</head>
+<body>
+
+<%- include('partials/console_header') %>
+
+<div class="form-container">
+  <h2>Create a New Post</h2>
+  <form action="/create-post" method="POST" enctype="multipart/form-data">
+    <label for="caption">What's on your mind?</label>
+    <textarea name="caption" id="caption" rows="4" required placeholder="Write a caption..."></textarea>
+
+    <!-- Preview Section -->
+    <div class="preview-container" id="previewContainer"></div>
+
+    <!-- Upload Inputs -->
+    <label class="file-label" for="images">📷 Attach Images</label>
+    <input type="file" id="images" accept="image/*" multiple />
+
+    <label class="file-label" for="videos">🎥 Attach Videos</label>
+    <input type="file" id="videos" accept="video/*" multiple />
+
+    <!-- Hidden inputs to hold the selected files -->
+    <input type="file" name="images" id="imagesInput" accept="image/*" multiple hidden />
+    <input type="file" name="videos" id="videosInput" accept="video/*" multiple hidden />
+
+    <div class="button-group">
+      <button type="submit">Post</button>
+    </div>
+  </form>
+
+  <a class="back" href="/dashboard">← Back to Dashboard</a>
+</div>
+
+<script>
+  const images = document.getElementById('images');
+  const videos = document.getElementById('videos');
+  const previewContainer = document.getElementById('previewContainer');
+  let selectedFiles = [];
+
+  function updatePreview() {
+    previewContainer.innerHTML = '';
+    selectedFiles.forEach((file, index) => {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'preview-wrapper';
+
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'remove-btn';
+        removeBtn.innerText = '✖';
+        removeBtn.onclick = () => {
+          selectedFiles.splice(index, 1);
+          updatePreview();
+        };
+
+        const media = document.createElement(file.type.startsWith('video') ? 'video' : 'img');
+        media.src = e.target.result;
+        if (file.type.startsWith('video')) {
+          media.controls = true;
+          media.muted = true;
+        }
+
+        wrapper.appendChild(removeBtn);
+        wrapper.appendChild(media);
+        previewContainer.appendChild(wrapper);
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function handleFiles(inputFiles, type) {
+    const filesArray = Array.from(inputFiles);
+
+    for (let file of filesArray) {
+      if (type === 'image') {
+        if (!file.type.startsWith('image/')) continue;
+        if (file.size > 5 * 1024 * 1024) {
+          alert(`${file.name} is too large. Max size is 5MB.`);
+          continue;
+        }
+        const imageCount = selectedFiles.filter(f => f.type.startsWith('image/')).length;
+        if (imageCount >= 5) {
+          alert('You can only upload up to 5 images.');
+          return;
+        }
+        selectedFiles.push(file);
+      }
+
+      if (type === 'video') {
+        if (!file.type.startsWith('video/')) continue;
+        if (file.size > 10 * 1024 * 1024) {
+          alert(`${file.name} is too large. Max size is 10MB.`);
+          continue;
+        }
+        const hasVideo = selectedFiles.some(f => f.type.startsWith('video/'));
+        if (hasVideo) {
+          alert('You can only upload 1 video.');
+          return;
+        }
+        selectedFiles.push(file);
+      }
+    }
+
+    updatePreview();
+  }
+
+  images.addEventListener('change', () => handleFiles(images.files, 'image'));
+  videos.addEventListener('change', () => handleFiles(videos.files, 'video'));
+
+  document.querySelector('form').addEventListener('submit', function (e) {
+    const dataTransferImages = new DataTransfer();
+    const dataTransferVideos = new DataTransfer();
+
+    selectedFiles.forEach(file => {
+      if (file.type.startsWith('image/')) {
+        dataTransferImages.items.add(file);
+      } else if (file.type.startsWith('video/')) {
+        dataTransferVideos.items.add(file);
+      }
+    });
+
+    document.getElementById('imagesInput').files = dataTransferImages.files;
+    document.getElementById('videosInput').files = dataTransferVideos.files;
+  });
+</script>
+
+
+</body>
+</html>
