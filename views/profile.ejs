@@ -123,6 +123,33 @@
         height: 40px;
       }
     }
+
+    .releases-wrapper {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.release-block {
+  flex: 1;
+  min-width: 250px;
+}
+
+.release-title {
+  font-size: 1.1rem;
+  color: #1db954;
+  margin-bottom: 0.75rem;
+}
+
+.release-meta {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.song-item.no-border {
+  border: none;
+}
+
   </style>
 </head>
 <body>
@@ -143,7 +170,7 @@
   <main class="artist-profile">
     <!-- Popular Songs Section -->
     <div class="section">
-      <h2>Popular</h2>
+      <h2>Popular Songs</h2>
       <% artist.songs.forEach(song => { %>
         <div class="song-item">
           <div class="song-info">
@@ -158,6 +185,48 @@
         </div>
       <% }) %>
     </div>
+
+    <!-- Latest & Popular Releases Section -->
+<div class="section">
+  <h2>Latest Release | Popular Release</h2>
+  <div class="releases-wrapper">
+    <!-- Latest Release -->
+    <div class="release-block">
+      <h3 class="release-title">Latest Release</h3>
+      <div class="song-item no-border">
+        <div class="song-info">
+          <img src="/uploads/latest.jpg" alt="Latest Release">
+          <div>
+            <div class="song-title">Aurora Pulse</div>
+            <div class="release-meta">Released on Jun 20, 2025</div>
+          </div>
+        </div>
+        <div class="song-actions">
+          <i class="fas fa-play"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Popular Release -->
+    <div class="release-block">
+      <h3 class="release-title">Popular Release</h3>
+      <div class="song-item no-border">
+        <div class="song-info">
+          <img src="/uploads/popular.jpg" alt="Popular Release">
+          <div>
+            <div class="song-title">Neon Rain</div>
+            <div class="release-meta">2.4M streams</div>
+          </div>
+        </div>
+        <div class="song-actions">
+          <i class="fas fa-play"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 
     <!-- More About the Artist -->
     <div class="section">
