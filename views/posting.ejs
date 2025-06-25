@@ -215,30 +215,37 @@
   }
 
   .form-container {
-    max-width: 100%;
-    padding: 1rem;
-    margin: 1rem;
-    border-radius: 12px;
+    max-width: 90%;
+    padding: 0.75rem;
+    margin: 0.5rem auto;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   }
 
   h2 {
-    font-size: 1.4rem;
-    line-height: 1.3;
+    font-size: 1.3rem;
+    line-height: 1.2;
+    text-align: center;
   }
 
   label {
-    font-size: 0.9rem;
-    margin-top: 1rem;
+    font-size: 0.85rem;
+    margin-top: 0.75rem;
   }
 
   textarea {
-    font-size: 0.95rem;
-    padding: 0.75rem;
-  }
+  font-size: 0.9rem;
+  padding: 0.6rem;
+  width: 100%;              /* Ensure it doesn't exceed parent width */
+  box-sizing: border-box;   /* Includes padding in width calculation */
+  resize: vertical;         /* Prevent horizontal resizing on mobile */
+  overflow-x: hidden;       /* Hide accidental horizontal overflow */
+}
+
 
   .file-label {
-    padding: 0.6rem 1rem;
-    font-size: 0.9rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
   }
 
   .preview-container {
@@ -249,42 +256,85 @@
 
   .preview-wrapper img,
   .preview-wrapper video {
-    max-height: 70px;
+    max-height: 60px;
     width: auto;
   }
 
   .remove-btn {
-    top: -6px;
-    right: -6px;
-    width: 22px;
-    height: 22px;
-    font-size: 0.75rem;
+    top: -5px;
+    right: -5px;
+    width: 20px;
+    height: 20px;
+    font-size: 0.7rem;
   }
 
   .button-group {
     flex-direction: column;
     align-items: stretch;
+    gap: 0.5rem;
   }
 
   button[type="submit"] {
     width: 100%;
-    font-size: 1rem;
-    padding: 0.75rem;
+    font-size: 0.95rem;
+    padding: 0.65rem;
   }
 
   .back {
-    font-size: 0.9rem;
-    margin-top: 1.5rem;
+    font-size: 0.85rem;
+    margin-top: 1rem;
+    text-align: center;
   }
 
   header {
-    padding: 1rem;
+    padding: 0.75rem;
   }
 
   .logo {
-    font-size: 1.25rem;
+    font-size: 1.2rem;
   }
 }
+
+.alert-box {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #4BB543; /* Green */
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  z-index: 9999;
+}
+
+.alert-box.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.alert-box.hidden {
+  display: none;
+}
+
+.checkmark {
+  font-size: 1.3rem;
+  animation: popIn 0.3s ease forwards;
+}
+
+@keyframes popIn {
+  0% { transform: scale(0); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+
 
 </style>
 </head>
@@ -294,7 +344,7 @@
 
 <div class="form-container">
   <h2>Create a New Post</h2>
-  <form action="/create-post" method="POST" enctype="multipart/form-data">
+  <form id="postForm" action="/create-post" method="POST" enctype="multipart/form-data">
     <label for="caption">What's on your mind?</label>
     <textarea name="caption" id="caption" rows="4" required placeholder="Write a caption..."></textarea>
 
@@ -319,6 +369,12 @@
 
   <a class="back" href="/dashboard">← Back to Dashboard</a>
 </div>
+
+<div id="alertBox" class="alert-box hidden">
+  <span class="checkmark">✔</span>
+  <span id="alertMessage"></span>
+</div>
+
 
 <script>
   const images = document.getElementById('images');
@@ -411,6 +467,49 @@
     document.getElementById('imagesInput').files = dataTransferImages.files;
     document.getElementById('videosInput').files = dataTransferVideos.files;
   });
+
+  const form = document.querySelector('#postForm');
+const alertBox = document.getElementById('alertBox');
+const alertMessage = document.getElementById('alertMessage');
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const formData = new FormData(form);
+
+  try {
+    const response = await fetch('/create-post', {
+      method: 'POST',
+      body: formData
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      alertMessage.textContent = result.message;
+
+      // Show alert box with animation
+      alertBox.classList.remove('hidden');
+      setTimeout(() => alertBox.classList.add('show'), 10);
+
+      // After 2 seconds, fade out and redirect
+      setTimeout(() => {
+        alertBox.classList.remove('show');
+        setTimeout(() => {
+          alertBox.classList.add('hidden');
+          window.location.href = '/dashboard';
+        }, 400); // match CSS transition time
+      }, 2000);
+
+    } else {
+      alert('Error: ' + result.message);
+    }
+  } catch (error) {
+    alert('Network error');
+  }
+});
+
+
 </script>
 
 

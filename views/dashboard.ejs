@@ -244,6 +244,35 @@
   }
 }
 
+.media-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  overflow: hidden;
+}
+
+.fancy-loader {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 40px;
+  height: 40px;
+  margin: -20px;
+  border-radius: 50%;
+  background: rgba(0, 122, 255, 0.6);
+  animation: pulse 1s infinite ease-in-out;
+  z-index: 2;
+}
+
+.media-wrapper.loaded .fancy-loader {
+  display: none;
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.95); opacity: 0.7; }
+  50% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(0.95); opacity: 0.7; }
+}
 
   </style>
 </head>
@@ -257,27 +286,32 @@
     </div>
   <% } else { %>
     <% posts.forEach(post => { %>
-      <div class="post">
-        <h3>@<%= post.username %></h3>
-        <p><%= post.caption %></p>
+  <div class="post">
+    <h3>@<%= post.username %></h3>
+    <p><%= post.caption %></p>
 
-        <% post.images.forEach(img => { %>
-          <img src="/uploads/<%= img %>" alt="Post image" />
-        <% }) %>
-
-        <% post.tracks.forEach(track => { %>
-          <audio controls src="/uploads/<%= track %>"></audio>
-        <% }) %>
-
-        <% post.videos.forEach(video => { %>
-          <video controls src="/uploads/<%= video %>" width="100%"></video>
-        <% }) %>
-
-        <div class="timestamp">Posted <%= post.timeAgo %></div>
-      </div>
+    <% post.images.forEach(imgUrl => { 
+         const filename = imgUrl.split('/').pop(); %>
+      <img src="/media/image/<%= filename %>" alt="Post image" />
     <% }) %>
+
+    <% post.tracks.forEach(trackUrl => {
+         const filename = trackUrl.split('/').pop(); %>
+      <audio controls src="/media/audio/<%= filename %>"></audio>
+    <% }) %>
+
+    <% post.videos.forEach(videoUrl => {
+         const filename = videoUrl.split('/').pop(); %>
+      <video controls src="/media/video/<%= filename %>" width="100%"></video>
+    <% }) %>
+
+    <div class="timestamp">Posted <%= post.timeAgo %></div>
+  </div>
+<% }) %>
+
   <% } %>
 </main>
+
 
 <a href="/create-post" class="floating-plus" title="Create Post">+</a>
 
@@ -326,7 +360,11 @@
       plusButton.classList.remove('up');
     }
   });
+
+  
 </script>
+
+
 
 
 
