@@ -4,7 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Music Dashboard | TETRA</title>
-  <link rel="stylesheet" href="/styles.css" />
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
     body {
   margin: 0;
@@ -274,6 +275,91 @@
   100% { transform: scale(0.95); opacity: 0.7; }
 }
 
+.post-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.post-profile-pic {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #ccc url('/path-to-placeholder.jpg') center/cover no-repeat;
+  border: 2px solid #007aff;
+}
+
+.post-username {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.media-carousel {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.media-track {
+  display: flex;
+  transition: transform 0.3s ease;
+}
+
+.media-item {
+  min-width: 100%;
+  flex-shrink: 0;
+  padding-right: 0.5rem;
+}
+
+.media-item img,
+.media-item video {
+  width: 100%;
+  border-radius: 10px;
+}
+
+.carousel-btn {
+  display: none;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.4);
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  z-index: 5;
+  border-radius: 50%;
+}
+
+.carousel-btn.left {
+  left: 10px;
+}
+
+.carousel-btn.right {
+  right: 10px;
+}
+
+@media (min-width: 601px) {
+  .post:hover .carousel-btn {
+    display: block;
+  }
+}
+
+@media (max-width: 600px) {
+  .media-track {
+    scroll-snap-type: x mandatory;
+    overflow-x: auto;
+  }
+
+  .media-item {
+    scroll-snap-align: start;
+  }
+}
+
+
   </style>
 </head>
 <body>
@@ -287,7 +373,11 @@
   <% } else { %>
     <% posts.forEach(post => { %>
   <div class="post">
-    <h3>@<%= post.username %></h3>
+    <div class="post-header">
+  <div class="post-profile-pic"></div>
+  <div class="post-username"><%= post.username %></div>
+</div>
+
     <p><%= post.caption %></p>
 
     <% post.images.forEach(imgUrl => { 
