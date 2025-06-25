@@ -1,0 +1,222 @@
+<style>
+    .floating-plus {
+  position: fixed;
+  bottom: 70px;
+  right: 20px;
+  background-color: #007aff;
+  color: white;
+  font-size: 1rem;
+  width: 90px;
+  height: 40px;
+  border-radius: 999px;
+  box-shadow: 0 3px 10px rgba(0, 122, 255, 0.4);
+  text-decoration: none;
+  transition: background-color 0.3s ease, transform 0.2s ease, bottom 0.3s ease;
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+
+.floating-plus:hover {
+  background-color: #005fc1;
+  transform: scale(1.1);
+}
+
+.floating-plus.up {
+  bottom: 440px; /* Matches expanded drawer height + spacing */
+}
+
+.music-drawer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #101840;
+  color: white;
+  transition: height 0.3s ease, transform 0.3s ease;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.4);
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  overflow: hidden;
+  z-index: 900;
+}
+
+.music-drawer.collapsed {
+  height: 60px;
+}
+
+.music-drawer.expanded {
+  height: 430px;
+}
+
+.music-bar {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1rem;
+  cursor: pointer;
+  background-color: #18214d;
+}
+
+.music-bar .track-info {
+  font-size: 0.9rem;
+}
+
+.music-bar .controls button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.2rem;
+  margin-left: 0.5rem;
+  cursor: pointer;
+}
+
+.music-expanded {
+  padding: 1rem;
+  display: none;
+  text-align: center;
+}
+
+.music-drawer.expanded .music-expanded {
+  display: block;
+}
+
+.album-art {
+  width: 120px;
+  height: 120px;
+  border-radius: 12px;
+  margin: 0 auto 1rem;
+  display: block;
+}
+
+.track-details {
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.artist {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 1rem;
+}
+
+.seekbar {
+  width: 90%;
+  margin: 0 auto 1rem;
+}
+
+.seekbar input[type="range"] {
+  width: 100%;
+  height: 6px;
+  background: #ccc;
+  border-radius: 5px;
+  accent-color: #007aff;
+  appearance: none;
+  outline: none;
+}
+
+.expanded-controls {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+.expanded-controls button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.6rem;
+  cursor: pointer;
+}
+
+@media screen and (max-width: 600px) {
+
+  .floating-plus {
+    width: 50px;
+    height: 50px;
+    font-size: 1.8rem;
+    bottom: 65px;
+    right: 20px;
+  }
+
+  .floating-plus.up {
+    bottom: 420px;
+  }
+
+  .album-art {
+    width: 90px;
+    height: 90px;
+  }
+
+  .track-details {
+    font-size: 0.95rem;
+  }
+
+  .artist {
+    font-size: 0.75rem;
+  }
+
+  .expanded-controls button {
+    font-size: 1.4rem;
+  }
+
+  .music-drawer.expanded {
+    height: 410px;
+  }
+}
+</style>
+
+<a href="/create-post" class="floating-plus" title="Create Post">+</a>
+
+<!-- Peeking Music Bar / Player -->
+<div id="musicDrawer" class="music-drawer collapsed">
+  <div class="music-bar">
+    <div class="track-info">
+      <strong>Now Playing:</strong> Electric Sunrise — AuroraDreams
+    </div>
+    <div class="controls">
+      <button>⏯</button>
+      <button>⏭</button>
+    </div>
+  </div>
+  <div class="music-expanded">
+  <img src="/uploads/electric-sunrise-cover.jpg" alt="Album Art" class="album-art">
+  <div class="track-details">Electric Sunrise</div>
+  <div class="artist">AuroraDreams</div>
+
+  <div class="seekbar">
+    <input type="range" min="0" max="100" value="40" />
+  </div>
+
+  <div class="expanded-controls">
+    <button>⏮</button>
+    <button>⏯</button>
+    <button>⏭</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+  const drawer = document.getElementById('musicDrawer');
+  const bar = drawer.querySelector('.music-bar');
+  const plusButton = document.querySelector('.floating-plus');
+
+  bar.addEventListener('click', () => {
+    const isExpanded = drawer.classList.contains('expanded');
+    drawer.classList.toggle('expanded');
+    drawer.classList.toggle('collapsed');
+
+    if (!isExpanded) {
+      plusButton.classList.add('up');
+    } else {
+      plusButton.classList.remove('up');
+    }
+  });
+
+  
+</script>

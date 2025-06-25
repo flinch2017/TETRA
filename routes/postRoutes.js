@@ -32,6 +32,37 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+async function compCheck(req, res, next) {
+  try {
+    if (!req.session.user || !req.session.user.acode) {
+      // Not logged in
+      return res.redirect('/login');
+    }
+
+    // Query user from DB to check plan
+    const result = await pool.query('SELECT plan FROM users WHERE acode = $1', [req.session.user.acode]);
+
+    if (result.rows.length === 0) {
+      // User not found in DB — redirect to login or error
+      return res.redirect('/login');
+    }
+
+    const userPlan = result.rows[0].plan;
+
+    if (!userPlan) {
+      // Plan is null or missing, restrict access
+      return res.redirect('/pricing');
+    }
+
+    // User has a plan, proceed
+    next();
+
+  } catch (err) {
+    console.error('Error checking user plan:', err);
+    res.status(500).send('Internal Server Error');
+  }
+}
+
 function generatePostId(length = 20) {
   return crypto.randomBytes(30).toString('base64').replace(/[^a-zA-Z0-9]/g, '').substring(0, length);
 }
@@ -393,8 +424,7 @@ router.post('/capture-paypal-order', async (req, res) => {
 
 
 
-router.get('/dashboard', async (req, res) => {
-  if (!req.session.user) return res.redirect('/login');
+router.get('/dashboard', compCheck, async (req, res) => {
 
   try {
     const userResult = await pool.query(
@@ -515,6 +545,26 @@ router.get('/media/:type/:filename', async (req, res) => {
     console.error('Error generating presigned URL:', err);
     res.status(500).send('Error generating media link');
   }
+});
+
+
+router.get('/profile', async (req, res) => {
+  const user = req.session.user;
+
+  // Simulated artist data (replace with DB fetch later if needed)
+  const artist = {
+    name: user.username || 'Unknown Artist',
+    bannerUrl: '/uploads/artist-banner.jpg', // fallback image path
+    followers: '34,209',
+    bio: 'This artist blends soulful melodies with futuristic production. Known for electrifying performances and genre-defying music.',
+    songs: [
+      { title: 'Echoes of Tomorrow', coverUrl: '/uploads/track1.jpg' },
+      { title: 'Neon Rain', coverUrl: '/uploads/track2.jpg' },
+      { title: 'Dreams in Motion', coverUrl: '/uploads/track3.jpg' },
+    ],
+  };
+
+  res.render('profile', { artist });
 });
 
 

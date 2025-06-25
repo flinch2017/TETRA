@@ -21,6 +21,7 @@
       padding: 2.5rem;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
       border: 1px solid rgba(255, 255, 255, 0.05);
+      margin-top: 40px !important;
     }
 
     h2 {
@@ -340,7 +341,9 @@
 </head>
 <body>
 
-<%- include('partials/console_header') %>
+<div class="fixed-header">
+    <%- include('partials/console_header') %>
+  </div>
 
 <div class="form-container">
   <h2>Create a New Post</h2>

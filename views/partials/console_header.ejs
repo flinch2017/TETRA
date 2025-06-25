@@ -1,3 +1,5 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css" />
+
 <style>
   header {
     background: #050a1f;
@@ -114,33 +116,55 @@
       gap: 1rem;
     }
   }
+
+.fixed-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 10000;
+  background-color: #0a0f2c;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+body {
+  padding-top: 60px; /* applies padding to the body globally */
+}
+
+main.newsfeed,
+main.form-container {
+  padding-top: 60px; /* If you want main sections to reset or adjust differently */
+}
+
+
 </style>
 
 <header>
   <div class="logo">TETRA</div>
   <div class="nav-links">
-    <a href="/charts" class="nav-item">
-      <span class="nav-icon">📊</span>
-      <span class="nav-label">Charts</span>
-    </a>
-    <a href="/messages" class="nav-item">
-      <span class="nav-icon">💬</span>
-      <span class="nav-label">Messages</span>
-      <span class="notification-badge">2</span>
-    </a>
-    <a href="/notifications" class="nav-item">
-      <span class="nav-icon">🔔</span>
-      <span class="nav-label">Notifications</span>
-      <span class="notification-badge">3</span>
-    </a>
-    <div class="profile-container" id="profileDropdown">
-      <div class="profile-pic"></div>
-      <div class="dropdown">
-        <a href="/profile">See Profile</a>
-        <a href="/logout">Logout</a>
-      </div>
+  <a href="/charts" class="nav-item">
+    <span class="nav-icon"><i class="fas fa-chart-bar"></i></span>
+    <span class="nav-label">Charts</span>
+  </a>
+  <a href="/messages" class="nav-item">
+    <span class="nav-icon"><i class="fas fa-comments"></i></span>
+    <span class="nav-label">Messages</span>
+    <span class="notification-badge">2</span>
+  </a>
+  <a href="/notifications" class="nav-item">
+    <span class="nav-icon"><i class="fas fa-bell"></i></span>
+    <span class="nav-label">Notifications</span>
+    <span class="notification-badge">3</span>
+  </a>
+  <div class="profile-container" id="profileDropdown">
+    <div class="profile-pic"></div>
+    <div class="dropdown">
+      <a href="/profile">See Profile</a>
+      <a href="/logout">Logout</a>
     </div>
   </div>
+</div>
+
 </header>
 
 <script>

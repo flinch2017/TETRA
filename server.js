@@ -62,6 +62,9 @@ app.use(
 
 
 
+
+
+
 // Helper to check if username or email already exists
 async function userExists(username, email) {
   const result = await pool.query(
