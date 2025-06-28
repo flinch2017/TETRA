@@ -3,6 +3,7 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const uploadToS3 = require('../utils/uploadToS3');
+const { encrypt, decrypt } = require('../utils/encryption.js');
 const pool = require('../utils/db');
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
@@ -66,6 +67,8 @@ async function compCheck(req, res, next) {
 function generatePostId(length = 20) {
   return crypto.randomBytes(30).toString('base64').replace(/[^a-zA-Z0-9]/g, '').substring(0, length);
 }
+
+
 
 
 
@@ -302,11 +305,14 @@ router.post('/verify-otp', async (req, res) => {
 
     const acode = await generateUniqueAcode();
 
-    // Mark user as verified and save acode
-    await pool.query(
-      `UPDATE users SET verified = true, otp = NULL, otp_expires = NULL, acode = $1 WHERE email = $2`,
-      [acode, email]
-    );
+    // Mark user as verified, set account_mode to 'regular', and save acode
+await pool.query(
+  `UPDATE users 
+   SET verified = true, otp = NULL, otp_expires = NULL, acode = $1, account_mode = 'regular'
+   WHERE email = $2`,
+  [acode, email]
+);
+
 
     // Create session
     req.session.user = {
@@ -425,18 +431,30 @@ router.post('/capture-paypal-order', async (req, res) => {
 
 
 router.get('/dashboard', compCheck, async (req, res) => {
-
   try {
+    // Fetch plan, pfp_url, and acode of the current user
     const userResult = await pool.query(
-      'SELECT plan FROM users WHERE id = $1',
+      'SELECT plan, pfp_url, acode FROM users WHERE id = $1',
       [req.session.user.id]
     );
 
-    const userPlan = userResult.rows[0]?.plan;
+    const userRow = userResult.rows[0];
+    const userPlan = userRow?.plan;
+
     if (!userPlan || userPlan === 'none') return res.redirect('/pricing');
 
+    // Generate presigned URL for logged-in user's own profile pic
+    let presignedPfpUrl;
+    if (userRow?.pfp_url) {
+      const filename = userRow.pfp_url.split('/').pop();
+      presignedPfpUrl = await generatePresignedUrl(`pfp/${filename}`);
+    } else {
+      presignedPfpUrl = await generatePresignedUrl('drawables/default_pfp.png');
+    }
+
+    // Fetch posts including poster's artist_name, username, acode, and pfp_url
     const postsResult = await pool.query(
-      `SELECT p.*, u.username 
+      `SELECT p.*, u.username, u.artist_name, u.acode, u.pfp_url
        FROM posts p
        JOIN users u ON u.acode = p.acode
        ORDER BY p.date DESC`
@@ -462,19 +480,28 @@ router.get('/dashboard', compCheck, async (req, res) => {
         return await generatePresignedUrl(`videos/${filename}`);
       }));
 
+      // Generate presigned URL for poster's profile pic
+      const presignedPosterPfpUrl = post.pfp_url
+        ? await generatePresignedUrl(`pfp/${path.basename(post.pfp_url)}`)
+        : await generatePresignedUrl('drawables/default_pfp.png');
+
       return {
         post_id: post.post_id,
-        username: post.username,
+        acode: post.acode,  // for linking to profile
         caption: post.caption,
         images: presignedImages,
         tracks: presignedTracks,
         videos: presignedVideos,
-        timeAgo: moment(post.date).fromNow()
+        timeAgo: moment(post.date).fromNow(),
+        displayName: post.artist_name?.trim() || post.username,
+        posterPfpUrl: presignedPosterPfpUrl   // ✅ add poster's profile pic
       };
     }));
 
     res.render('dashboard', {
       user: req.session.user,
+      userAcode: userRow.acode,   // current logged-in user's acode
+      pfpUrl: presignedPfpUrl,    // current logged-in user's pfp
       posts
     });
 
@@ -485,9 +512,38 @@ router.get('/dashboard', compCheck, async (req, res) => {
 });
 
 
-router.get('/create-post', (req, res) => {
-  res.render('posting'); // Make sure create-post.ejs exists in your views directory
+
+
+
+
+router.get('/create-post', async (req, res) => {
+  try {
+    const userResult = await pool.query(
+      'SELECT pfp_url, acode FROM users WHERE acode = $1',
+      [req.session.user.acode]
+    );
+
+    const userRow = userResult.rows[0];
+
+    let presignedPfpUrl = null;
+    if (userRow?.pfp_url) {
+      const filename = userRow.pfp_url.split('/').pop();
+      presignedPfpUrl = await generatePresignedUrl(`pfp/${filename}`);
+    } else {
+      presignedPfpUrl = await generatePresignedUrl('drawables/default_pfp.png');
+    }
+
+    res.render('posting', {
+      pfpUrl: presignedPfpUrl,
+      userAcode: userRow?.acode // ✅ pass the user's acode to EJS
+    });
+  } catch (err) {
+    console.error('Error fetching profile picture for create-post:', err);
+    res.status(500).send('Something went wrong.');
+  }
 });
+
+
 
 router.post('/create-post', upload.fields([
   { name: 'images', maxCount: 10 },
@@ -548,24 +604,357 @@ router.get('/media/:type/:filename', async (req, res) => {
 });
 
 
-router.get('/profile', async (req, res) => {
-  const user = req.session.user;
+router.get('/profile', compCheck, async (req, res) => {
+  const loggedInUser = req.session.user;
+  const queryAcode = req.query.acode; // get from query param
 
-  // Simulated artist data (replace with DB fetch later if needed)
-  const artist = {
-    name: user.username || 'Unknown Artist',
-    bannerUrl: '/uploads/artist-banner.jpg', // fallback image path
-    followers: '34,209',
-    bio: 'This artist blends soulful melodies with futuristic production. Known for electrifying performances and genre-defying music.',
-    songs: [
-      { title: 'Echoes of Tomorrow', coverUrl: '/uploads/track1.jpg' },
-      { title: 'Neon Rain', coverUrl: '/uploads/track2.jpg' },
-      { title: 'Dreams in Motion', coverUrl: '/uploads/track3.jpg' },
-    ],
-  };
+  try {
+    // decide which acode to use
+    const targetAcode = queryAcode || loggedInUser.acode;
 
-  res.render('profile', { artist });
+    // fetch user by targetAcode
+    const result = await pool.query(
+      'SELECT account_mode, acode, pfp_url, artist_name, bio FROM users WHERE acode = $1',
+      [targetAcode]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).render('profile', { 
+        artist: { 
+          name: loggedInUser.username || 'Unknown Artist',
+          bannerUrl: '/path/to/default/banner.png',
+          followers: '0',
+          bio: '',
+          account_mode: null,
+          acode: null,
+          songs: []
+        },
+        pfpUrl: '/path/to/default_pfp.png',
+        userAcode: loggedInUser.acode, // always pass current user's acode
+        error: 'User not found.'
+      });
+    }
+
+    const row = result.rows[0];
+    const accountMode = row.account_mode;
+    const acode = row.acode; // raw acode of profile being viewed
+    const artistName = row.artist_name?.trim();
+    const bio = row.bio?.trim() || '';
+
+    // fetch pfp of logged-in user (for header)
+let headerPfpUrl;
+const loggedInUserResult = await pool.query('SELECT pfp_url FROM users WHERE acode = $1', [loggedInUser.acode]);
+if (loggedInUserResult.rows[0]?.pfp_url) {
+  const filename = loggedInUserResult.rows[0].pfp_url.split('/').pop();
+  headerPfpUrl = await generatePresignedUrl(`pfp/${filename}`);
+} else {
+  headerPfpUrl = await generatePresignedUrl('drawables/default_pfp.png');
+}
+
+// fetch pfp and banner of target profile user
+let presignedBannerUrl;
+if (row.pfp_url) {
+  const filename = row.pfp_url.split('/').pop();
+  presignedBannerUrl = await generatePresignedUrl(`pfp/${filename}`);
+} else {
+  presignedBannerUrl = await generatePresignedUrl('drawables/banner_default.png');
+}
+
+
+    const encryptedAcode = acode ? encrypt(acode) : null;
+
+    const artist = {
+      name: artistName || loggedInUser.username || 'Unknown Artist',
+      bannerUrl: presignedBannerUrl,
+      followers: '34,209',
+      bio,
+      account_mode: accountMode,
+      acode: encryptedAcode,
+      songs: [
+        { title: 'Echoes of Tomorrow', coverUrl: '/uploads/track1.jpg' },
+        { title: 'Neon Rain', coverUrl: '/uploads/track2.jpg' },
+        { title: 'Dreams in Motion', coverUrl: '/uploads/track3.jpg' },
+      ],
+    };
+
+    const isOwnProfile = (targetAcode === loggedInUser.acode);
+
+res.render('profile', { 
+  artist,
+  pfpUrl: headerPfpUrl,
+  userAcode: loggedInUser.acode,
+  isOwnProfile   // new flag
 });
+
+
+
+  } catch (err) {
+    console.error('Error fetching profile data:', err);
+    res.render('profile', {
+      artist: { name: loggedInUser.username || 'Unknown Artist', bannerUrl: '/path/to/default/banner.png', followers: '0', bio: '', account_mode: null, acode: null, songs: [] },
+      pfpUrl: '/path/to/default_pfp.png',
+      userAcode: loggedInUser.acode,
+      error: 'Failed to load profile.'
+    });
+  }
+});
+
+
+
+
+
+
+// GET /edit-profile
+router.get('/edit-profile', compCheck, async (req, res) => {
+  const { acode } = req.query;
+
+  if (!acode) {
+    return res.status(400).send('Missing acode.');
+  }
+
+  try {
+    // Decrypt the acode from query
+    const decryptedAcode = decrypt(acode);
+
+    // Fetch only the needed fields from users table
+    const result = await pool.query(
+      'SELECT artist_name, main_genre, bio, pfp_url, acode FROM users WHERE acode = $1',
+      [decryptedAcode]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).send('User not found.');
+    }
+
+    const user = result.rows[0];
+
+    // Encrypt acode again for safe form use
+    const encryptedAcode = encrypt(user.acode);
+
+    // Generate presigned pfp URL
+    let presignedPfpUrl;
+    if (user.pfp_url) {
+      const filename = user.pfp_url.split('/').pop();
+      presignedPfpUrl = await generatePresignedUrl(`pfp/${filename}`);
+    } else {
+      presignedPfpUrl = await generatePresignedUrl('drawables/default_pfp.png');
+    }
+
+    // ✅ Always include current logged-in user's acode from session
+    const userAcode = req.session.user.acode;
+
+    res.render('edit-profile', {
+      user: {
+        artistName: user.artist_name,
+        genre: user.main_genre,
+        bio: user.bio,
+        acode: encryptedAcode
+      },
+      pfpUrl: presignedPfpUrl,
+      userAcode // now available to your EJS as <%= userAcode %>
+    });
+
+  } catch (err) {
+    console.error('Error loading edit profile:', err);
+    res.status(500).send('Server error.');
+  }
+});
+
+
+
+
+router.post('/update-artist', compCheck, upload.single('banner'), async (req, res) => {
+  const { artistName, genre, bio, acode } = req.body;
+
+  if (!acode) {
+    return res.status(400).json({ message: 'Missing acode.' });
+  }
+
+  try {
+    const decryptedAcode = decrypt(acode);
+    let pfpUrl = null;
+
+    // If new banner uploaded, upload to S3
+    if (req.file) {
+      pfpUrl = await uploadToS3(req.file, 'pfp/'); // returns the S3 URL or key
+    }
+
+    // Fetch current account_mode
+    const result = await pool.query('SELECT account_mode FROM users WHERE acode = $1', [decryptedAcode]);
+    let accountMode = result.rows[0]?.account_mode;
+
+    // build dynamic update fields and values
+    const updateFields = ['artist_name = $1', 'main_genre = $2', 'bio = $3'];
+    const values = [artistName, genre, bio];
+
+    if (!accountMode || accountMode === 'regular') {
+      updateFields.push('account_mode = $' + (values.length + 1));
+      values.push('artist');
+    }
+
+    if (pfpUrl) {
+      updateFields.push('pfp_url = $' + (values.length + 1));
+      values.push(pfpUrl);
+    }
+
+    // always add decryptedAcode at the end for WHERE
+    values.push(decryptedAcode);
+
+    // Build final query
+    const query = `UPDATE users SET ${updateFields.join(', ')} WHERE acode = $${values.length}`;
+
+    await pool.query(query, values);
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Error updating artist profile:', err);
+    res.status(500).json({ message: 'Server error.' });
+  }
+});
+
+
+router.get('/submission', async (req, res) => {
+  try {
+    const userResult = await pool.query(
+      'SELECT pfp_url, acode FROM users WHERE acode = $1',
+      [req.session.user.acode]
+    );
+
+    const userRow = userResult.rows[0];
+
+    let presignedPfpUrl = null;
+    if (userRow?.pfp_url) {
+      const filename = userRow.pfp_url.split('/').pop();
+      presignedPfpUrl = await generatePresignedUrl(`pfp/${filename}`);
+    } else {
+      presignedPfpUrl = await generatePresignedUrl('drawables/default_pfp.png');
+    }
+
+    res.render('submission', {
+      pfpUrl: presignedPfpUrl,
+      userAcode: userRow?.acode // ✅ pass the user's acode to the EJS template
+    });
+  } catch (err) {
+    console.error('Error fetching profile picture for submission page:', err);
+    res.status(500).send('Something went wrong.');
+  }
+});
+
+
+
+router.post('/add-release', async (req, res) => {
+  try {
+    const { acode } = req.query; // get acode from query string
+
+    // Generate unique release_id
+    const date = new Date();
+    const datePart = date.toISOString().slice(0, 10); // YYYY-MM-DD
+    const randomPart = [...Array(25 - datePart.length - 1)] // minus 1 for hyphen
+      .map(() => Math.random().toString(36)[2]) // random letter/number
+      .join('');
+    const release_id = `${datePart}-${randomPart}`;
+
+    // Destructure other fields from body
+    const {
+      title,
+      main_artist,
+      collaborator,
+      release_type,
+      genre,
+      sub_genre,
+      composer,
+      lyricist,
+      producer,
+      title_language,
+      vocal_language,
+      copyright_holder,
+      phonograph,
+      publishing,
+      record_label,
+      mood,
+      isrc,
+      upc_ean,
+      order_in_release,
+      musical_key,
+      bpm,
+      explicit,
+      restrictions,
+      track,
+      release_date,
+      submission_date,
+      edit_date,
+      art_url,
+      audio_url,
+      canvas_url,
+      approval_status
+    } = req.body;
+
+    const result = await pool.query(`
+      INSERT INTO releases (
+        acode, release_id, title, main_artist, collaborator, release_type, genre, sub_genre,
+        composer, lyricist, producer, title_language, vocal_language,
+        copyright_holder, phonograph, publishing, record_label, mood,
+        isrc, upc_ean, order_in_release, musical_key, bpm, explicit, restrictions,
+        track, release_date, submission_date, edit_date, art_url, audio_url, canvas_url, approval_status
+      ) VALUES (
+        $1, $2, $3, $4, $5, $6, $7, $8,
+        $9, $10, $11, $12, $13,
+        $14, $15, $16, $17, $18,
+        $19, $20, $21, $22, $23, $24, $25,
+        $26, $27, $28, $29, $30, $31, $32, $33
+      )
+      RETURNING *;
+    `, [
+      acode,
+      release_id,
+      title,
+      main_artist,
+      collaborator,       // array if applicable
+      release_type,
+      genre,
+      sub_genre,
+      composer,          // array if applicable
+      lyricist,          // array if applicable
+      producer,          // array if applicable
+      title_language,
+      vocal_language,
+      copyright_holder,
+      phonograph,
+      publishing,
+      record_label,
+      mood,
+      isrc,
+      upc_ean,
+      order_in_release,
+      musical_key,
+      bpm,
+      explicit,
+      restrictions,
+      track,
+      release_date,
+      submission_date,
+      edit_date,
+      art_url,
+      audio_url,
+      canvas_url,
+      approval_status
+    ]);
+
+    res.status(201).json({
+      message: 'Release added successfully',
+      release: result.rows[0]
+    });
+  } catch (error) {
+    console.error('Error adding release:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+
+
+
+
 
 
 

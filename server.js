@@ -92,22 +92,28 @@ app.use(helmet({
       defaultSrc: ["'self'"],
       scriptSrc: [
         "'self'",
-        "'unsafe-inline'", // Only if you use inline scripts
+        "'unsafe-inline'",
         "https://js.stripe.com",
         "https://www.paypal.com",
         "https://www.sandbox.paypal.com"
       ],
       styleSrc: [
         "'self'",
-        "'unsafe-inline'", // Needed for Tailwind + style attributes
-        "https://cdn.jsdelivr.net"
+        "'unsafe-inline'",
+        "https://cdn.jsdelivr.net",
+        "https://cdnjs.cloudflare.com"
+      ],
+      fontSrc: [
+        "'self'",
+        "https://cdn.jsdelivr.net",   // ✅ allow Font Awesome fonts from jsDelivr
+        "https://cdnjs.cloudflare.com"
       ],
       imgSrc: [
         "'self'",
         "data:",
         "https://www.transparenttextures.com",
         "https://www.paypalobjects.com",
-        "https://tetrametropolis.s3.us-east-1.amazonaws.com" // ✅ allow S3 images
+        "https://tetrametropolis.s3.us-east-1.amazonaws.com"
       ],
       frameSrc: [
         "'self'",
@@ -124,6 +130,7 @@ app.use(helmet({
     }
   }
 }));
+
 
 
 

@@ -136,6 +136,11 @@ main.form-container {
   padding-top: 60px; /* If you want main sections to reset or adjust differently */
 }
 
+.logo {
+  cursor: pointer;
+}
+
+
 
 </style>
 
@@ -157,12 +162,13 @@ main.form-container {
     <span class="notification-badge">3</span>
   </a>
   <div class="profile-container" id="profileDropdown">
-    <div class="profile-pic"></div>
-    <div class="dropdown">
-      <a href="/profile">See Profile</a>
-      <a href="/logout">Logout</a>
-    </div>
+  <div class="profile-pic" style="background-image: url('<%= pfpUrl %>');"></div>
+  <div class="dropdown">
+    <a href="/profile?acode=<%= userAcode %>">See Profile</a>
+    <a href="/logout">Logout</a>
   </div>
+</div>
+
 </div>
 
 </header>
@@ -180,3 +186,10 @@ main.form-container {
     }
   });
 </script>
+
+<script>
+  document.querySelector('.logo').addEventListener('click', function() {
+    window.location.href = '/dashboard';
+  });
+</script>
+

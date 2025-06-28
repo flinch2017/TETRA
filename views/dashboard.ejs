@@ -23,6 +23,7 @@
   padding: 2rem;
   max-width: 700px;
   margin: 0 auto;
+  padding-bottom: 40px;
 }
 
 .post {
@@ -149,8 +150,55 @@
 .post-header {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  justify-content: space-between;
   margin-bottom: 1rem;
+  position: relative;
+}
+
+.post-user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+
+.post-dropdown {
+  position: relative;
+}
+
+.post-dropdown-toggle {
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.post-dropdown-toggle:hover {
+  color: #fff;
+}
+
+.post-dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 120%;
+  right: 0;
+  background-color: #12193a;
+  border-radius: 6px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  overflow: hidden;
+  z-index: 10;
+  min-width: 120px;
+}
+
+.post-dropdown-menu a {
+  display: block;
+  padding: 0.5rem 1rem;
+  color: rgba(255,255,255,0.9);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.post-dropdown-menu a:hover {
+  background-color: rgba(255,255,255,0.1);
 }
 
 .post-profile-pic {
@@ -165,7 +213,9 @@
   font-size: 1.1rem;
   font-weight: 600;
   color: #fff;
+  text-decoration: none;  /* ✅ remove underline */
 }
+
 
 .media-carousel {
   position: relative;
@@ -268,42 +318,56 @@
     </div>
   <% } else { %>
     <% posts.forEach(post => { %>
-  <div class="post">
-    <div class="post-header">
-  <div class="post-profile-pic"></div>
-  <div class="post-username"><%= post.username %></div>
-</div>
-
-    <p><%= post.caption %></p>
-
-    <% post.images.forEach(imgUrl => { 
-         const filename = imgUrl.split('/').pop(); %>
-      <img src="/media/image/<%= filename %>" alt="Post image" />
-    <% }) %>
-
-    <% post.tracks.forEach(trackUrl => {
-         const filename = trackUrl.split('/').pop(); %>
-      <audio controls src="/media/audio/<%= filename %>"></audio>
-    <% }) %>
-
-    <% post.videos.forEach(videoUrl => {
-         const filename = videoUrl.split('/').pop(); %>
-      <video controls src="/media/video/<%= filename %>" width="100%"></video>
-    <% }) %>
-
-    <div class="timestamp">Posted <%= post.timeAgo %></div>
-
-    <div class="post-actions">
-  <button title="Like"><i class="fas fa-heart"></i></button>
-  <button title="Comment"><i class="fas fa-comment"></i></button>
-  <button title="Share"><i class="fas fa-share"></i></button>
-</div>
-
+      <div class="post">
+        <div class="post-header">
+  <div class="post-user-info">
+    <a href="/profile?acode=<%= post.acode %>">
+      <div class="post-profile-pic" style="background-image: url('<%= post.posterPfpUrl %>');"></div>
+    </a>
+    <a href="/profile?acode=<%= post.acode %>" class="post-username">
+      <%= post.displayName %>
+    </a>
   </div>
-<% }) %>
+  <div class="post-dropdown">
+    <i class="fas fa-ellipsis-v post-dropdown-toggle"></i>
+    <div class="post-dropdown-menu">
+      <a href="#">Save</a>
+      <a href="#">Report</a>
+    </div>
+  </div>
+</div>
 
+
+
+        <p><%= post.caption %></p>
+
+        <% post.images.forEach(imgUrl => { 
+             const filename = imgUrl.split('/').pop(); %>
+          <img src="/media/image/<%= filename %>" alt="Post image" />
+        <% }) %>
+
+        <% post.tracks.forEach(trackUrl => {
+             const filename = trackUrl.split('/').pop(); %>
+          <audio controls src="/media/audio/<%= filename %>"></audio>
+        <% }) %>
+
+        <% post.videos.forEach(videoUrl => {
+             const filename = videoUrl.split('/').pop(); %>
+          <video controls src="/media/video/<%= filename %>" width="100%"></video>
+        <% }) %>
+
+        <div class="timestamp">Posted <%= post.timeAgo %></div>
+
+        <div class="post-actions">
+          <button title="Like"><i class="fas fa-heart"></i></button>
+          <button title="Comment"><i class="fas fa-comment"></i></button>
+          <button title="Share"><i class="fas fa-share"></i></button>
+        </div>
+      </div>
+    <% }) %>
   <% } %>
 </main>
+
 
 
 
@@ -313,6 +377,23 @@
 
 
 
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.post-dropdown-toggle').forEach(toggle => {
+    toggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const menu = toggle.nextElementSibling;
+      menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+    });
+  });
+
+  document.addEventListener('click', () => {
+    document.querySelectorAll('.post-dropdown-menu').forEach(menu => {
+      menu.style.display = 'none';
+    });
+  });
+});
+</script>
 
 
 

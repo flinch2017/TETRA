@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Music Dashboard | TETRA</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css" />
+
+
+
+  <style>
+    body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #0a0f2c;
+  color: white;
+}
+
+.form-container {
+  max-width: 700px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: rgba(255,255,255,0.05);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+
+.form-container h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.4rem;
+  color: rgba(255,255,255,0.9);
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 0.5rem;
+  border: none;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.1);
+  color: white;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  background: rgba(255,255,255,0.2);
+}
+
+.submit-btn {
+  display: block;
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #007bff;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: background-color 0.2s ease;
+}
+
+.submit-btn:hover {
+  background-color: #0056b3;
+}
+
+
+
+
+
+
+
+  </style>
+</head>
+<body>
+  <div class="fixed-header">
+    <%- include('partials/console_header') %>
+  </div>
+
+  <main class="form-container">
+  <h2>Add New Release</h2>
+  <form id="releaseForm">
+    <div class="form-group">
+      <label>Title</label>
+      <input type="text" name="title" required>
+    </div>
+
+    <div class="form-group">
+      <label>Main Artist</label>
+      <input type="text" name="main_artist" required>
+    </div>
+
+    <div class="form-group">
+      <label>Collaborators (comma-separated)</label>
+      <input type="text" name="collaborator">
+    </div>
+
+    <div class="form-group">
+      <label>Release Type</label>
+      <select name="release_type" required>
+        <option value="Single">Single</option>
+        <option value="EP">EP</option>
+        <option value="Album">Album</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Genre</label>
+      <input type="text" name="genre" required>
+    </div>
+
+    <div class="form-group">
+      <label>Sub Genre</label>
+      <input type="text" name="sub_genre">
+    </div>
+
+    <div class="form-group">
+      <label>Composer(s) (comma-separated)</label>
+      <input type="text" name="composer">
+    </div>
+
+    <div class="form-group">
+      <label>Lyricist(s) (comma-separated)</label>
+      <input type="text" name="lyricist">
+    </div>
+
+    <div class="form-group">
+      <label>Producer(s) (comma-separated)</label>
+      <input type="text" name="producer">
+    </div>
+
+    <div class="form-group">
+      <label>Title Language</label>
+      <input type="text" name="title_language">
+    </div>
+
+    <div class="form-group">
+      <label>Vocal Language</label>
+      <input type="text" name="vocal_language">
+    </div>
+
+    <div class="form-group">
+      <label>Copyright Holder</label>
+      <input type="text" name="copyright_holder">
+    </div>
+
+    <div class="form-group">
+      <label>Phonograph</label>
+      <input type="text" name="phonograph">
+    </div>
+
+    <div class="form-group">
+      <label>Publishing</label>
+      <input type="text" name="publishing">
+    </div>
+
+    <div class="form-group">
+      <label>Record Label</label>
+      <input type="text" name="record_label">
+    </div>
+
+    <div class="form-group">
+      <label>Mood</label>
+      <input type="text" name="mood">
+    </div>
+
+    <div class="form-group">
+      <label>ISRC</label>
+      <input type="text" name="isrc">
+    </div>
+
+    <div class="form-group">
+      <label>UPC/EAN</label>
+      <input type="text" name="upc_ean">
+    </div>
+
+    <div class="form-group">
+      <label>Order in Release</label>
+      <input type="number" name="order_in_release">
+    </div>
+
+    <div class="form-group">
+      <label>Musical Key</label>
+      <input type="text" name="musical_key">
+    </div>
+
+    <div class="form-group">
+      <label>BPM</label>
+      <input type="number" name="bpm">
+    </div>
+
+    <div class="form-group">
+      <label>Explicit Content</label>
+      <select name="explicit">
+        <option value="false">No</option>
+        <option value="true">Yes</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Restrictions</label>
+      <input type="text" name="restrictions">
+    </div>
+
+    <div class="form-group">
+      <label>Track</label>
+      <input type="text" name="track">
+    </div>
+
+    <div class="form-group">
+      <label>Release Date</label>
+      <input type="date" name="release_date">
+    </div>
+
+    <div class="form-group">
+      <label>Artwork URL</label>
+      <input type="url" name="art_url">
+    </div>
+
+    <div class="form-group">
+      <label>Audio URL</label>
+      <input type="url" name="audio_url">
+    </div>
+
+    <div class="form-group">
+      <label>Canvas URL</label>
+      <input type="url" name="canvas_url">
+    </div>
+
+    <div class="form-group">
+      <label>Approval Status</label>
+      <select name="approval_status">
+        <option value="pending">Pending</option>
+        <option value="approved">Approved</option>
+        <option value="rejected">Rejected</option>
+      </select>
+    </div>
+
+    <button type="submit" class="submit-btn">Add Release</button>
+  </form>
+</main>
+
+<script>
+document.getElementById('releaseForm').addEventListener('submit', async function(e) {
+  e.preventDefault(); // prevent default form submit
+
+  const form = e.target;
+  const formData = new FormData(form);
+
+  // convert FormData to plain object to handle arrays
+  const data = {};
+  formData.forEach((value, key) => {
+    // convert comma-separated fields into arrays
+    if(['composer', 'lyricist', 'producer', 'collaborator'].includes(key)) {
+      data[key] = value ? value.split(',').map(s => s.trim()) : [];
+    } else {
+      data[key] = value;
+    }
+  });
+
+  try {
+    const response = await fetch('/add-release?acode=<%= userAcode %>', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+
+    const result = await response.json();
+
+    if(response.ok) {
+      alert('✅ Release added successfully!');
+      form.reset();
+    } else {
+      alert('❌ Failed to add release: ' + (result.error || 'Unknown error'));
+    }
+  } catch(err) {
+    console.error(err);
+    alert('❌ Error connecting to server.');
+  }
+});
+</script>
+
+</body>
+</html>

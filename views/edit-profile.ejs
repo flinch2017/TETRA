@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Edit Artist Profile | TETRA</title>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css" />
+<style>
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #0a0f2c;
+    color: white;
+  }
+
+  .fixed-header {
+    position: fixed;
+    top: 0; left: 0; width: 100%;
+    z-index: 10000;
+    background-color: #050a1f;
+  }
+
+  main {
+    max-width: 600px;
+    margin: 100px auto 40px;
+    padding: 2rem;
+    background-color: rgba(18, 25, 58, 0.8);
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(0,123,255,0.2);
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  label {
+    font-size: 0.95rem;
+    margin-bottom: 0.3rem;
+  }
+
+  input[type="text"],
+textarea,
+select {
+  padding: 0.6rem 1rem;            /* more horizontal padding left & right */
+  border-radius: 6px;
+  border: none;
+  font-size: 1rem;
+  width: 100%;
+  background-color: rgba(255,255,255,0.1);
+  color: white;
+  box-sizing: border-box;          /* ensures padding doesn’t cause overflow */
+  margin-right: auto;              /* ensures no flush to right edge */
+}
+
+
+  input[type="file"] {
+    border: none;
+    font-size: 0.95rem;
+    color: white;
+  }
+
+  button {
+  padding: 0.75rem;
+  border: none;
+  border-radius: 999px;
+  background-color: #007bff;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(0,123,255,0.4), 0 0 20px rgba(0,123,255,0.2);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+button:hover {
+  background-color: #005fc1;
+  box-shadow: 0 0 15px rgba(0,123,255,0.6), 0 0 30px rgba(0,123,255,0.4);
+}
+
+
+  @media (max-width: 600px) {
+  main {
+    margin: 80px 1rem 30px;
+    padding: 1.2rem;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  input[type="text"],
+  textarea,
+  select {
+    font-size: 0.95rem;
+    padding: 0.5rem 1rem;   /* keep good side padding even on small screens */
+  }
+
+  button {
+    font-size: 0.95rem;
+    padding: 0.65rem;
+  }
+}
+
+select {
+  color: white;                /* dropdown text color */
+  
+}
+
+select option {
+  color: black;                /* option text color */
+  background-color: white;     /* option background */
+}
+
+
+</style>
+</head>
+<body>
+
+<div class="fixed-header">
+  <%- include('partials/console_header') %>
+</div>
+
+<main>
+  <h1>Edit Artist Profile</h1>
+  <form id="editArtistForm" enctype="multipart/form-data">
+    <input type="hidden" name="acode" value="<%= user.acode %>">
+    <div>
+      <label for="artistName">Artist Name</label>
+      <input type="text" id="artistName" name="artistName" value="<%= user.artistName || '' %>" required>
+    </div>
+
+    <div>
+  <label for="genre">Main Genre</label>
+  <select id="genre" name="genre" required>
+    <option value="">Select genre</option>
+    <option value="Pop" <%= user.genre === 'Pop' ? 'selected' : '' %>>Pop</option>
+    <option value="Rock" <%= user.genre === 'Rock' ? 'selected' : '' %>>Rock</option>
+    <option value="Hip-hop" <%= user.genre === 'Hip-hop' ? 'selected' : '' %>>Hip-hop</option>
+    <option value="R&B" <%= user.genre === 'R&B' ? 'selected' : '' %>>R&B</option>
+    <option value="Electronic" <%= user.genre === 'Electronic' ? 'selected' : '' %>>Electronic</option>
+    <option value="Dance" <%= user.genre === 'Dance' ? 'selected' : '' %>>Dance</option>
+    <option value="Indie" <%= user.genre === 'Indie' ? 'selected' : '' %>>Indie</option>
+    <option value="Alternative" <%= user.genre === 'Alternative' ? 'selected' : '' %>>Alternative</option>
+    <option value="Jazz" <%= user.genre === 'Jazz' ? 'selected' : '' %>>Jazz</option>
+    <option value="Blues" <%= user.genre === 'Blues' ? 'selected' : '' %>>Blues</option>
+    <option value="Classical" <%= user.genre === 'Classical' ? 'selected' : '' %>>Classical</option>
+    <option value="Reggae" <%= user.genre === 'Reggae' ? 'selected' : '' %>>Reggae</option>
+    <option value="Country" <%= user.genre === 'Country' ? 'selected' : '' %>>Country</option>
+    <option value="Folk" <%= user.genre === 'Folk' ? 'selected' : '' %>>Folk</option>
+    <option value="Latin" <%= user.genre === 'Latin' ? 'selected' : '' %>>Latin</option>
+    <option value="Metal" <%= user.genre === 'Metal' ? 'selected' : '' %>>Metal</option>
+    <option value="Soul" <%= user.genre === 'Soul' ? 'selected' : '' %>>Soul</option>
+    <option value="Soundtrack" <%= user.genre === 'Soundtrack' ? 'selected' : '' %>>Soundtrack</option>
+    <option value="World" <%= user.genre === 'World' ? 'selected' : '' %>>World</option>
+    
+  </select>
+</div>
+
+
+    <div>
+      <label for="bio">About</label>
+      <textarea id="bio" name="bio" rows="4" placeholder="Tell us about yourself..."><%= user.bio || '' %></textarea>
+    </div>
+
+    <div>
+      <label for="banner">Profile Banner</label>
+      <img src="<%= user.pfpUrl %>" alt="Profile picture">
+      <input type="file" id="banner" name="banner">
+      
+    </div>
+
+    <button type="submit">Save Changes</button>
+  </form>
+</main>
+
+<script>
+  document.getElementById('editArtistForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const form = e.target;
+    const formData = new FormData(form);
+
+    try {
+      const response = await fetch('/update-artist', {
+        method: 'POST',
+        body: formData
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        alert('Profile updated successfully!');
+        window.location.href = '/profile';   // redirect after success
+      } else {
+        alert('Update failed: ' + (result.message || 'Unknown error'));
+      }
+    } catch (err) {
+      console.error('AJAX error:', err);
+      alert('An error occurred.');
+    }
+  });
+</script>
+
+
+</body>
+</html>

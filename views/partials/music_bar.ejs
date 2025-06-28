@@ -9,21 +9,21 @@
   width: 90px;
   height: 40px;
   border-radius: 999px;
-  box-shadow: 0 3px 10px rgba(0, 122, 255, 0.4);
+  box-shadow: 0 0 8px rgba(0, 122, 255, 0.6), 0 0 16px rgba(0, 122, 255, 0.4);
   text-decoration: none;
-  transition: background-color 0.3s ease, transform 0.2s ease, bottom 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease, bottom 0.3s ease;
   z-index: 1001;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-
-
 .floating-plus:hover {
   background-color: #005fc1;
   transform: scale(1.1);
+  box-shadow: 0 0 12px rgba(0, 122, 255, 0.8), 0 0 24px rgba(0, 122, 255, 0.5);
 }
+
 
 .floating-plus.up {
   bottom: 440px; /* Matches expanded drawer height + spacing */
@@ -168,9 +168,42 @@
     height: 410px;
   }
 }
+
+.plus-options {
+  position: fixed;
+  bottom: 120px; /* place above the plus button */
+  right: 20px;
+  background-color: #12193a;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  overflow: hidden;
+  z-index: 1002;
+  display: none; /* hidden by default */
+  flex-direction: column;
+  min-width: 140px;
+}
+
+.plus-options a {
+  padding: 0.6rem 1rem;
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  font-size: 0.9rem;
+  text-align: left;
+}
+
+.plus-options a:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
 </style>
 
-<a href="/create-post" class="floating-plus" title="Create Post">+</a>
+<a href="javascript:void(0);" class="floating-plus" id="plusButton" title="Create">+</a>
+
+<div class="plus-options" id="plusOptions">
+  <a href="/create-post">Create Post</a>
+  <a href="/submission">Release</a>
+</div>
+
 
 <!-- Peeking Music Bar / Player -->
 <div id="musicDrawer" class="music-drawer collapsed">
@@ -204,7 +237,8 @@
 <script>
   const drawer = document.getElementById('musicDrawer');
   const bar = drawer.querySelector('.music-bar');
-  const plusButton = document.querySelector('.floating-plus');
+  const plusButton = document.getElementById('plusButton'); // only declare once
+  const plusOptions = document.getElementById('plusOptions');
 
   bar.addEventListener('click', () => {
     const isExpanded = drawer.classList.contains('expanded');
@@ -216,7 +250,18 @@
     } else {
       plusButton.classList.remove('up');
     }
+
+    // Also hide plusOptions when drawer toggles
+    plusOptions.style.display = 'none';
   });
 
-  
+  plusButton.addEventListener('click', (e) => {
+    e.stopPropagation();
+    plusOptions.style.display = (plusOptions.style.display === 'flex') ? 'none' : 'flex';
+  });
+
+  // Close menu when clicking elsewhere
+  document.addEventListener('click', () => {
+    plusOptions.style.display = 'none';
+  });
 </script>

@@ -1,225 +1,304 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title><%= artist.name %> | TETRA</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title><%= artist.name %> | TETRA</title>
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #0a0f2c;
-      color: white;
-    }
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css" />
+<style>
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #0a0f2c;
+    color: white;
+  }
 
-    .artist-header {
-      position: relative;
-      background-size: cover;
-      background-position: center;
-      height: 300px;
-      display: flex;
-      align-items: flex-end;
-      padding: 2rem;
-    }
+  .fixed-header {
+    position: fixed;
+    top: 0; left: 0; width: 100%;
+    z-index: 10000;
+    background-color: #050a1f;
+  }
 
-    .artist-header .overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to top, rgba(10, 15, 44, 0.9), rgba(10, 15, 44, 0));
-    }
+  .artist-header {
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    height: 300px;
+    display: flex;
+    align-items: flex-end;
+    padding: 2rem;
+    
+    overflow: visible;
+  }
 
-    .artist-info {
-      position: relative;
-      z-index: 1;
-    }
+  .overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(10, 15, 44, 0.9), rgba(10, 15, 44, 0));
+    z-index: 1;
+  }
 
+ 
+
+  .artist-dropdown {
+  position: relative;
+}
+
+.artist-dropdown-toggle {
+  cursor: pointer;
+  color: white;
+  font-size: 1.5rem;
+}
+
+.artist-dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 120%;
+  left: 0;  /* align directly below the ellipsis icon */
+  background-color: #12193a;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  min-width: 160px;
+  z-index: 999999;
+}
+
+
+.artist-dropdown-menu a {
+  display: block;
+  padding: 0.75rem 1rem;
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.artist-dropdown-menu a:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+
+  .artist-info {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .artist-name {
+    font-size: 2.5rem;
+    font-weight: bold;
+  }
+
+  .artist-follow {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;  /* ← increased gap */
+  margin-top: 1rem;
+}
+
+
+  .follow-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  background-color: #007bff; /* vibrant blue */
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 0.95rem;
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.6), 0 0 16px rgba(0, 123, 255, 0.4);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.follow-btn:hover {
+  box-shadow: 0 0 12px rgba(0, 123, 255, 0.8), 0 0 24px rgba(0, 123, 255, 0.5);
+  transform: translateY(-1px);
+}
+
+
+  .section {
+    padding: 2rem;
+    max-width: 1000px;
+    margin: 0 auto;
+    margin-bottom: 20px;
+  }
+
+  .section h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .song-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .song-item.no-border {
+    border: none;
+  }
+
+  .song-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .song-info img {
+    width: 50px;
+    height: 50px;
+    border-radius: 6px;
+    object-fit: cover;
+  }
+
+  .song-title {
+    font-weight: 500;
+  }
+
+  .song-actions i {
+    margin-left: 1rem;
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .song-actions i:hover {
+    color: #1db954;
+  }
+
+  .artist-details {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.75);
+    line-height: 1.6;
+  }
+
+  .releases-wrapper {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .release-block {
+    flex: 1;
+    min-width: 250px;
+  }
+
+  .release-title {
+    font-size: 1.1rem;
+    color: #1db954;
+    margin-bottom: 0.75rem;
+  }
+
+  .release-meta {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  @media screen and (max-width: 600px) {
     .artist-name {
-      font-size: 2.5rem;
-      font-weight: bold;
-    }
-
-    .artist-follow {
-      margin-top: 0.5rem;
-      font-size: 0.9rem;
-      color: rgba(255, 255, 255, 0.7);
-    }
-
-    .follow-btn {
-      margin-top: 1rem;
-      padding: 0.5rem 1rem;
-      border-radius: 999px;
-      background-color: #1db954;
-      color: white;
-      border: none;
-      cursor: pointer;
-      font-size: 0.95rem;
+      font-size: 2rem;
     }
 
     .section {
-      padding: 2rem;
-      max-width: 1000px;
-      margin: 0 auto;
-    }
-
-    .section h2 {
-      font-size: 1.5rem;
-      margin-bottom: 1rem;
-    }
-
-    .song-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0.75rem 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    }
-
-    .song-info {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
+      padding: 1rem;
     }
 
     .song-info img {
-      width: 50px;
-      height: 50px;
-      border-radius: 6px;
-      object-fit: cover;
+      width: 40px;
+      height: 40px;
     }
+  }
 
-    .song-title {
-      font-weight: 500;
-    }
-
-    .song-actions i {
-      margin-left: 1rem;
-      cursor: pointer;
-      color: rgba(255, 255, 255, 0.8);
-    }
-
-    .song-actions i:hover {
-      color: #1db954;
-    }
-
-    .artist-details {
-      font-size: 0.95rem;
-      color: rgba(255, 255, 255, 0.75);
-      line-height: 1.6;
-    }
-
-    @media screen and (max-width: 600px) {
-      .artist-name {
-        font-size: 2rem;
-      }
-
-      .section {
-        padding: 1rem;
-      }
-
-      .song-info img {
-        width: 40px;
-        height: 40px;
-      }
-    }
-
-    .releases-wrapper {
+  .artist-rank {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 48px;
+  height: 48px;
+  background-color: rgba(18, 25, 58, 0.8);
+  border-radius: 50%;
   display: flex;
-  gap: 2rem;
-  flex-wrap: wrap;
-}
-
-.release-block {
-  flex: 1;
-  min-width: 250px;
-}
-
-.release-title {
-  font-size: 1.1rem;
-  color: #1db954;
-  margin-bottom: 0.75rem;
-}
-
-.release-meta {
+  align-items: center;
+  justify-content: center;
   font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: bold;
+  z-index: 2;
 }
 
-.song-item.no-border {
+.artist-profile {
+  padding-bottom: 80px; /* space so content isn't hidden under music bar */
+}
+
+.setup-artist-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+  margin-top: 2rem;
+}
+
+.setup-artist-btn {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 999px;
+  background-color: #007bff; /* vibrant blue */
+  color: white;
   border: none;
+  cursor: pointer;
+  text-decoration: none; /* remove underline */
+  box-shadow: 0 0 10px rgba(0, 123, 255, 0.6), 0 0 20px rgba(0, 123, 255, 0.4);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
 
-  </style>
+.setup-artist-btn:hover {
+  box-shadow: 0 0 15px rgba(0, 123, 255, 0.8), 0 0 30px rgba(0, 123, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+
+
+</style>
 </head>
 <body>
-  <div class="fixed-header">
-    <%- include('partials/console_header') %>
-  </div>
 
-  <!-- Artist Branding Header -->
-  <div class="artist-header" style="background-image: url('<%= artist.bannerUrl %>')">
-    <div class="overlay"></div>
-    <div class="artist-info">
-      <div class="artist-name"><%= artist.name %></div>
-      <div class="artist-follow"><%= artist.followers %> followers</div>
+<div class="fixed-header">
+  <%- include('partials/console_header') %>
+</div>
+
+<div class="artist-header" style="background-image: url('<%= artist.bannerUrl %>')">
+  <div class="overlay"></div>
+  <% if (artist.rank && artist.rank <= 500) { %>
+  <div class="artist-rank">
+    #<%= artist.rank %>
+  </div>
+<% } %>
+
+
+  <div class="artist-info">
+    <div class="artist-name"><%= artist.name %></div>
+    <div class="artist-follow"><%= artist.followers %> followers</div>
+    <div class="header-actions">
       <button class="follow-btn">Follow</button>
-    </div>
-  </div>
+      <div class="artist-dropdown">
+        <i class="fas fa-ellipsis-v artist-dropdown-toggle"></i>
+        <div class="artist-dropdown-menu">
+          <% if (isOwnProfile) { %>
+  <a href="/edit-profile?acode=<%= artist.acode %>">Edit Profile</a>
+<% } %>
 
-  <main class="artist-profile">
-    <!-- Popular Songs Section -->
-    <div class="section">
-      <h2>Popular Songs</h2>
-      <% artist.songs.forEach(song => { %>
-        <div class="song-item">
-          <div class="song-info">
-            <img src="<%= song.coverUrl %>" alt="Cover">
-            <div class="song-title"><%= song.title %></div>
-          </div>
-          <div class="song-actions">
-            <i class="fas fa-play"></i>
-            <i class="fas fa-heart"></i>
-            <i class="fas fa-ellipsis-h"></i>
-          </div>
-        </div>
-      <% }) %>
-    </div>
-
-    <!-- Latest & Popular Releases Section -->
-<div class="section">
-  <h2>Latest Release | Popular Release</h2>
-  <div class="releases-wrapper">
-    <!-- Latest Release -->
-    <div class="release-block">
-      <h3 class="release-title">Latest Release</h3>
-      <div class="song-item no-border">
-        <div class="song-info">
-          <img src="/uploads/latest.jpg" alt="Latest Release">
-          <div>
-            <div class="song-title">Aurora Pulse</div>
-            <div class="release-meta">Released on Jun 20, 2025</div>
-          </div>
-        </div>
-        <div class="song-actions">
-          <i class="fas fa-play"></i>
-        </div>
-      </div>
-    </div>
-
-    <!-- Popular Release -->
-    <div class="release-block">
-      <h3 class="release-title">Popular Release</h3>
-      <div class="song-item no-border">
-        <div class="song-info">
-          <img src="/uploads/popular.jpg" alt="Popular Release">
-          <div>
-            <div class="song-title">Neon Rain</div>
-            <div class="release-meta">2.4M streams</div>
-          </div>
-        </div>
-        <div class="song-actions">
-          <i class="fas fa-play"></i>
+          <a href="#">Add to Favorites</a>
+          <a href="#">Report</a>
+          <a href="#">Block Artist</a>
         </div>
       </div>
     </div>
@@ -228,17 +307,102 @@
 
 
 
-    <!-- More About the Artist -->
-    <div class="section">
-      <h2>About</h2>
+<% if (isOwnProfile && (!artist.account_mode || artist.account_mode === 'regular')) { %>
+  <div class="setup-artist-container">
+    <a href="/edit-profile?acode=<%= artist.acode %>" class="setup-artist-btn">Setup Artist Profile</a>
+  </div>
+<% } %>
+
+
+
+<main class="artist-profile">
+  <div class="section">
+    <h2>Popular Songs</h2>
+    <% if (artist.songs && artist.songs.length > 0) { %>
+      <% artist.songs.forEach(song => { %>
+        <div class="song-item">
+          <div class="song-info">
+            <img src="<%= song.coverUrl %>" alt="Cover">
+            <div>
+              <div class="song-title"><%= song.title %></div>
+              <div class="release-meta"><%= song.streams %> streams</div>
+            </div>
+          </div>
+          <div class="song-actions">
+            <i class="fas fa-play"></i>
+            <i class="fas fa-heart"></i>
+            <i class="fas fa-ellipsis-v"></i>
+          </div>
+        </div>
+      <% }) %>
+    <% } else { %>
+      <p style="color: rgba(255,255,255,0.6); font-size:0.95rem;">No available songs</p>
+    <% } %>
+  </div>
+
+  <div class="section">
+    <h2>Latest Release | Popular Release</h2>
+    <% if (artist.releases && artist.releases.length > 0) { %>
+      <div class="releases-wrapper">
+        <% artist.releases.forEach(release => { %>
+          <div class="release-block">
+            <h3 class="release-title"><%= release.type %></h3>
+            <div class="song-item no-border">
+              <div class="song-info">
+                <img src="<%= release.coverUrl %>" alt="<%= release.title %>">
+                <div>
+                  <div class="song-title"><%= release.title %></div>
+                  <% if (release.streams) { %>
+                    <div class="release-meta"><%= release.streams %> streams</div>
+                  <% } else if (release.releasedOn) { %>
+                    <div class="release-meta">Released on <%= release.releasedOn %></div>
+                  <% } %>
+                </div>
+              </div>
+              <div class="song-actions">
+                <i class="fas fa-play"></i>
+              </div>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    <% } else { %>
+      <p style="color: rgba(255,255,255,0.6); font-size:0.95rem;">No available releases</p>
+    <% } %>
+  </div>
+
+  <div class="section">
+    <h2>About</h2>
+    <% if (artist.bio) { %>
       <div class="artist-details">
         <%= artist.bio %>
       </div>
-    </div>
-  </main>
-
-  <div class="fixed-bar">
-    <%- include('partials/music_bar') %>
+    <% } %>
   </div>
+</main>
+
+
+
+<div class="fixed-bar">
+  <%- include('partials/music_bar') %>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.artist-dropdown-toggle').forEach(toggle => {
+    toggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const menu = toggle.nextElementSibling;
+      menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+    });
+  });
+  document.addEventListener('click', () => {
+    document.querySelectorAll('.artist-dropdown-menu').forEach(menu => {
+      menu.style.display = 'none';
+    });
+  });
+});
+
+</script>
 </body>
 </html>
