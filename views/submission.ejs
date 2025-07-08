@@ -76,6 +76,20 @@
 }
 
 
+.track-item {
+  background: rgba(255,255,255,0.08);
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.track-meta {
+  display: none;
+  margin-top: 0.5rem;
+  background: rgba(255,255,255,0.05);
+  padding: 0.5rem;
+  border-radius: 6px;
+}
 
 
 
@@ -91,6 +105,9 @@
   <main class="form-container">
   <h2>Add New Release</h2>
   <form id="releaseForm">
+
+    <!-- 🌱 Phase 1: Basic & core info -->
+    <h3>Phase 1: Basic Info</h3>
     <div class="form-group">
       <label>Title</label>
       <input type="text" name="title" required>
@@ -125,56 +142,97 @@
       <input type="text" name="sub_genre">
     </div>
 
-    <div class="form-group">
-      <label>Composer(s) (comma-separated)</label>
-      <input type="text" name="composer">
-    </div>
+    <!-- ✏️ Phase 2: Creators & Rights -->
+<h3>Phase 2: Creators & Rights</h3>
+<div class="form-group">
+  <label>Composer(s) (comma-separated)</label>
+  <input type="text" name="composer">
+</div>
 
-    <div class="form-group">
-      <label>Lyricist(s) (comma-separated)</label>
-      <input type="text" name="lyricist">
-    </div>
+<div class="form-group">
+  <label>Lyricist(s) (comma-separated)</label>
+  <input type="text" name="lyricist">
+</div>
 
-    <div class="form-group">
-      <label>Producer(s) (comma-separated)</label>
-      <input type="text" name="producer">
-    </div>
+<div class="form-group">
+  <label>Producer(s) (comma-separated)</label>
+  <input type="text" name="producer">
+</div>
 
-    <div class="form-group">
-      <label>Title Language</label>
-      <input type="text" name="title_language">
-    </div>
+<div class="form-group">
+  <label>Title Language</label>
+  <input type="text" name="title_language">
+</div>
 
-    <div class="form-group">
-      <label>Vocal Language</label>
-      <input type="text" name="vocal_language">
-    </div>
+<div class="form-group">
+  <label>Vocal Language</label>
+  <input type="text" name="vocal_language">
+</div>
 
-    <div class="form-group">
-      <label>Copyright Holder</label>
-      <input type="text" name="copyright_holder">
-    </div>
+<div class="form-group">
+  <label>Copyright Holder</label>
+  <input type="text" name="copyright_holder">
+</div>
 
-    <div class="form-group">
-      <label>Phonograph</label>
-      <input type="text" name="phonograph">
-    </div>
+<div class="form-group">
+  <label>Phonograph</label>
+  <input type="text" name="phonograph">
+</div>
 
-    <div class="form-group">
-      <label>Publishing</label>
-      <input type="text" name="publishing">
-    </div>
+<div class="form-group">
+  <label>Publishing</label>
+  <input type="text" name="publishing">
+</div>
 
-    <div class="form-group">
-      <label>Record Label</label>
-      <input type="text" name="record_label">
-    </div>
+<div class="form-group">
+  <label>Record Label</label>
+  <input type="text" name="record_label">
+</div>
 
-    <div class="form-group">
-      <label>Mood</label>
-      <input type="text" name="mood">
-    </div>
+<div class="form-group">
+  <label>Mood</label>
+  <input type="text" name="mood">
+</div>
 
+<div class="form-group">
+  <label>Tracks (MP3 only, max 32)</label>
+  <div style="display: flex; align-items: center;">
+    <input type="file" id="tracksInput" accept=".mp3,audio/mpeg" style="display: none;">
+    <button type="button" id="addTrackBtn" style="
+      margin-left: 0.5rem;
+      background: rgba(255,255,255,0.1);
+      border: none;
+      border-radius: 6px;
+      color: white;
+      font-size: 1.2rem;
+      width: 2.5rem;
+      height: 2.5rem;
+      cursor: pointer;
+    ">+</button>
+  </div>
+</div>
+
+<div id="trackList"></div>
+
+<div class="form-group">
+  <label>Release Type (auto-detected)</label>
+  <input type="text" name="release_type" id="releaseType" readonly>
+</div>
+
+
+
+
+
+<div id="trackList"></div>
+
+<div class="form-group">
+  <label>Release Type (auto-detected)</label>
+  <input type="text" name="release_type" id="releaseType" readonly>
+</div>
+
+
+    <!-- ⚙️ Phase 3: Technical & release details -->
+    <h3>Phase 3: Technical & Release Details</h3>
     <div class="form-group">
       <label>ISRC</label>
       <input type="text" name="isrc">
@@ -214,9 +272,18 @@
     </div>
 
     <div class="form-group">
-      <label>Track</label>
-      <input type="text" name="track">
-    </div>
+  <label>Tracks (MP3 only, max 32)</label>
+  <input type="file" id="tracksInput" name="tracks" accept=".mp3,audio/mpeg" multiple required>
+</div>
+
+<div id="trackList"></div>
+
+<div class="form-group">
+  <label>Release Type (auto-detected)</label>
+  <input type="text" name="release_type" id="releaseType" readonly>
+</div>
+
+
 
     <div class="form-group">
       <label>Release Date</label>
@@ -252,46 +319,98 @@
 </main>
 
 <script>
-document.getElementById('releaseForm').addEventListener('submit', async function(e) {
-  e.preventDefault(); // prevent default form submit
+const addTrackBtn = document.getElementById('addTrackBtn');
+const tracksInput = document.getElementById('tracksInput');
+const trackList = document.getElementById('trackList');
+const releaseTypeInput = document.getElementById('releaseType');
 
-  const form = e.target;
-  const formData = new FormData(form);
+// Store selected tracks
+let selectedTracks = [];
 
-  // convert FormData to plain object to handle arrays
-  const data = {};
-  formData.forEach((value, key) => {
-    // convert comma-separated fields into arrays
-    if(['composer', 'lyricist', 'producer', 'collaborator'].includes(key)) {
-      data[key] = value ? value.split(',').map(s => s.trim()) : [];
-    } else {
-      data[key] = value;
-    }
+addTrackBtn.addEventListener('click', () => {
+  tracksInput.click();
+});
+
+tracksInput.addEventListener('change', () => {
+  const newFiles = Array.from(tracksInput.files);
+  newFiles.forEach(file => {
+    // Avoid duplicates
+    if (selectedTracks.find(f => f.name === file.name && f.size === file.size)) return;
+    selectedTracks.push(file);
   });
+  tracksInput.value = ''; // clear for next selection
+  updateTrackList();
+});
 
-  try {
-    const response = await fetch('/add-release?acode=<%= userAcode %>', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
+function updateTrackList() {
+  if (selectedTracks.length > 32) {
+    alert('⚠ You can only upload up to 32 tracks.');
+    selectedTracks = selectedTracks.slice(0, 32);
+  }
+
+  // Detect release type
+  if (selectedTracks.length === 0) {
+    releaseTypeInput.value = '';
+  } else if (selectedTracks.length <= 2) {
+    releaseTypeInput.value = 'Single';
+  } else if (selectedTracks.length <= 6) {
+    releaseTypeInput.value = 'EP';
+  } else {
+    releaseTypeInput.value = 'Album';
+  }
+
+  trackList.innerHTML = '';
+  selectedTracks.forEach((file, index) => {
+    const item = document.createElement('div');
+    item.className = 'track-item';
+    item.innerHTML = `
+      <span>${file.name}</span>
+      <button type="button" style="
+        float: right;
+        background: none;
+        border: none;
+        color: #f66;
+        font-weight: bold;
+        font-size: 1rem;
+        cursor: pointer;
+      ">✖</button>
+    `;
+
+    const removeBtn = item.querySelector('button');
+    removeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      selectedTracks.splice(index, 1);
+      updateTrackList();
     });
 
-    const result = await response.json();
+    // Hidden metadata div
+    const meta = document.createElement('div');
+    meta.className = 'track-meta';
+    meta.innerHTML = `
+      <div class="form-group">
+        <label>Track Title</label>
+        <input type="text" name="track_title_${index}">
+      </div>
+      <div class="form-group">
+        <label>Track ISRC</label>
+        <input type="text" name="track_isrc_${index}">
+      </div>
+      <div class="form-group">
+        <label>Track Order</label>
+        <input type="number" name="track_order_${index}" value="${index+1}">
+      </div>
+    `;
 
-    if(response.ok) {
-      alert('✅ Release added successfully!');
-      form.reset();
-    } else {
-      alert('❌ Failed to add release: ' + (result.error || 'Unknown error'));
-    }
-  } catch(err) {
-    console.error(err);
-    alert('❌ Error connecting to server.');
-  }
-});
+    item.addEventListener('click', () => {
+      meta.style.display = meta.style.display === 'none' ? 'block' : 'none';
+    });
+
+    trackList.appendChild(item);
+    trackList.appendChild(meta);
+  });
+}
 </script>
+
 
 </body>
 </html>

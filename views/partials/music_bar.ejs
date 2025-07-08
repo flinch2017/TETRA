@@ -201,7 +201,8 @@
 
 <div class="plus-options" id="plusOptions">
   <a href="/create-post">Create Post</a>
-  <a href="/submission">Release</a>
+  <a href="javascript:void(0);" id="releaseLink">Release</a>
+
 </div>
 
 
@@ -264,4 +265,168 @@
   document.addEventListener('click', () => {
     plusOptions.style.display = 'none';
   });
+</script>
+
+<!-- Release Modal -->
+<div id="releaseModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h3>Select Release Type</h3>
+    <div class="release-options">
+  <a href="/submission?type=single" class="release-card">
+    <i class="fas fa-music"></i><br>Single
+  </a>
+  <a href="/submission?type=ep" class="release-card">
+    <i class="fas fa-compact-disc"></i><br>EP
+  </a>
+  <a href="/submission?type=album" class="release-card">
+    <i class="fas fa-record-vinyl"></i><br>Album
+  </a>
+</div>
+
+  </div>
+</div>
+
+
+<style>
+
+  .release-card i {
+  font-size: 1.4rem;
+  margin-bottom: 0.4rem;
+  display: block;
+}
+
+  /* Modal Styles */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1500;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.6);
+  animation: fadeIn 0.3s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { background-color: rgba(0,0,0,0); }
+  to { background-color: rgba(0,0,0,0.6); }
+}
+
+.modal-content {
+  background-color: #12193a;
+  margin: 10% auto;
+  padding: 1.5rem;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 350px;
+  color: white;
+  text-align: center;
+  transform: scale(0.8);
+  opacity: 0;
+  animation: popIn 0.3s ease forwards;
+}
+
+@keyframes popIn {
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.modal-content h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+}
+
+.release-options {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+.release-card {
+  flex: 1 1 100px;               /* grow/shrink, base width 100px */
+  max-width: 100px;             /* don’t let it go beyond 100px */
+  background-color: #1c2a5a;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: white;
+  padding: 0.8rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: transform 0.2s ease, background-color 0.3s;
+  text-align: center;
+  word-break: break-word;
+}
+
+
+.release-card:hover {
+  background-color: #007aff;
+  transform: translateY(-4px);
+}
+
+.close {
+  color: rgba(255,255,255,0.8);
+  float: right;
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+@media (max-width: 500px) {
+  .modal-content {
+    margin-top: 30%;
+    padding: 1rem;
+  }
+
+  .release-options {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .release-card {
+    max-width: none;            /* allow full width on small screens */
+    width: 90%;
+    flex: none;
+    font-size: 1rem;
+    padding: 0.9rem;
+  }
+}
+
+
+
+</style>
+
+<script>
+  const releaseLink = document.getElementById('releaseLink');
+const releaseModal = document.getElementById('releaseModal');
+const closeModal = releaseModal.querySelector('.close');
+
+releaseLink.addEventListener('click', (e) => {
+  e.stopPropagation();
+  plusOptions.style.display = 'none';
+  releaseModal.style.display = 'block';
+
+  // Restart animation
+  const content = releaseModal.querySelector('.modal-content');
+  content.style.animation = 'none';
+  void content.offsetWidth; // trigger reflow
+  content.style.animation = 'popIn 0.3s ease forwards';
+});
+
+closeModal.addEventListener('click', () => {
+  releaseModal.style.display = 'none';
+});
+
+window.addEventListener('click', (e) => {
+  if (e.target == releaseModal) {
+    releaseModal.style.display = 'none';
+  }
+});
+
+
 </script>

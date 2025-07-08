@@ -105,7 +105,7 @@ app.use(helmet({
       ],
       fontSrc: [
         "'self'",
-        "https://cdn.jsdelivr.net",   // ✅ allow Font Awesome fonts from jsDelivr
+        "https://cdn.jsdelivr.net",   
         "https://cdnjs.cloudflare.com"
       ],
       imgSrc: [
@@ -126,10 +126,16 @@ app.use(helmet({
         "https://api.stripe.com",
         "https://www.paypal.com",
         "https://www.sandbox.paypal.com"
+      ],
+      mediaSrc: [
+        "'self'",
+        "blob:",
+        "https://tetrametropolis.s3.us-east-1.amazonaws.com"
       ]
     }
   }
 }));
+
 
 
 

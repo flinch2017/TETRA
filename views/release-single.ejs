@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Music Dashboard | TETRA</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css" />
+
+
+
+  <style>
+    body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #0a0f2c;
+  color: white;
+}
+
+.form-container {
+  max-width: 700px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: rgba(255,255,255,0.05);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+
+.form-container h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.4rem;
+  color: rgba(255,255,255,0.9);
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 0.5rem;
+  border: none;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.1);
+  color: white;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  background: rgba(255,255,255,0.2);
+}
+
+.submit-btn {
+  display: block;
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #007bff;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: background-color 0.2s ease;
+}
+
+.submit-btn:hover {
+  background-color: #0056b3;
+}
+
+
+.track-item {
+  background: rgba(255,255,255,0.08);
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.track-meta {
+  display: none;
+  margin-top: 0.5rem;
+  background: rgba(255,255,255,0.05);
+  padding: 0.5rem;
+  border-radius: 6px;
+}
+
+
+.tracklist-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-top: 0.5rem;
+}
+
+.add-track {
+  background-color: #007aff;
+  color: white;
+  padding: 0.6rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 300px;
+  margin-top: 0.5rem;
+  transition: background-color 0.3s;
+}
+
+.add-track:hover {
+  background-color: #005fc1;
+}
+
+.track-card {
+  background-color: #1c2a5a;
+  border-radius: 8px;
+  padding: 0.6rem;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.track-card:hover {
+  background-color: #25366e;
+}
+
+.track-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.track-filename {
+  font-size: 0.9rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.track-remove {
+  color: rgba(255,255,255,0.8);
+  cursor: pointer;
+}
+
+.track-remove:hover {
+  color: #ff4c4c;
+}
+
+.track-fields {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 0.6rem;
+}
+
+.track-fields input {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.6rem 0.8rem;       /* ↑ more vertical and horizontal padding */
+  margin: 0.4rem 0;             /* ↑ more space between fields */
+  border-radius: 6px;           /* slightly rounder corners */
+  border: none;
+  font-size: 0.95rem;           /* larger text */
+  background-color: rgba(255,255,255,0.1);
+  color: white;
+}
+
+
+.track-fields input::placeholder {
+  color: rgba(255,255,255,0.7);
+}
+
+
+.track-audio {
+  width: 100%;
+  margin-top: 0.4rem;
+  border-radius: 4px;
+}
+
+
+.track-fields select {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.6rem 0.8rem;
+  margin: 0.4rem 0;
+  border-radius: 6px;
+  border: none;
+  font-size: 0.95rem;
+  background-color: rgba(255,255,255,0.1);
+  color: white;
+}
+
+.track-fields select option {
+  color: black; /* keep dropdown list readable */
+}
+
+.audio-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 0.6rem;
+}
+
+.progress-circle {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: conic-gradient(#007aff 0deg, rgba(255,255,255,0.1) 0deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.play-btn {
+  color: white;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.upload-progress {
+  width: 100%;
+  height: 4px;
+  background-color: rgba(255,255,255,0.1);
+  border-radius: 2px;
+  margin-top: 0.4rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.upload-progress::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  height: 100%;
+  width: var(--upload-percent, 0%);
+  background-color: #007aff;
+  transition: width 0.2s linear;
+}
+
+
+
+
+  </style>
+</head>
+<body>
+  <div class="fixed-header">
+    <%- include('partials/console_header') %>
+  </div>
+
+  <main class="form-container">
+  <h2>Add New Release</h2>
+  <form id="releaseForm">
+
+    <!-- 🌱 Phase 1: Basic & core info -->
+    <h3>Phase 1: Basic Info</h3>
+    <div class="form-group">
+      <label>Artwork*</label>
+      <input type="file" name="art_url">
+    </div>
+
+    <div class="form-group">
+      <label>Release Title*</label>
+      <input type="text" name="title" required>
+    </div>
+
+    <div class="form-group">
+      <label>Released by*</label>
+      <input type="text" name="main_artist" required>
+    </div>
+
+    <h3>Phase 2: Upload Tracks</h3>
+    <div class="form-group">
+  <label>Tracklist*</label>
+  <div id="tracklistContainer" class="tracklist-container">
+    <!-- tracks will appear here -->
+  </div>
+  <div class="add-track" id="addTrackBtn">
+    <i class="fas fa-plus"></i>
+  </div>
+</div>
+
+
+
+
+    <!-- ✏️ Phase 2: Creators & Rights -->
+<h3>Phase 3: Creators & Rights</h3>
+<div class="form-group">
+  <label>Copyright Holder</label>
+  <input type="text" name="copyright_holder">
+</div>
+
+<div class="form-group">
+  <label>Phonograph</label>
+  <input type="text" name="phonograph">
+</div>
+
+<div class="form-group">
+  <label>Publishing</label>
+  <input type="text" name="publishing">
+</div>
+
+<div class="form-group">
+  <label>Record Label</label>
+  <input type="text" name="record_label">
+</div>
+
+
+    <!-- ⚙️ Phase 3: Technical & release details -->
+    <h3>Phase 4: Technical & Release Details</h3>
+
+    <div class="form-group">
+      <label>UPC/EAN</label>
+      <input type="text" name="upc_ean">
+    </div>
+
+    <div class="form-group">
+      <label>Musical Key</label>
+      <input type="text" name="musical_key">
+    </div>
+
+    <div class="form-group">
+      <label>BPM</label>
+      <input type="number" name="bpm">
+    </div>
+
+    <div class="form-group">
+      <label>Restrictions</label>
+      <input type="text" name="restrictions">
+    </div>
+
+
+    <div class="form-group">
+      <label>Release Date</label>
+      <input type="date" name="release_date">
+    </div>
+
+    
+
+    <div class="form-group">
+      <label>Canvas</label>
+      <input type="file" name="canvas_url">
+    </div>
+
+    <button type="submit" class="submit-btn">Add Release</button>
+  </form>
+</main>
+
+
+<script>
+const addTrackBtn = document.getElementById('addTrackBtn');
+const tracklistContainer = document.getElementById('tracklistContainer');
+
+addTrackBtn.addEventListener('click', () => {
+  if (tracklistContainer.querySelectorAll('.track-card').length >= 3) {
+    alert('You can only upload up to 3 tracks.');
+    return;
+  }
+
+  // Create hidden file input
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'audio/mpeg';
+  input.style.display = 'none';
+
+  input.addEventListener('change', () => {
+    if (input.files.length > 0) {
+      const file = input.files[0];
+
+      const card = document.createElement('div');
+      card.className = 'track-card';
+
+      const header = document.createElement('div');
+      header.className = 'track-header';
+
+      const filename = document.createElement('div');
+      filename.className = 'track-filename';
+      filename.textContent = file.name;
+
+      // Audio
+      const audio = document.createElement('audio');
+      const blobUrl = URL.createObjectURL(file);
+      audio.src = blobUrl;
+      audio.preload = 'metadata';
+
+      // Remove btn
+      const removeBtn = document.createElement('i');
+      removeBtn.className = 'fas fa-times track-remove';
+      removeBtn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+
+        // stop & clean audio
+        audio.pause();
+        audio.src = '';
+        URL.revokeObjectURL(blobUrl);
+
+        // delete uploaded file from S3 if uploaded
+        if (card.dataset.s3Key) {
+          try {
+            await fetch('/delete-track', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ key: card.dataset.s3Key })
+            });
+            console.log('Deleted from S3');
+          } catch (err) {
+            console.error('Error deleting from S3:', err);
+          }
+        }
+
+        // remove card & input
+        tracklistContainer.removeChild(card);
+        tracklistContainer.removeChild(input);
+      });
+
+      header.appendChild(filename);
+      header.appendChild(removeBtn);
+      card.appendChild(header);
+
+      // Audio preview: circular
+      const previewContainer = document.createElement('div');
+      previewContainer.className = 'audio-preview';
+
+      const progressCircle = document.createElement('div');
+      progressCircle.className = 'progress-circle';
+
+      const playBtn = document.createElement('i');
+      playBtn.className = 'fas fa-play play-btn';
+
+      progressCircle.appendChild(playBtn);
+      previewContainer.appendChild(progressCircle);
+      card.appendChild(previewContainer);
+
+      // Upload progress bar
+      const uploadBar = document.createElement('div');
+      uploadBar.className = 'upload-progress';
+      previewContainer.appendChild(uploadBar);
+
+      // Play/pause handling
+      let isPlaying = false;
+      playBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (isPlaying) {
+          audio.pause();
+        } else {
+          audio.play();
+        }
+      });
+
+      audio.addEventListener('play', () => {
+        isPlaying = true;
+        playBtn.classList.remove('fa-play');
+        playBtn.classList.add('fa-pause');
+      });
+
+      audio.addEventListener('pause', () => {
+        isPlaying = false;
+        playBtn.classList.remove('fa-pause');
+        playBtn.classList.add('fa-play');
+      });
+
+      audio.addEventListener('timeupdate', () => {
+        const progress = audio.currentTime / audio.duration;
+        progressCircle.style.background = `conic-gradient(#007aff ${progress*360}deg, rgba(255,255,255,0.1) ${progress*360}deg)`;
+      });
+
+      // Upload via AJAX
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', '/upload-track', true);
+
+      const formData = new FormData();
+      formData.append('track', file);
+
+      xhr.upload.addEventListener('progress', (e) => {
+        if (e.lengthComputable) {
+          const percent = (e.loaded / e.total) * 100;
+          uploadBar.style.setProperty('--upload-percent', percent + '%');
+        }
+      });
+
+      xhr.onload = () => {
+        if (xhr.status === 200) {
+          console.log('Upload successful!');
+          uploadBar.style.opacity = '0.5';
+          try {
+            const res = JSON.parse(xhr.responseText);
+            card.dataset.s3Key = res.key; // save key for deletion later
+          } catch (err) {
+            console.error('Invalid JSON response', err);
+          }
+        } else {
+          console.error('Upload failed');
+          uploadBar.style.backgroundColor = 'red';
+        }
+      };
+
+      xhr.send(formData);
+
+      // Fields
+      const fields = document.createElement('div');
+      fields.className = 'track-fields';
+
+      const fieldDefs = [
+        { name: 'Track Title*', type: 'text' },
+        { name: 'Primary Artist*', type: 'text' },
+        { name: 'Featured Artist (If available)', type: 'text' },
+        { name: 'Genre*', type: 'select', options: ['Pop', 'Rock', 'Hip-Hop', 'Jazz', 'Electronic', 'Classical'] },
+        { name: 'Sub-Genre*', type: 'select', options: ['Alternative', 'Indie', 'Synthwave', 'Trap', 'Soul'] },
+        { name: 'Composer*', type: 'text' },
+        { name: 'Lyricist (If available)', type: 'text' },
+        { name: 'Producer*', type: 'text' },
+        { name: 'ISRC (If available)', type: 'text' },
+        { name: 'BPM*', type: 'text' },
+        { name: 'Mood*', type: 'select', options: ['Happy', 'Sad', 'Energetic', 'Chill', 'Romantic'] },
+        { name: 'Explicit*', type: 'select', options: ['Yes', 'Not Explicit', 'Clean Version'] }
+      ];
+
+      fieldDefs.forEach(def => {
+        let field;
+        if (def.type === 'select') {
+          field = document.createElement('select');
+          const placeholder = document.createElement('option');
+          placeholder.value = '';
+          placeholder.disabled = true;
+          placeholder.selected = true;
+          placeholder.hidden = true;
+          placeholder.textContent = def.name;
+          field.appendChild(placeholder);
+          def.options.forEach(opt => {
+            const option = document.createElement('option');
+            option.value = opt;
+            option.textContent = opt;
+            field.appendChild(option);
+          });
+        } else {
+          field = document.createElement('input');
+          field.type = 'text';
+          field.placeholder = def.name;
+        }
+        fields.appendChild(field);
+      });
+
+      fields.style.display = 'block';
+      header.addEventListener('click', (e) => {
+        if (!e.target.classList.contains('track-remove')) {
+          fields.style.display = fields.style.display === 'none' ? 'block' : 'none';
+        }
+      });
+
+      card.appendChild(fields);
+      tracklistContainer.appendChild(card);
+    }
+  });
+
+  tracklistContainer.appendChild(input);
+  input.click();
+});
+</script>
+
+
+
+
+
+
+</body>
+</html>

@@ -12,6 +12,8 @@ const router = express.Router();
 const moment = require('moment');
 const paypal = require('@paypal/checkout-server-sdk');
 const generatePresignedUrl = require('../utils/s3Presign');
+const uploadTrackToS3 = require('../utils/uploadTrackToS3');
+const deleteFromS3 = require('../utils/s3Delete');
 
 let environment = new paypal.core.SandboxEnvironment(
   "AZ3vwRr1sqKm0Fm3jQAP8nkMmkCjaYvGxuSYRBaNvfRNOGSdqAJ_xUXKkn8go9a8eS7oegV6lSFkYorj",
@@ -813,16 +815,15 @@ router.post('/update-artist', compCheck, upload.single('banner'), async (req, re
 });
 
 
-router.get('/submission', async (req, res) => {
+router.get('/submission', async (req, res) => { 
   try {
     const userResult = await pool.query(
       'SELECT pfp_url, acode FROM users WHERE acode = $1',
       [req.session.user.acode]
     );
-
     const userRow = userResult.rows[0];
 
-    let presignedPfpUrl = null;
+    let presignedPfpUrl;
     if (userRow?.pfp_url) {
       const filename = userRow.pfp_url.split('/').pop();
       presignedPfpUrl = await generatePresignedUrl(`pfp/${filename}`);
@@ -830,9 +831,26 @@ router.get('/submission', async (req, res) => {
       presignedPfpUrl = await generatePresignedUrl('drawables/default_pfp.png');
     }
 
-    res.render('submission', {
+    // get release type from query
+    const releaseType = req.query.type;
+
+    // decide template based on type
+    let template;
+    if (releaseType === 'single') {
+      template = 'release-single';
+    } else if (releaseType === 'ep') {
+      template = 'release-ep';
+    } else if (releaseType === 'album') {
+      template = 'release-album';
+    } else {
+      // fallback if type missing or invalid
+      return res.status(400).send('Invalid release type.');
+    }
+
+    res.render(template, {
       pfpUrl: presignedPfpUrl,
-      userAcode: userRow?.acode // ✅ pass the user's acode to the EJS template
+      userAcode: userRow?.acode,
+      releaseType
     });
   } catch (err) {
     console.error('Error fetching profile picture for submission page:', err);
@@ -840,6 +858,37 @@ router.get('/submission', async (req, res) => {
   }
 });
 
+// POST /upload-track
+router.post('/upload-track', upload.single('track'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ success: false, message: 'No track uploaded' });
+
+    // Upload local file to S3
+    const s3Key = await uploadTrackToS3(req.file, 'tracks/');
+
+    // Generate presigned URL to preview
+    const url = await generatePresignedUrl(s3Key, 3600);
+
+    res.json({ success: true, key: s3Key, url });
+  } catch (err) {
+    console.error('Upload failed:', err);
+    res.status(500).json({ success: false, message: 'Upload failed' });
+  }
+});
+
+router.post('/delete-track', async (req, res) => {
+  try {
+    const { key } = req.body;
+    if (!key) return res.status(400).json({ error: 'Missing S3 key' });
+
+    await deleteFromS3(key);
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Failed to delete from S3:', err);
+    res.status(500).json({ error: 'Failed to delete track from S3' });
+  }
+});
 
 
 router.post('/add-release', async (req, res) => {
