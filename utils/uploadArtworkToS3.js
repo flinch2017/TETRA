@@ -1,13 +1,12 @@
-// utils/uploadTrackToS3.js
+// utils/uploadArtworkToS3.js
 const fs = require('fs');
 const path = require('path');
 const { PutObjectCommand } = require('@aws-sdk/client-s3');
 const s3 = require('./s3Client');
 
-async function uploadTrackToS3(file, releaseId, trackId, folder = 'tracks/') {
+async function uploadArtworkToS3(file, releaseId) {
   const filePath = file.path;
-  const key = `${folder}${trackId}-${file.originalname.replace(/\s+/g, '_')}`;
-
+  const key = `artworks/${releaseId}-${file.originalname.replace(/\s+/g, '_')}`;
 
   try {
     const stream = fs.createReadStream(filePath);
@@ -22,11 +21,10 @@ async function uploadTrackToS3(file, releaseId, trackId, folder = 'tracks/') {
 
     return key;
   } catch (err) {
-    console.error('Error uploading track to S3:', err);
+    console.error('Error uploading artwork to S3:', err);
     await fs.promises.unlink(filePath).catch(() => {});
     throw err;
   }
 }
 
-
-module.exports = uploadTrackToS3;
+module.exports = uploadArtworkToS3;

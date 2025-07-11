@@ -14,6 +14,8 @@ const paypal = require('@paypal/checkout-server-sdk');
 const generatePresignedUrl = require('../utils/s3Presign');
 const uploadTrackToS3 = require('../utils/uploadTrackToS3');
 const deleteFromS3 = require('../utils/s3Delete');
+const uploadArtworkToS3 = require('../utils/uploadArtworkToS3');
+const uploadCanvasToS3 = require('../utils/uploadCanvasToS3');
 
 let environment = new paypal.core.SandboxEnvironment(
   "AZ3vwRr1sqKm0Fm3jQAP8nkMmkCjaYvGxuSYRBaNvfRNOGSdqAJ_xUXKkn8go9a8eS7oegV6lSFkYorj",
@@ -843,14 +845,20 @@ router.get('/submission', async (req, res) => {
     } else if (releaseType === 'album') {
       template = 'release-album';
     } else {
-      // fallback if type missing or invalid
       return res.status(400).send('Invalid release type.');
     }
+
+    // generate releaseId
+    const releaseId = Array.from(crypto.randomBytes(12))
+      .map(byte => 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'[byte % 62])
+      .join('');
 
     res.render(template, {
       pfpUrl: presignedPfpUrl,
       userAcode: userRow?.acode,
-      releaseType
+      releaseType,
+      releaseId,
+      currentUser: userRow?.acode   // ✅ set currentUser to the acode
     });
   } catch (err) {
     console.error('Error fetching profile picture for submission page:', err);
@@ -858,23 +866,29 @@ router.get('/submission', async (req, res) => {
   }
 });
 
+
 // POST /upload-track
 router.post('/upload-track', upload.single('track'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ success: false, message: 'No track uploaded' });
 
-    // Upload local file to S3
-    const s3Key = await uploadTrackToS3(req.file, 'tracks/');
+    const { releaseId, trackId } = req.body;
+    if (!releaseId || !trackId) {
+      return res.status(400).json({ success: false, message: 'Missing releaseId or trackId' });
+    }
+
+    const s3Key = await uploadTrackToS3(req.file, releaseId, trackId, 'tracks/');
 
     // Generate presigned URL to preview
     const url = await generatePresignedUrl(s3Key, 3600);
 
-    res.json({ success: true, key: s3Key, url });
+    res.json({ success: true, key: s3Key, url, trackId });
   } catch (err) {
     console.error('Upload failed:', err);
     res.status(500).json({ success: false, message: 'Upload failed' });
   }
 });
+
 
 router.post('/delete-track', async (req, res) => {
   try {
@@ -890,114 +904,134 @@ router.post('/delete-track', async (req, res) => {
   }
 });
 
-
-router.post('/add-release', async (req, res) => {
+// GET /search-artists?q=...
+router.get('/search-artists', async (req, res) => {
   try {
-    const { acode } = req.query; // get acode from query string
+    const q = req.query.q;
+    const currentUserAcode = req.session.user?.acode;
 
-    // Generate unique release_id
-    const date = new Date();
-    const datePart = date.toISOString().slice(0, 10); // YYYY-MM-DD
-    const randomPart = [...Array(25 - datePart.length - 1)] // minus 1 for hyphen
-      .map(() => Math.random().toString(36)[2]) // random letter/number
-      .join('');
-    const release_id = `${datePart}-${randomPart}`;
+    if (!q || q.trim() === '') {
+      return res.json([]); // empty query
+    }
 
-    // Destructure other fields from body
-    const {
-      title,
-      main_artist,
-      collaborator,
-      release_type,
-      genre,
-      sub_genre,
-      composer,
-      lyricist,
-      producer,
-      title_language,
-      vocal_language,
-      copyright_holder,
-      phonograph,
-      publishing,
-      record_label,
-      mood,
-      isrc,
-      upc_ean,
-      order_in_release,
-      musical_key,
-      bpm,
-      explicit,
-      restrictions,
-      track,
-      release_date,
-      submission_date,
-      edit_date,
-      art_url,
-      audio_url,
-      canvas_url,
-      approval_status
-    } = req.body;
+    const searchQuery = `
+      SELECT acode, artist_name, pfp_url
+      FROM users
+      WHERE LOWER(artist_name) LIKE LOWER($1)
+      AND acode != $2
+      LIMIT 10
+    `;
 
-    const result = await pool.query(`
-      INSERT INTO releases (
-        acode, release_id, title, main_artist, collaborator, release_type, genre, sub_genre,
-        composer, lyricist, producer, title_language, vocal_language,
-        copyright_holder, phonograph, publishing, record_label, mood,
-        isrc, upc_ean, order_in_release, musical_key, bpm, explicit, restrictions,
-        track, release_date, submission_date, edit_date, art_url, audio_url, canvas_url, approval_status
-      ) VALUES (
-        $1, $2, $3, $4, $5, $6, $7, $8,
-        $9, $10, $11, $12, $13,
-        $14, $15, $16, $17, $18,
-        $19, $20, $21, $22, $23, $24, $25,
-        $26, $27, $28, $29, $30, $31, $32, $33
-      )
-      RETURNING *;
-    `, [
-      acode,
-      release_id,
-      title,
-      main_artist,
-      collaborator,       // array if applicable
-      release_type,
-      genre,
-      sub_genre,
-      composer,          // array if applicable
-      lyricist,          // array if applicable
-      producer,          // array if applicable
-      title_language,
-      vocal_language,
-      copyright_holder,
-      phonograph,
-      publishing,
-      record_label,
-      mood,
-      isrc,
-      upc_ean,
-      order_in_release,
-      musical_key,
-      bpm,
-      explicit,
-      restrictions,
-      track,
-      release_date,
-      submission_date,
-      edit_date,
-      art_url,
-      audio_url,
-      canvas_url,
-      approval_status
-    ]);
+    const { rows } = await pool.query(searchQuery, [`%${q}%`, currentUserAcode]);
 
-    res.status(201).json({
-      message: 'Release added successfully',
-      release: result.rows[0]
-    });
-  } catch (error) {
-    console.error('Error adding release:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    // generate presigned URLs
+    const artistsWithPfp = await Promise.all(rows.map(async user => {
+      let presignedPfpUrl;
+      if (user.pfp_url) {
+        const filename = user.pfp_url.split('/').pop(); // get filename
+        presignedPfpUrl = await generatePresignedUrl(`pfp/${filename}`);
+      } else {
+        presignedPfpUrl = await generatePresignedUrl('drawables/default_pfp.png');
+      }
+      return {
+        acode: user.acode,
+        artist_name: user.artist_name,
+        pfp_url: presignedPfpUrl
+      };
+    }));
+
+    res.json(artistsWithPfp);
+  } catch (err) {
+    console.error('Error searching artists:', err);
+    res.status(500).json({ error: 'Something went wrong' });
   }
 });
+
+
+router.post('/submit-release', upload.any(), async (req, res) => {
+  try {
+    const {
+      release_id, release_title, acode, genre, explicit,
+      upc, copyright, phonograph, record_label,
+      release_date, release_time, release_zone, track_order, release_type
+    } = req.body;
+
+    // Find uploaded files
+    const artFile = req.files.find(f => f.fieldname === 'art_url') || null;
+    const canvasFile = req.files.find(f => f.fieldname === 'canvas_url') || null;
+
+    let artKey = null, canvasKey = null;
+    if (artFile) artKey = await uploadArtworkToS3(artFile, release_id);
+    if (canvasFile) canvasKey = await uploadCanvasToS3(canvasFile, release_id);
+
+    // Insert album
+    await pool.query(`
+      INSERT INTO albums
+      (release_id, acode, release_title, artwork_url, canvas_url, genre, explicit, upc, tracks,
+       copyright, phonograph, record_label, release_date, release_time, release_zone, release_type)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)
+    `, [
+      release_id, acode, release_title, artKey, canvasKey, genre, explicit, upc, track_order,
+      copyright, phonograph, record_label, release_date, release_time, release_zone, release_type
+    ]);
+
+    // Parse tracks
+    const tracks = [];
+    Object.entries(req.body).forEach(([key, value]) => {
+      const match = key.match(/^tracks\[(\d+)]\[(.+)]$/);
+      if (match) {
+        const index = parseInt(match[1], 10);
+        const field = match[2];
+        if (!tracks[index]) tracks[index] = {};
+        tracks[index][field] = value;
+      }
+    });
+
+    console.log('Parsed tracks:', JSON.stringify(tracks, null, 2));
+
+    // Track order array
+    const trackOrderArray = (track_order || '').split(',');
+
+    for (const track of tracks) {
+      if (!track.trackId || !track.s3Key) continue; // skip invalid
+
+      let orderIndex = trackOrderArray.indexOf(track.trackId);
+      if (orderIndex === -1) orderIndex = 0;
+
+      await pool.query(`
+        INSERT INTO tracks 
+        (track_id, release_id, acode, track_title, primary_artist, features, audio_url,
+         genre, sub_genre, composer, producer, mood, ISRC, track_order, release_date, bpm, explicit)
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)
+      `, [
+        track.trackId,
+        release_id,
+        acode,
+        track.title || '',
+        track.primaryArtistAcodes || '',
+        track.featuredArtistAcodes || '',
+        track.s3Key,
+        track.genre || '',
+        track.subGenre || '',
+        track.composer || '',
+        track.producer || '',
+        track.mood || '',
+        track.isrc || null,
+        orderIndex + 1,
+        release_date,
+        track.bpm || '',
+        track.explicit || ''
+      ]);
+    }
+
+    res.json({ success: true, message: 'Release created successfully!' });
+  } catch (err) {
+    console.error('Error submitting release:', err);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+
 
 
 

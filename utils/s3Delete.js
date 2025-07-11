@@ -1,3 +1,4 @@
+//s3Delete.js
 const { DeleteObjectCommand } = require('@aws-sdk/client-s3');
 const s3 = require('./s3Client');
 

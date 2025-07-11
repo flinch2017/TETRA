@@ -95,7 +95,8 @@ app.use(helmet({
         "'unsafe-inline'",
         "https://js.stripe.com",
         "https://www.paypal.com",
-        "https://www.sandbox.paypal.com"
+        "https://www.sandbox.paypal.com",
+        "https://cdn.jsdelivr.net"      // ✅ add this line
       ],
       styleSrc: [
         "'self'",
@@ -135,6 +136,7 @@ app.use(helmet({
     }
   }
 }));
+
 
 
 
