@@ -288,7 +288,15 @@
     <div class="artist-name"><%= artist.name %></div>
     <div class="artist-follow"><%= artist.followers %> followers</div>
     <div class="header-actions">
-      <button class="follow-btn">Follow</button>
+      <button 
+  class="follow-btn" 
+  data-target="<%= artist.acode %>" 
+  data-following="<%= isFollowing ? 'true' : 'false' %>">
+  <%= isFollowing ? 'Following' : 'Follow' %>
+</button>
+
+
+
       <div class="artist-dropdown">
         <i class="fas fa-ellipsis-v artist-dropdown-toggle"></i>
         <div class="artist-dropdown-menu">
@@ -404,5 +412,48 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 </script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const followBtn = document.querySelector('.follow-btn');
+  if (followBtn) {
+    followBtn.addEventListener('click', async () => {
+      const targetAcode = followBtn.getAttribute('data-target');
+      const isFollowing = followBtn.getAttribute('data-following') === 'true';
+
+      try {
+        const url = isFollowing ? '/unfollow' : '/follow';
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ targetAcode })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          followBtn.textContent = isFollowing ? 'Follow' : 'Following';
+          followBtn.setAttribute('data-following', isFollowing ? 'false' : 'true');
+
+          // Update follower count
+          const followerCountElem = document.querySelector('.artist-follow');
+          if (followerCountElem) {
+            let count = parseInt(followerCountElem.textContent) || 0;
+            count = isFollowing ? count - 1 : count + 1;
+            followerCountElem.textContent = `${count} followers`;
+          }
+        } else {
+          alert(data.message || 'Action failed');
+        }
+      } catch (err) {
+        console.error('Follow/unfollow failed:', err);
+        alert('An error occurred');
+      }
+    });
+  }
+});
+</script>
+
+
+
 </body>
 </html>

@@ -382,8 +382,21 @@ select[name="timezone"] {
   </div>
 
   <main class="form-container">
-  <h2>Add New Release</h2>
+  <h2>Single Release</h2>
+  
   <form id="releaseForm">
+
+    <div id="releaseWarnings" style="
+  display: none; 
+  background-color: #fff3cd; 
+  color: #856404; 
+  border: 1px solid #ffeeba; 
+  padding: 10px; 
+  margin-bottom: 15px; 
+  border-radius: 4px;
+  font-size: 0.95rem;
+"></div>
+
 
     <!-- 🌱 Phase 1: Basic & core info -->
     <h3>Phase 1: Basic Info</h3>
@@ -392,6 +405,11 @@ select[name="timezone"] {
       <label>Release ID*</label>
       <input type="text" name="release_id" value="<%= releaseId %>
 ">
+    </div>
+
+    <div class="form-group" style="display:none;">
+      <label>Release Type*</label>
+      <input type="text" name="release_type" value="Single">
     </div>
 
     <div class="form-group">
@@ -403,7 +421,7 @@ select[name="timezone"] {
   <div class="artwork-upload" id="artworkUpload">
     <span class="plus-icon">+</span>
     <img id="artworkPreview" src="" alt="Artwork Preview" style="display:none;" />
-    <input type="file" name="art_url" id="artworkInput" accept="image/png" required hidden>
+    <input type="file" name="art_url" id="artworkInput" accept="image/png" hidden>
   </div>
 </div>
 
@@ -419,7 +437,7 @@ select[name="timezone"] {
 
     <div class="form-group" style="display:none;">
   <label>Released by*</label>
-  <input type="text" name="acode" value="<%= currentUser %>">
+  <input type="text" name="acode" value="<%= currentUser %>" required>
 </div>
 
     <h3>Phase 2: Upload Tracks</h3>
@@ -439,18 +457,18 @@ select[name="timezone"] {
     <!-- ✏️ Phase 2: Creators & Rights -->
 <h3>Phase 3: Creators & Rights</h3>
 <div class="form-group">
-  <label>Copyright Holder</label>
-  <input type="text" name="copyright">
+  <label>Copyright Holder*</label>
+  <input type="text" name="copyright" required>
 </div>
 
 <div class="form-group">
-  <label>Phonograph</label>
-  <input type="text" name="phonograph">
+  <label>Phonograph*</label>
+  <input type="text" name="phonograph" required>
 </div>
 
 
 <div class="form-group">
-  <label>Record Label</label>
+  <label>Record Label (Optional)</label>
   <input type="text" name="record_label">
 </div>
 
@@ -459,24 +477,17 @@ select[name="timezone"] {
     <h3>Phase 4: Technical & Release Details</h3>
 
     <div class="form-group">
-      <label>UPC/EAN</label>
+      <label>UPC/EAN (If available)</label>
       <input type="text" name="upc">
     </div>
 
     <div class="form-group">
-      <label>Musical Key</label>
+      <label>Musical Key (Optional)</label>
       <input type="text" name="musical_key">
     </div>
 
     <div class="form-group">
-      <label>BPM</label>
-      <input type="number" name="bpm">
-    </div>
-
-    
-
-    <div class="form-group">
-  <label>Canvas</label>
+  <label>Canvas (Optional)</label>
   <div class="canvas-upload" id="canvasUpload">
     <span class="plus-icon">+</span>
     <video id="canvasPreview" style="display:none;" muted loop></video>
@@ -491,15 +502,15 @@ select[name="timezone"] {
 
     <div class="form-group">
       <label>Release Date*</label>
-      <input type="date" name="release_date">
+      <input type="date" name="release_date" required>
     </div>
     <div class="form-group">
       <label>Release Time*</label>
-      <input type="time" name="release_time">
+      <input type="time" name="release_time" required>
     </div>
     <div class="form-group">
       <label>Timezone*</label>
-      <select name="release_zone" style="color: black;">
+      <select name="release_zone" style="color: black;" required>
   <option value="" disabled selected hidden>Select Timezone</option>
   <option value="UTC">UTC</option>
   <option value="Etc/GMT+12">GMT-12:00 (International Date Line West)</option>
@@ -530,6 +541,31 @@ select[name="timezone"] {
   
 
     <button type="submit" class="submit-btn">Add Release</button>
+
+<div id="uploadProgressContainer" style="
+  display: none;
+  margin-top: 10px;
+  background-color: #e9ecef;
+  border-radius: 999px;
+  overflow: hidden;
+  height: 22px;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+">
+  <div id="uploadProgressBar" style="
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, #4facfe, #00f2fe);
+    text-align: center;
+    color: white;
+    font-weight: 500;
+    font-size: 0.85rem;
+    line-height: 22px;
+    white-space: nowrap;
+    transition: width 0.3s ease;
+  ">0%</div>
+</div>
+
+
   </form>
 </main>
 
@@ -566,11 +602,12 @@ function updateTrackOrder() {
   });
 
   const order = cards.map(card => {
-    const trackIdField = card.querySelector('input[type="text"]'); // first field is track ID
+    const trackIdField = card.querySelector('input[type="hidden"]'); // get hidden trackId
     return trackIdField ? trackIdField.value : '';
   });
   trackOrderInput.value = order.join(',');
 }
+
 
 
 
@@ -685,8 +722,15 @@ card.appendChild(dragContainer);
 
     // Fields
     const fields=document.createElement('div'); fields.className='track-fields';
-    const trackIdField=document.createElement('input'); trackIdField.type='text'; trackIdField.value=trackId; trackIdField.readOnly=true;
-    trackIdField.placeholder='Track ID'; fields.appendChild(trackIdField);
+    
+    const trackIdField = document.createElement('input');
+trackIdField.type = 'hidden';
+trackIdField.name = 'trackId';
+trackIdField.value = trackId;
+fields.appendChild(trackIdField);   // ✅ must append so it is included in FormData
+
+
+
 
     const trackTitleField = document.createElement('input');
 trackTitleField.type = 'text';
@@ -906,14 +950,19 @@ fields.appendChild(producerInput);
 // ISRC text input
 const isrcInput = document.createElement('input');
 isrcInput.type = 'text';
-isrcInput.placeholder = 'ISRC';
+isrcInput.placeholder = 'ISRC (If available)';
+isrcInput.name = 'isrc';
 fields.appendChild(isrcInput);
+
 
 // BPM text input
 const bpmInput = document.createElement('input');
-bpmInput.type = 'text';
+bpmInput.type = 'number';
 bpmInput.placeholder = 'BPM*';
+bpmInput.min = '30';
+bpmInput.max = '300';
 fields.appendChild(bpmInput);
+
 
 // Mood dropdown
 const moodSelect = document.createElement('select');
@@ -952,101 +1001,6 @@ fields.appendChild(explicitSelect);
 });
 </script>
 
-
-<script>
-document.getElementById('releaseForm').addEventListener('submit', function (e) {
-  const trackCount = document.querySelectorAll('#tracklistContainer .track-card').length;
-  if (trackCount === 0) {
-    e.preventDefault(); // Stop form submission
-    alert('Please add at least one track before submitting.');
-  }
-});
-</script>
-
-
-
-<script>
-document.getElementById('releaseForm').addEventListener('submit', async function (e) {
-  e.preventDefault(); // stop default submission
-
-  // Check at least one track
-  const trackCount = document.querySelectorAll('#tracklistContainer .track-card').length;
-  if (trackCount === 0) {
-    alert('Please add at least one track before submitting.');
-    return;
-  }
-
-  // Update track order
-  updateTrackOrder();
-
-  // Create FormData
-  const formData = new FormData(this);
-
-  document.querySelectorAll('#tracklistContainer .track-card').forEach((card, idx) => {
-  const prefix = `tracks[${idx}]`;
-
-  const trackId = card.querySelector('input[type="text"]')?.value;
-  if (trackId) formData.append(`${prefix}[trackId]`, trackId);
-
-  const title = card.querySelector('input[placeholder="Track Title*"]')?.value;
-  if (title) formData.append(`${prefix}[title]`, title);
-
-  const primary = card.querySelector('input[name="primaryArtistAcodes"]')?.value;
-  if (primary) formData.append(`${prefix}[primaryArtistAcodes]`, primary);
-
-  const featured = card.querySelector('input[name="featuredArtistAcodes"]')?.value;
-  if (featured) formData.append(`${prefix}[featuredArtistAcodes]`, featured);
-
-  const genre = card.querySelector('select[name="genre"]')?.value;
-  if (genre) formData.append(`${prefix}[genre]`, genre);
-
-  const subGenre = card.querySelector('select[name="subGenre"]')?.value;
-  if (subGenre) formData.append(`${prefix}[subGenre]`, subGenre);
-
-  const composer = card.querySelector('input[placeholder="Composer*"]')?.value;
-  if (composer) formData.append(`${prefix}[composer]`, composer);
-
-  const producer = card.querySelector('input[placeholder="Producer*"]')?.value;
-  if (producer) formData.append(`${prefix}[producer]`, producer);
-
-  const isrc = card.querySelector('input[placeholder="ISRC"]')?.value;
-  if (isrc) formData.append(`${prefix}[isrc]`, isrc);
-
-  const bpm = card.querySelector('input[placeholder="BPM*"]')?.value;
-  if (bpm) formData.append(`${prefix}[bpm]`, bpm);
-
-  const mood = card.querySelector('select[name="mood"]')?.value;
-  if (mood) formData.append(`${prefix}[mood]`, mood);
-
-  const explicit = card.querySelector('select[name="explicit"]')?.value;
-  if (explicit) formData.append(`${prefix}[explicit]`, explicit);
-
-  // ✅ FIX: send the uploaded audio S3 key
-  const s3Key = card.dataset.s3Key;
-  if (s3Key) formData.append(`${prefix}[s3Key]`, s3Key);
-});
-
-
-  try {
-    const response = await fetch('/submit-release', {
-      method: 'POST',
-      body: formData
-    });
-
-    const result = await response.json();
-    if (result.success) {
-      alert('Release submitted successfully!');
-      // Redirect or refresh if needed
-      // window.location.href = '/your-release-page';
-    } else {
-      alert('Error: ' + (result.message || 'Something went wrong'));
-    }
-  } catch (error) {
-    console.error('Submit error:', error);
-    alert('Server error. Please try again later.');
-  }
-});
-</script>
 
 <script>
 const canvasUpload = document.getElementById('canvasUpload');
@@ -1139,6 +1093,190 @@ artworkInput.addEventListener('change', () => {
   }
 });
 </script>
+
+<script>
+document.getElementById('releaseForm').addEventListener('submit', async function (e) {
+  e.preventDefault();
+
+  let messages = [];
+
+  // Validate main form fields
+  const artwork = document.querySelector('#artworkInput').files.length;
+  if (!artwork) messages.push('• Please upload artwork.');
+  const releaseTitle = document.querySelector('input[name="release_title"]').value.trim();
+  if (!releaseTitle) messages.push('• Please enter Release Title.');
+  const releaseDate = document.querySelector('input[name="release_date"]').value;
+  if (!releaseDate) messages.push('• Please select Release Date.');
+  const releaseTime = document.querySelector('input[name="release_time"]').value;
+  if (!releaseTime) messages.push('• Please select Release Time.');
+  const releaseZone = document.querySelector('select[name="release_zone"]').value;
+  if (!releaseZone) messages.push('• Please select Timezone.');
+
+  const upc = document.querySelector('input[name="upc"]')?.value?.trim();
+  if (!upc) messages.push('• Please enter UPC.');
+
+  // Validate tracks
+  const trackCards = document.querySelectorAll('#tracklistContainer .track-card');
+  if (trackCards.length === 0) {
+    messages.push('• Please add at least one track.');
+  }
+
+  const tracks = [];
+  const isrcs = [];
+  trackCards.forEach((card, index) => {
+    const title = card.querySelector('input[placeholder="Track Title*"]').value.trim();
+    const primaryArtistAcodes = card.querySelector('input[name="primaryArtistAcodes"]').value.trim();
+    const genre = card.querySelector('select[name="genre"]').value;
+    const subGenre = card.querySelector('select[name="subGenre"]').value;
+    const composer = card.querySelector('input[placeholder="Composer*"]').value.trim();
+    const producer = card.querySelector('input[placeholder="Producer*"]').value.trim();
+    const bpm = card.querySelector('input[placeholder="BPM*"]').value.trim();
+    const mood = card.querySelector('select[name="mood"]').value;
+    const explicit = card.querySelector('select[name="explicit"]').value;
+    const trackId = card.querySelector('input[name="trackId"]')?.value;
+    const featuredArtistAcodes = card.querySelector('input[name="featuredArtistAcodes"]').value.trim();
+    const isrc = card.querySelector('input[name="isrc"]')?.value?.trim();
+    const s3Key = card.dataset.s3Key;
+
+    if (!title) messages.push(`• Track ${index + 1}: Please enter Track Title.`);
+    if (!primaryArtistAcodes) messages.push(`• Track ${index + 1}: Please add at least one Primary Artist.`);
+    if (!genre) messages.push(`• Track ${index + 1}: Please select Genre.`);
+    if (!subGenre) messages.push(`• Track ${index + 1}: Please select Sub-Genre.`);
+    if (!composer) messages.push(`• Track ${index + 1}: Please enter Composer.`);
+    if (!producer) messages.push(`• Track ${index + 1}: Please enter Producer.`);
+    if (!bpm) messages.push(`• Track ${index + 1}: Please enter BPM.`);
+    if (!mood) messages.push(`• Track ${index + 1}: Please select Mood.`);
+    if (!explicit) messages.push(`• Track ${index + 1}: Please select if track is Explicit.`);
+    if (isrc) isrcs.push(isrc);
+
+    tracks.push({
+      trackId, title, primaryArtistAcodes, featuredArtistAcodes, genre, subGenre, composer, producer, bpm, mood, explicit, isrc, s3Key
+    });
+  });
+
+  // ✅ Extra warning if there is only one track and titles differ
+  if (trackCards.length === 1) {
+    const trackTitle = tracks[0].title;
+    if (trackTitle.toLowerCase() !== releaseTitle.toLowerCase()) {
+      messages.push('• You have only added one track. Please make sure the Release Title and Track Title match (they currently do not).');
+    }
+  }
+
+  // NEW: Check ISRC & UPC duplicates
+  if (isrcs.length > 0 || upc) {
+    try {
+      const duplicateResponse = await fetch('/check-duplicates', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isrcs, upc })
+      });
+      const duplicateResult = await duplicateResponse.json();
+      if (duplicateResult.duplicateISRCs && duplicateResult.duplicateISRCs.length > 0) {
+        duplicateResult.duplicateISRCs.forEach(d => {
+          messages.push(`• The ISRC "${d}" already exists in the system.`);
+        });
+      }
+      if (duplicateResult.duplicateUPC) {
+        messages.push(`• The UPC "${upc}" already exists in the system.`);
+      }
+    } catch (error) {
+      console.error('Duplicate check error:', error);
+      messages.push('• Could not verify ISRC/UPC duplicates. Please try again later.');
+    }
+  }
+
+  // Show warnings if any
+  const warningBox = document.getElementById('releaseWarnings');
+  if (messages.length > 0) {
+    warningBox.innerHTML = messages.join('<br>');
+    warningBox.style.display = 'block';
+    window.scrollTo({ top: warningBox.offsetTop - 20, behavior: 'smooth' });
+    return;
+  } else {
+    warningBox.style.display = 'none';
+  }
+
+  // ✅ If validation passed, send data
+  updateTrackOrder();
+  const formData = new FormData(this);
+  formData.append('tracks', JSON.stringify(tracks));
+
+    try {
+  const progressContainer = document.getElementById('uploadProgressContainer');
+  const progressBar = document.getElementById('uploadProgressBar');
+  const submitBtn = document.querySelector('.submit-btn');
+
+  // Reset & show progress, hide button
+  progressBar.style.width = '0%';
+  progressBar.textContent = '0%';
+  submitBtn.style.display = 'none';
+  progressContainer.style.display = 'block';
+
+  const xhr = new XMLHttpRequest();
+  xhr.open('POST', '/submit-release');
+
+  xhr.upload.addEventListener('progress', function(e) {
+    if (e.lengthComputable) {
+      const percent = Math.round((e.loaded / e.total) * 100);
+      progressBar.style.width = percent + '%';
+      progressBar.textContent = percent + '%';
+    }
+  });
+
+  xhr.onload = function() {
+    try {
+      const result = JSON.parse(xhr.responseText);
+      if (xhr.status === 200 && result.success) {
+        progressBar.style.width = '100%';
+        progressBar.textContent = 'Upload complete!';
+        setTimeout(() => {
+          window.location.href = '/profile?acode=<%= userAcode %>';
+        }, 800); // brief pause to show completion
+      } else {
+        showError(result.message || 'Something went wrong');
+      }
+    } catch (parseErr) {
+      console.error('Parse error:', parseErr);
+      showError('Unexpected server response.');
+    }
+  };
+
+  xhr.onerror = function() {
+    showError('Network error. Please try again.');
+  };
+
+  xhr.send(formData);
+
+  function showError(message) {
+    warningBox.innerHTML = '• ' + message;
+    warningBox.style.display = 'block';
+    submitBtn.style.display = 'block';
+    progressContainer.style.display = 'none';
+    progressBar.style.width = '0%';
+    progressBar.textContent = '0%';
+  }
+} catch (error) {
+  console.error('Submit error:', error);
+  warningBox.innerHTML = '• Server error. Please try again later.';
+  warningBox.style.display = 'block';
+  submitBtn.style.display = 'block';
+  progressContainer.style.display = 'none';
+  progressBar.style.width = '0%';
+  progressBar.textContent = '0%';
+}
+
+
+});
+</script>
+
+
+
+
+
+
+
+
+
 
 </body>
 </html>

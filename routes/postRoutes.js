@@ -610,21 +610,21 @@ router.get('/media/:type/:filename', async (req, res) => {
 
 router.get('/profile', compCheck, async (req, res) => {
   const loggedInUser = req.session.user;
-  const queryAcode = req.query.acode; // get from query param
+  const queryAcode = req.query.acode;
+  let isOwnProfile = false;
 
   try {
-    // decide which acode to use
     const targetAcode = queryAcode || loggedInUser.acode;
+    isOwnProfile = (targetAcode === loggedInUser.acode);
 
-    // fetch user by targetAcode
-    const result = await pool.query(
+    // Fetch target user info
+    const { rows: userRows } = await pool.query(
       'SELECT account_mode, acode, pfp_url, artist_name, bio FROM users WHERE acode = $1',
       [targetAcode]
     );
-
-    if (result.rowCount === 0) {
+    if (userRows.length === 0) {
       return res.status(404).render('profile', { 
-        artist: { 
+        artist: {
           name: loggedInUser.username || 'Unknown Artist',
           bannerUrl: '/path/to/default/banner.png',
           followers: '0',
@@ -634,72 +634,182 @@ router.get('/profile', compCheck, async (req, res) => {
           songs: []
         },
         pfpUrl: '/path/to/default_pfp.png',
-        userAcode: loggedInUser.acode, // always pass current user's acode
+        userAcode: loggedInUser.acode,
+        isOwnProfile,
+        isFollowing: false,
         error: 'User not found.'
       });
     }
+    const user = userRows[0]; // raw acode: user.acode
 
-    const row = result.rows[0];
-    const accountMode = row.account_mode;
-    const acode = row.acode; // raw acode of profile being viewed
-    const artistName = row.artist_name?.trim();
-    const bio = row.bio?.trim() || '';
+    // Logged-in user's pfp for header
+    let headerPfpUrl = '/path/to/default_pfp.png';
+    if (loggedInUser.pfp_url) {
+      const filename = loggedInUser.pfp_url.split('/').pop();
+      headerPfpUrl = await generatePresignedUrl(`pfp/${filename}`);
+    }
 
-    // fetch pfp of logged-in user (for header)
-let headerPfpUrl;
-const loggedInUserResult = await pool.query('SELECT pfp_url FROM users WHERE acode = $1', [loggedInUser.acode]);
-if (loggedInUserResult.rows[0]?.pfp_url) {
-  const filename = loggedInUserResult.rows[0].pfp_url.split('/').pop();
-  headerPfpUrl = await generatePresignedUrl(`pfp/${filename}`);
-} else {
-  headerPfpUrl = await generatePresignedUrl('drawables/default_pfp.png');
-}
+    // Target profile banner (or default)
+    let bannerUrl = await generatePresignedUrl('drawables/banner_default.png');
+    if (user.pfp_url) {
+      const filename = user.pfp_url.split('/').pop();
+      bannerUrl = await generatePresignedUrl(`pfp/${filename}`);
+    }
 
-// fetch pfp and banner of target profile user
-let presignedBannerUrl;
-if (row.pfp_url) {
-  const filename = row.pfp_url.split('/').pop();
-  presignedBannerUrl = await generatePresignedUrl(`pfp/${filename}`);
-} else {
-  presignedBannerUrl = await generatePresignedUrl('drawables/banner_default.png');
-}
+    // Encrypt only for sending to front end
+    const encryptedAcode = user.acode ? encrypt(user.acode) : null;
 
+    // Follower count
+    const { rows: followerRows } = await pool.query(
+      `SELECT COUNT(*)::int AS count FROM follows WHERE following_acode = $1`,
+      [user.acode]
+    );
+    const followerCount = followerRows[0]?.count || 0;
 
-    const encryptedAcode = acode ? encrypt(acode) : null;
+    // Check if logged-in user already follows target (always use raw acode)
+    let isFollowing = false;
+    if (!isOwnProfile) {
+      const followCheck = await pool.query(
+        `SELECT 1 FROM follows WHERE follower_acode = $1 AND following_acode = $2`,
+        [loggedInUser.acode, user.acode]
+      );
+      isFollowing = followCheck.rowCount > 0;
+    }
+
+    // Fetch popular tracks (stream counts)
+    const { rows: trackRows } = await pool.query(`
+      SELECT 
+        t.track_id, t.track_title, a.artwork_url,
+        COALESCE(s.stream_count, 0) AS streams
+      FROM tracks t
+      INNER JOIN albums a ON t.release_id = a.release_id
+      LEFT JOIN (
+        SELECT track_id, COUNT(*)::int AS stream_count
+        FROM streams
+        WHERE verified = 'Yes'
+        GROUP BY track_id
+      ) s ON t.track_id = s.track_id
+      WHERE a.acode = $1
+      ORDER BY streams DESC
+      LIMIT 10
+    `, [targetAcode]);
+
+    // Build songs array
+    const songs = [];
+    for (const track of trackRows) {
+      let coverUrl = '/path/to/default_cover.jpg';
+      if (track.artwork_url) {
+        const filename = track.artwork_url.split('/').pop();
+        coverUrl = await generatePresignedUrl(`artworks/${filename}`);
+      }
+      songs.push({
+        title: track.track_title,
+        coverUrl,
+        streams: track.streams
+      });
+    }
 
     const artist = {
-      name: artistName || loggedInUser.username || 'Unknown Artist',
-      bannerUrl: presignedBannerUrl,
-      followers: '34,209',
-      bio,
-      account_mode: accountMode,
-      acode: encryptedAcode,
-      songs: [
-        { title: 'Echoes of Tomorrow', coverUrl: '/uploads/track1.jpg' },
-        { title: 'Neon Rain', coverUrl: '/uploads/track2.jpg' },
-        { title: 'Dreams in Motion', coverUrl: '/uploads/track3.jpg' },
-      ],
+      name: user.artist_name?.trim() || loggedInUser.username || 'Unknown Artist',
+      bannerUrl,
+      followers: followerCount,
+      bio: user.bio?.trim() || '',
+      account_mode: user.account_mode,
+      acode: encryptedAcode, // send encrypted to front
+      songs
     };
 
-    const isOwnProfile = (targetAcode === loggedInUser.acode);
-
-res.render('profile', { 
-  artist,
-  pfpUrl: headerPfpUrl,
-  userAcode: loggedInUser.acode,
-  isOwnProfile   // new flag
-});
-
-
+    res.render('profile', { 
+      artist,
+      pfpUrl: headerPfpUrl,
+      userAcode: loggedInUser.acode,
+      isOwnProfile,
+      isFollowing
+    });
 
   } catch (err) {
     console.error('Error fetching profile data:', err);
     res.render('profile', {
-      artist: { name: loggedInUser.username || 'Unknown Artist', bannerUrl: '/path/to/default/banner.png', followers: '0', bio: '', account_mode: null, acode: null, songs: [] },
+      artist: { 
+        name: loggedInUser.username || 'Unknown Artist', 
+        bannerUrl: '/path/to/default/banner.png', 
+        followers: '0', 
+        bio: '', 
+        account_mode: null, 
+        acode: null,
+        songs: [] 
+      },
       pfpUrl: '/path/to/default_pfp.png',
       userAcode: loggedInUser.acode,
+      isOwnProfile,
+      isFollowing: false,
       error: 'Failed to load profile.'
     });
+  }
+});
+
+
+
+router.post('/follow', compCheck, async (req, res) => {
+  const loggedInUser = req.session.user;
+  let { targetAcode } = req.body;
+
+  if (!targetAcode || targetAcode === loggedInUser.acode) {
+    return res.status(400).json({ success: false, message: 'Invalid target.' });
+  }
+
+  try {
+    targetAcode = decrypt(targetAcode); // get raw
+
+    const followId = crypto.randomBytes(15).toString('base64').replace(/[^a-zA-Z0-9]/g, '').slice(0, 20);
+
+    const existing = await pool.query(
+      `SELECT 1 FROM follows WHERE follower_acode = $1 AND following_acode = $2`,
+      [loggedInUser.acode, targetAcode]
+    );
+
+    if (existing.rowCount > 0) {
+      return res.status(409).json({ success: false, message: 'Already following' });
+    }
+
+    await pool.query(
+      `INSERT INTO follows (follow_id, follower_acode, following_acode) VALUES ($1, $2, $3)`,
+      [followId, loggedInUser.acode, targetAcode]
+    );
+
+    res.json({ success: true, message: 'Followed successfully' });
+
+  } catch (err) {
+    console.error('Error following artist:', err);
+    res.status(500).json({ success: false, message: 'Failed to follow' });
+  }
+});
+
+router.post('/unfollow', compCheck, async (req, res) => {
+  const loggedInUser = req.session.user;
+  let { targetAcode } = req.body;
+
+  if (!targetAcode || targetAcode === loggedInUser.acode) {
+    return res.status(400).json({ success: false, message: 'Invalid target.' });
+  }
+
+  try {
+    targetAcode = decrypt(targetAcode);
+
+    const result = await pool.query(
+      `DELETE FROM follows WHERE follower_acode = $1 AND following_acode = $2`,
+      [loggedInUser.acode, targetAcode]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ success: false, message: 'Not following' });
+    }
+
+    res.json({ success: true, message: 'Unfollowed successfully' });
+
+  } catch (err) {
+    console.error('Error unfollowing artist:', err);
+    res.status(500).json({ success: false, message: 'Failed to unfollow' });
   }
 });
 
@@ -947,6 +1057,41 @@ router.get('/search-artists', async (req, res) => {
   }
 });
 
+router.post('/check-duplicates', async (req, res) => {
+  const { isrcs, upc } = req.body;
+
+  try {
+    const duplicateISRCs = [];
+    let duplicateUPC = false;
+
+    if (Array.isArray(isrcs) && isrcs.length > 0) {
+      // Check existing ISRCs
+      const { rows } = await pool.query(
+        'SELECT isrc FROM tracks WHERE isrc = ANY($1)',
+        [isrcs]
+      );
+      rows.forEach(row => duplicateISRCs.push(row.isrc));
+    }
+
+    if (upc) {
+      // Check if UPC already exists
+      const { rows } = await pool.query(
+        'SELECT 1 FROM albums WHERE upc = $1 LIMIT 1',
+        [upc]
+      );
+      if (rows.length > 0) {
+        duplicateUPC = true;
+      }
+    }
+
+    res.json({ duplicateISRCs, duplicateUPC });
+  } catch (err) {
+    console.error('Error checking duplicates:', err);
+    res.status(500).json({ message: 'Server error checking duplicates' });
+  }
+});
+
+
 
 router.post('/submit-release', upload.any(), async (req, res) => {
   try {
@@ -964,30 +1109,41 @@ router.post('/submit-release', upload.any(), async (req, res) => {
     if (artFile) artKey = await uploadArtworkToS3(artFile, release_id);
     if (canvasFile) canvasKey = await uploadCanvasToS3(canvasFile, release_id);
 
-    // Insert album
+    // Insert album (set null if field is empty string or undefined)
     await pool.query(`
       INSERT INTO albums
       (release_id, acode, release_title, artwork_url, canvas_url, genre, explicit, upc, tracks,
        copyright, phonograph, record_label, release_date, release_time, release_zone, release_type)
       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)
     `, [
-      release_id, acode, release_title, artKey, canvasKey, genre, explicit, upc, track_order,
-      copyright, phonograph, record_label, release_date, release_time, release_zone, release_type
+      release_id || null,
+      acode || null,
+      release_title || null,
+      artKey,
+      canvasKey,
+      genre || null,
+      explicit || null,
+      upc || null,
+      track_order || null,
+      copyright || null,
+      phonograph || null,
+      record_label || null,
+      release_date || null,
+      release_time || null,
+      release_zone || null,
+      release_type || null
     ]);
 
     // Parse tracks
-    const tracks = [];
-    Object.entries(req.body).forEach(([key, value]) => {
-      const match = key.match(/^tracks\[(\d+)]\[(.+)]$/);
-      if (match) {
-        const index = parseInt(match[1], 10);
-        const field = match[2];
-        if (!tracks[index]) tracks[index] = {};
-        tracks[index][field] = value;
+    let tracks = [];
+    if (req.body.tracks) {
+      try {
+        tracks = JSON.parse(req.body.tracks);
+      } catch (e) {
+        console.error('Could not parse tracks JSON:', e);
       }
-    });
-
-    console.log('Parsed tracks:', JSON.stringify(tracks, null, 2));
+    }
+    console.log('Parsed tracks:', tracks);
 
     // Track order array
     const trackOrderArray = (track_order || '').split(',');
@@ -1001,26 +1157,26 @@ router.post('/submit-release', upload.any(), async (req, res) => {
       await pool.query(`
         INSERT INTO tracks 
         (track_id, release_id, acode, track_title, primary_artist, features, audio_url,
-         genre, sub_genre, composer, producer, mood, ISRC, track_order, release_date, bpm, explicit)
+         genre, sub_genre, composer, producer, mood, isrc, track_order, release_date, bpm, explicit)
         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)
       `, [
-        track.trackId,
-        release_id,
-        acode,
-        track.title || '',
-        track.primaryArtistAcodes || '',
-        track.featuredArtistAcodes || '',
-        track.s3Key,
-        track.genre || '',
-        track.subGenre || '',
-        track.composer || '',
-        track.producer || '',
-        track.mood || '',
-        track.isrc || null,
+        track.trackId || null,
+        release_id || null,
+        acode || null,
+        track.title?.trim() || null,
+        track.primaryArtistAcodes?.trim() || null,
+        track.featuredArtistAcodes?.trim() || null,
+        track.s3Key || null,
+        track.genre?.trim() || null,
+        track.subGenre?.trim() || null,
+        track.composer?.trim() || null,
+        track.producer?.trim() || null,
+        track.mood?.trim() || null,
+        track.isrc?.trim() || null,
         orderIndex + 1,
-        release_date,
-        track.bpm || '',
-        track.explicit || ''
+        release_date || null,
+        track.bpm?.trim() || null,
+        track.explicit?.trim() || null
       ]);
     }
 
@@ -1030,6 +1186,7 @@ router.post('/submit-release', upload.any(), async (req, res) => {
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });
+
 
 
 
