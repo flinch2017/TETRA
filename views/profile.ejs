@@ -187,16 +187,7 @@
     flex-wrap: wrap;
   }
 
-  .release-block {
-    flex: 1;
-    min-width: 250px;
-  }
-
-  .release-title {
-    font-size: 1.1rem;
-    color: #1db954;
-    margin-bottom: 0.75rem;
-  }
+  
 
   .release-meta {
     font-size: 0.85rem;
@@ -265,6 +256,97 @@
   transform: translateY(-2px);
 }
 
+  .releases-grid {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .releases-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .release-card-link {
+    flex: 0 0 180px;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .release-card {
+    position: relative;
+    scroll-snap-align: start;
+    background-color: #1c1c1c;
+    border-radius: 16px;
+    overflow: hidden;
+    /* Removed hover scaling and transition */
+  }
+
+  /* No .release-card:hover at all */
+
+  .release-cover {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 12px;
+    box-shadow: 0 0 6px rgba(0,0,0,0.3);
+  }
+
+  .release-details {
+    padding: 10px 8px;
+    text-align: left;
+  }
+
+  .release-title-with-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 5px;
+  }
+
+  .release-title {
+    font-size: 1rem;
+    font-weight: bold;
+    color: white;
+  }
+
+  .explicit-e-badge {
+    background-color: crimson;
+    color: white;
+    font-size: 0.65rem;
+    padding: 2px 5px;
+    border-radius: 4px;
+    font-weight: bold;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+
+  .release-meta {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 8px;
+  }
+
+  .release-card-link:hover,
+.release-card-link:hover * {
+  text-decoration: none;
+  color: inherit;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.clickable-song {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.clickable-song:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
 
 
 </style>
@@ -297,6 +379,7 @@
 
 
 
+
       <div class="artist-dropdown">
         <i class="fas fa-ellipsis-v artist-dropdown-toggle"></i>
         <div class="artist-dropdown-menu">
@@ -325,59 +408,67 @@
 
 <main class="artist-profile">
   <div class="section">
-    <h2>Popular Songs</h2>
-    <% if (artist.songs && artist.songs.length > 0) { %>
-      <% artist.songs.forEach(song => { %>
-        <div class="song-item">
-          <div class="song-info">
-            <img src="<%= song.coverUrl %>" alt="Cover">
-            <div>
-              <div class="song-title"><%= song.title %></div>
-              <div class="release-meta"><%= song.streams %> streams</div>
-            </div>
-          </div>
-          <div class="song-actions">
-            <i class="fas fa-play"></i>
-            <i class="fas fa-heart"></i>
-            <i class="fas fa-ellipsis-v"></i>
+  <h2>Popular Songs</h2>
+  <% if (artist.songs && artist.songs.length > 0) { %>
+    <% artist.songs.forEach(song => { %>
+      <div class="song-item clickable-song" data-song-id="<%= song.id %>">
+        <div class="song-info">
+          <img src="<%= song.coverUrl %>" alt="Cover">
+          <div>
+            <div class="song-title"><%= song.title %></div>
+            <div class="release-meta"><%= song.streams %> streams</div>
           </div>
         </div>
-      <% }) %>
-    <% } else { %>
-      <p style="color: rgba(255,255,255,0.6); font-size:0.95rem;">No available songs</p>
-    <% } %>
-  </div>
+        <div class="song-actions">
+          <i class="fas fa-heart"></i>
+          <i class="fas fa-ellipsis-v"></i>
+        </div>
+      </div>
+    <% }) %>
+  <% } else { %>
+    <p style="color: rgba(255,255,255,0.6); font-size:0.95rem;">No available songs</p>
+  <% } %>
+</div>
+
 
   <div class="section">
-    <h2>Latest Release | Popular Release</h2>
-    <% if (artist.releases && artist.releases.length > 0) { %>
-      <div class="releases-wrapper">
-        <% artist.releases.forEach(release => { %>
-          <div class="release-block">
-            <h3 class="release-title"><%= release.type %></h3>
-            <div class="song-item no-border">
-              <div class="song-info">
-                <img src="<%= release.coverUrl %>" alt="<%= release.title %>">
-                <div>
-                  <div class="song-title"><%= release.title %></div>
-                  <% if (release.streams) { %>
-                    <div class="release-meta"><%= release.streams %> streams</div>
-                  <% } else if (release.releasedOn) { %>
-                    <div class="release-meta">Released on <%= release.releasedOn %></div>
-                  <% } %>
-                </div>
+  <h2>Latest Albums</h2>
+  <% if (artist.releases && artist.releases.length > 0) { %>
+    <div class="releases-grid">
+      <% artist.releases.forEach(release => { %>
+        <a href="/album/<%= release.id %>" class="release-card-link">
+          <div class="release-card">
+            <img class="release-cover" src="<%= release.coverUrl %>" alt="<%= release.title %>">
+            <div class="release-details">
+              <div class="release-title-with-badge">
+                <span class="release-title"><%= release.title %></span>
+                <% if (release.explicit === 'Yes') { %>
+                  <span class="explicit-e-badge">E</span>
+                <% } %>
               </div>
-              <div class="song-actions">
-                <i class="fas fa-play"></i>
-              </div>
+              <% if (release.releasedOn) { %>
+                <div class="release-meta">Released on <%= release.releasedOn %></div>
+              <% } %>
             </div>
           </div>
-        <% }) %>
-      </div>
-    <% } else { %>
-      <p style="color: rgba(255,255,255,0.6); font-size:0.95rem;">No available releases</p>
-    <% } %>
-  </div>
+        </a>
+      <% }) %>
+    </div>
+  <% } else { %>
+    <p style="color: rgba(255,255,255,0.6); font-size:0.95rem;">No available albums</p>
+  <% } %>
+</div>
+
+
+
+
+
+
+
+
+
+
+
 
   <div class="section">
     <h2>About</h2>
@@ -434,7 +525,7 @@ document.addEventListener('DOMContentLoaded', () => {
           followBtn.textContent = isFollowing ? 'Follow' : 'Following';
           followBtn.setAttribute('data-following', isFollowing ? 'false' : 'true');
 
-          // Update follower count
+          // Optional: update follower count
           const followerCountElem = document.querySelector('.artist-follow');
           if (followerCountElem) {
             let count = parseInt(followerCountElem.textContent) || 0;

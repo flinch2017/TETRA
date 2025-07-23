@@ -147,31 +147,34 @@ main.form-container {
 <header>
   <div class="logo">TETRA</div>
   <div class="nav-links">
-  <a href="/charts" class="nav-item">
-    <span class="nav-icon"><i class="fas fa-chart-bar"></i></span>
-    <span class="nav-label">Charts</span>
-  </a>
-  <a href="/messages" class="nav-item">
-    <span class="nav-icon"><i class="fas fa-comments"></i></span>
-    <span class="nav-label">Messages</span>
-    <span class="notification-badge">2</span>
-  </a>
-  <a href="/notifications" class="nav-item">
-    <span class="nav-icon"><i class="fas fa-bell"></i></span>
-    <span class="nav-label">Notifications</span>
-    <span class="notification-badge">3</span>
-  </a>
-  <div class="profile-container" id="profileDropdown">
-  <div class="profile-pic" style="background-image: url('<%= pfpUrl %>');"></div>
-  <div class="dropdown">
-    <a href="/profile?acode=<%= userAcode %>">See Profile</a>
-    <a href="/logout">Logout</a>
+    <a href="/charts" class="nav-item">
+      <span class="nav-icon"><i class="fas fa-chart-bar"></i></span>
+      <span class="nav-label">Charts</span>
+    </a>
+    <a href="/music" class="nav-item">
+      <span class="nav-icon"><i class="fas fa-music"></i></span>
+      <span class="nav-label">Music</span>
+    </a>
+    <a href="/messages" class="nav-item">
+      <span class="nav-icon"><i class="fas fa-comments"></i></span>
+      <span class="nav-label">Messages</span>
+      <span class="notification-badge">2</span>
+    </a>
+    <a href="/notifications" class="nav-item">
+      <span class="nav-icon"><i class="fas fa-bell"></i></span>
+      <span class="nav-label">Notifications</span>
+      <span class="notification-badge">3</span>
+    </a>
+    <div class="profile-container" id="profileDropdown">
+      <div class="profile-pic" style="background-image: url('<%= pfpUrl %>');"></div>
+      <div class="dropdown">
+        <a href="/profile?acode=<%= userAcode %>">See Profile</a>
+        <a href="/logout">Logout</a>
+      </div>
+    </div>
   </div>
-</div>
-
-</div>
-
 </header>
+
 
 <script>
   const profile = document.getElementById('profileDropdown');

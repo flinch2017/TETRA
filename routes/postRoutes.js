@@ -453,7 +453,7 @@ router.get('/dashboard', compCheck, async (req, res) => {
       const filename = userRow.pfp_url.split('/').pop();
       presignedPfpUrl = await generatePresignedUrl(`pfp/${filename}`);
     } else {
-      presignedPfpUrl = await generatePresignedUrl('drawables/default_pfp.png');
+      presignedPfpUrl = await generatePresignedUrl('drawables/banner_default.png');
     }
 
     // Fetch posts including poster's artist_name, username, acode, and pfp_url
@@ -487,7 +487,7 @@ router.get('/dashboard', compCheck, async (req, res) => {
       // Generate presigned URL for poster's profile pic
       const presignedPosterPfpUrl = post.pfp_url
         ? await generatePresignedUrl(`pfp/${path.basename(post.pfp_url)}`)
-        : await generatePresignedUrl('drawables/default_pfp.png');
+        : await generatePresignedUrl('drawables/banner_default.png');
 
       return {
         post_id: post.post_id,
@@ -617,13 +617,28 @@ router.get('/profile', compCheck, async (req, res) => {
     const targetAcode = queryAcode || loggedInUser.acode;
     isOwnProfile = (targetAcode === loggedInUser.acode);
 
-    // Fetch target user info
+    // ✅ Get current user's profile picture
+    const { rows: currentUserRows } = await pool.query(
+      'SELECT pfp_url FROM users WHERE id = $1',
+      [loggedInUser.id]
+    );
+    const currentUser = currentUserRows[0] || {};
+
+    let headerPfpUrl = await generatePresignedUrl('drawables/banner_default.png');
+
+if (currentUser.pfp_url) {
+  const filename = currentUser.pfp_url.split('/').pop();
+  headerPfpUrl = await generatePresignedUrl(`pfp/${filename}`);
+}
+
+
+    // ✅ Target artist
     const { rows: userRows } = await pool.query(
       'SELECT account_mode, acode, pfp_url, artist_name, bio FROM users WHERE acode = $1',
       [targetAcode]
     );
     if (userRows.length === 0) {
-      return res.status(404).render('profile', { 
+      return res.status(404).render('profile', {
         artist: {
           name: loggedInUser.username || 'Unknown Artist',
           bannerUrl: '/path/to/default/banner.png',
@@ -631,62 +646,56 @@ router.get('/profile', compCheck, async (req, res) => {
           bio: '',
           account_mode: null,
           acode: null,
-          songs: []
+          songs: [],
+          releases: []
         },
-        pfpUrl: '/path/to/default_pfp.png',
+        pfpUrl: headerPfpUrl,
         userAcode: loggedInUser.acode,
         isOwnProfile,
         isFollowing: false,
         error: 'User not found.'
       });
     }
-    const user = userRows[0]; // raw acode: user.acode
 
-    // Logged-in user's pfp for header
-    let headerPfpUrl = '/path/to/default_pfp.png';
-    if (loggedInUser.pfp_url) {
-      const filename = loggedInUser.pfp_url.split('/').pop();
-      headerPfpUrl = await generatePresignedUrl(`pfp/${filename}`);
-    }
+    const user = userRows[0];
 
-    // Target profile banner (or default)
+    // ✅ Banner
     let bannerUrl = await generatePresignedUrl('drawables/banner_default.png');
     if (user.pfp_url) {
       const filename = user.pfp_url.split('/').pop();
       bannerUrl = await generatePresignedUrl(`pfp/${filename}`);
     }
 
-    // Encrypt only for sending to front end
-    const encryptedAcode = user.acode ? encrypt(user.acode) : null;
+    const encryptedAcode = encrypt(user.acode);
 
-    // Follower count
+    // ✅ Followers
     const { rows: followerRows } = await pool.query(
-      `SELECT COUNT(*)::int AS count FROM follows WHERE following_acode = $1`,
+      'SELECT COUNT(*)::int AS count FROM follows WHERE following_acode = $1',
       [user.acode]
     );
     const followerCount = followerRows[0]?.count || 0;
 
-    // Check if logged-in user already follows target (always use raw acode)
+    // ✅ Follow state
     let isFollowing = false;
     if (!isOwnProfile) {
       const followCheck = await pool.query(
-        `SELECT 1 FROM follows WHERE follower_acode = $1 AND following_acode = $2`,
+        'SELECT 1 FROM follows WHERE follower_acode = $1 AND following_acode = $2',
         [loggedInUser.acode, user.acode]
       );
       isFollowing = followCheck.rowCount > 0;
     }
 
-    // Fetch popular tracks (stream counts)
+    // ✅ Fetch top tracks (with explicit)
     const { rows: trackRows } = await pool.query(`
       SELECT 
-        t.track_id, t.track_title, a.artwork_url,
+        t.track_id, t.track_title, t.explicit,
+        a.artwork_url,
         COALESCE(s.stream_count, 0) AS streams
       FROM tracks t
       INNER JOIN albums a ON t.release_id = a.release_id
       LEFT JOIN (
         SELECT track_id, COUNT(*)::int AS stream_count
-        FROM streams
-        WHERE verified = 'Yes'
+        FROM streams WHERE verified = 'Yes'
         GROUP BY track_id
       ) s ON t.track_id = s.track_id
       WHERE a.acode = $1
@@ -694,7 +703,6 @@ router.get('/profile', compCheck, async (req, res) => {
       LIMIT 10
     `, [targetAcode]);
 
-    // Build songs array
     const songs = [];
     for (const track of trackRows) {
       let coverUrl = '/path/to/default_cover.jpg';
@@ -703,23 +711,53 @@ router.get('/profile', compCheck, async (req, res) => {
         coverUrl = await generatePresignedUrl(`artworks/${filename}`);
       }
       songs.push({
-        title: track.track_title,
+  id: track.track_id,           // ✅ Add this line
+  title: track.track_title,
+  coverUrl,
+  streams: track.streams,
+  explicit: track.explicit
+});
+
+    }
+
+    // ✅ Fetch albums/releases (with explicit)
+    const { rows: albumRows } = await pool.query(`
+      SELECT release_id, release_title, artwork_url, release_date, explicit
+      FROM albums
+      WHERE acode = $1
+      ORDER BY upload_date DESC
+      LIMIT 5
+    `, [targetAcode]);
+
+    const releases = [];
+    for (const album of albumRows) {
+      let coverUrl = '/path/to/default_cover.jpg';
+      if (album.artwork_url) {
+        const filename = album.artwork_url.split('/').pop();
+        coverUrl = await generatePresignedUrl(`artworks/${filename}`);
+      }
+      releases.push({
+        id: album.release_id,
+        title: album.release_title,
         coverUrl,
-        streams: track.streams
+        releasedOn: album.release_date,
+        explicit: album.explicit // ✅ pass text as-is
       });
     }
 
+    // ✅ Final object
     const artist = {
       name: user.artist_name?.trim() || loggedInUser.username || 'Unknown Artist',
       bannerUrl,
       followers: followerCount,
       bio: user.bio?.trim() || '',
       account_mode: user.account_mode,
-      acode: encryptedAcode, // send encrypted to front
-      songs
+      acode: encryptedAcode,
+      songs,
+      releases
     };
 
-    res.render('profile', { 
+    res.render('profile', {
       artist,
       pfpUrl: headerPfpUrl,
       userAcode: loggedInUser.acode,
@@ -730,14 +768,15 @@ router.get('/profile', compCheck, async (req, res) => {
   } catch (err) {
     console.error('Error fetching profile data:', err);
     res.render('profile', {
-      artist: { 
-        name: loggedInUser.username || 'Unknown Artist', 
-        bannerUrl: '/path/to/default/banner.png', 
-        followers: '0', 
-        bio: '', 
-        account_mode: null, 
+      artist: {
+        name: loggedInUser.username || 'Unknown Artist',
+        bannerUrl: '/path/to/default/banner.png',
+        followers: '0',
+        bio: '',
+        account_mode: null,
         acode: null,
-        songs: [] 
+        songs: [],
+        releases: []
       },
       pfpUrl: '/path/to/default_pfp.png',
       userAcode: loggedInUser.acode,
@@ -750,6 +789,10 @@ router.get('/profile', compCheck, async (req, res) => {
 
 
 
+
+
+
+
 router.post('/follow', compCheck, async (req, res) => {
   const loggedInUser = req.session.user;
   let { targetAcode } = req.body;
@@ -759,12 +802,12 @@ router.post('/follow', compCheck, async (req, res) => {
   }
 
   try {
-    targetAcode = decrypt(targetAcode); // get raw
+    targetAcode = decrypt(targetAcode); // raw
 
     const followId = crypto.randomBytes(15).toString('base64').replace(/[^a-zA-Z0-9]/g, '').slice(0, 20);
 
     const existing = await pool.query(
-      `SELECT 1 FROM follows WHERE follower_acode = $1 AND following_acode = $2`,
+      'SELECT 1 FROM follows WHERE follower_acode = $1 AND following_acode = $2',
       [loggedInUser.acode, targetAcode]
     );
 
@@ -773,17 +816,17 @@ router.post('/follow', compCheck, async (req, res) => {
     }
 
     await pool.query(
-      `INSERT INTO follows (follow_id, follower_acode, following_acode) VALUES ($1, $2, $3)`,
+      'INSERT INTO follows (follow_id, follower_acode, following_acode) VALUES ($1, $2, $3)',
       [followId, loggedInUser.acode, targetAcode]
     );
 
     res.json({ success: true, message: 'Followed successfully' });
-
   } catch (err) {
     console.error('Error following artist:', err);
     res.status(500).json({ success: false, message: 'Failed to follow' });
   }
 });
+
 
 router.post('/unfollow', compCheck, async (req, res) => {
   const loggedInUser = req.session.user;
@@ -794,10 +837,10 @@ router.post('/unfollow', compCheck, async (req, res) => {
   }
 
   try {
-    targetAcode = decrypt(targetAcode);
+    targetAcode = decrypt(targetAcode); // raw
 
     const result = await pool.query(
-      `DELETE FROM follows WHERE follower_acode = $1 AND following_acode = $2`,
+      'DELETE FROM follows WHERE follower_acode = $1 AND following_acode = $2',
       [loggedInUser.acode, targetAcode]
     );
 
@@ -806,7 +849,6 @@ router.post('/unfollow', compCheck, async (req, res) => {
     }
 
     res.json({ success: true, message: 'Unfollowed successfully' });
-
   } catch (err) {
     console.error('Error unfollowing artist:', err);
     res.status(500).json({ success: false, message: 'Failed to unfollow' });
@@ -851,7 +893,7 @@ router.get('/edit-profile', compCheck, async (req, res) => {
       const filename = user.pfp_url.split('/').pop();
       presignedPfpUrl = await generatePresignedUrl(`pfp/${filename}`);
     } else {
-      presignedPfpUrl = await generatePresignedUrl('drawables/default_pfp.png');
+      presignedPfpUrl = await generatePresignedUrl('drawables/banner_default.png');
     }
 
     // ✅ Always include current logged-in user's acode from session
@@ -877,6 +919,7 @@ router.get('/edit-profile', compCheck, async (req, res) => {
 
 
 
+// your existing route
 router.post('/update-artist', compCheck, upload.single('banner'), async (req, res) => {
   const { artistName, genre, bio, acode } = req.body;
 
@@ -887,17 +930,28 @@ router.post('/update-artist', compCheck, upload.single('banner'), async (req, re
   try {
     const decryptedAcode = decrypt(acode);
     let pfpUrl = null;
+    let oldPfpKey = null;
 
-    // If new banner uploaded, upload to S3
+    // Step 1: Fetch current pfp_url
+    const userResult = await pool.query('SELECT pfp_url, account_mode FROM users WHERE acode = $1', [decryptedAcode]);
+    const user = userResult.rows[0];
+    const accountMode = user?.account_mode;
+    const oldPfpUrl = user?.pfp_url;
+
+    // Step 2: If a new file is uploaded, upload new one and schedule deletion of old
     if (req.file) {
-      pfpUrl = await uploadToS3(req.file, 'pfp/'); // returns the S3 URL or key
+      pfpUrl = await uploadToS3(req.file, 'pfp/', decryptedAcode);
+
+      // Step 3: Extract key from old S3 URL if exists
+      if (oldPfpUrl) {
+        const s3UrlPrefix = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/`;
+        if (oldPfpUrl.startsWith(s3UrlPrefix)) {
+          oldPfpKey = oldPfpUrl.slice(s3UrlPrefix.length);
+        }
+      }
     }
 
-    // Fetch current account_mode
-    const result = await pool.query('SELECT account_mode FROM users WHERE acode = $1', [decryptedAcode]);
-    let accountMode = result.rows[0]?.account_mode;
-
-    // build dynamic update fields and values
+    // Step 4: Build dynamic update query
     const updateFields = ['artist_name = $1', 'main_genre = $2', 'bio = $3'];
     const values = [artistName, genre, bio];
 
@@ -911,13 +965,15 @@ router.post('/update-artist', compCheck, upload.single('banner'), async (req, re
       values.push(pfpUrl);
     }
 
-    // always add decryptedAcode at the end for WHERE
     values.push(decryptedAcode);
-
-    // Build final query
     const query = `UPDATE users SET ${updateFields.join(', ')} WHERE acode = $${values.length}`;
-
     await pool.query(query, values);
+
+    // Step 5: Delete the old profile picture from S3
+    if (oldPfpKey) {
+  await deleteFromS3(oldPfpKey);
+}
+
 
     res.json({ success: true });
   } catch (err) {
@@ -1187,6 +1243,74 @@ router.post('/submit-release', upload.any(), async (req, res) => {
   }
 });
 
+
+
+router.get('/api/song-info/:id', async (req, res) => {
+  const songId = req.params.id;
+
+  try {
+    // Fetch song info including primary artist and features
+    const result = await pool.query(`
+      SELECT 
+        track_title AS title, 
+        primary_artist, 
+        features, 
+        artwork_url AS "coverUrl", 
+        audio_url
+      FROM tracks
+      WHERE track_id = $1
+    `, [songId]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Song not found' });
+    }
+
+    const song = result.rows[0];
+
+    // Get primary artist name
+    const primaryArtistResult = await pool.query(
+      `SELECT artist_name FROM users WHERE acode = $1 LIMIT 1`,
+      [song.primary_artist]
+    );
+    const primaryArtistName = primaryArtistResult.rows[0]?.artist_name || 'Unknown Artist';
+
+    // Get feature names if available
+    let featureNames = [];
+    if (song.features) {
+      const featureCodes = song.features.split(',').map(code => code.trim());
+      if (featureCodes.length > 0) {
+        const featureQuery = `SELECT artist_name FROM users WHERE acode = ANY($1)`;
+        const featureResult = await pool.query(featureQuery, [featureCodes]);
+        featureNames = featureResult.rows.map(r => r.artist_name);
+      }
+    }
+
+    // Generate presigned URL for audio file in S3
+    let audioUrl = null;
+    if (song.audio_url) {
+      try {
+        audioUrl = await generatePresignedUrl(song.audio_url);
+      } catch (err) {
+        console.warn(`Failed to generate presigned URL for ${song.audio_url}:`, err);
+      }
+    }
+
+    const artistString = featureNames.length > 0
+      ? `${primaryArtistName} feat. ${featureNames.join(', ')}`
+      : primaryArtistName;
+
+    res.json({
+      title: song.title,
+      artist: artistString,
+      coverUrl: song.coverUrl,
+      audioUrl
+    });
+
+  } catch (err) {
+    console.error('Error fetching song info:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 
 

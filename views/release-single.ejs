@@ -581,6 +581,8 @@ const currentUser = "<%= currentUser %>";
 const addTrackBtn = document.getElementById('addTrackBtn');
 const tracklistContainer = document.getElementById('tracklistContainer');
 const uploadedS3Keys = new Set();
+let formSubmitted = false;
+
 
 const trackOrderInput = document.createElement('input');
 trackOrderInput.type = 'hidden';
@@ -626,12 +628,14 @@ function showArtistAlert() {
 }
 
 window.addEventListener('beforeunload', () => {
+  if (formSubmitted) return;
   uploadedS3Keys.forEach(key => {
     const data = JSON.stringify({ key });
     const blob = new Blob([data], { type: 'application/json' });
     navigator.sendBeacon('/delete-track', blob);
   });
 });
+
 
 addTrackBtn.addEventListener('click', () => {
   if (tracklistContainer.querySelectorAll('.track-card').length >= 3) {
@@ -999,7 +1003,17 @@ fields.appendChild(explicitSelect);
   });
   tracklistContainer.appendChild(input); input.click();
 });
+
+const releaseForm = document.querySelector('form'); // adjust selector if needed
+if (releaseForm) {
+  releaseForm.addEventListener('submit', () => {
+    formSubmitted = true;
+  });
+}
+
 </script>
+
+
 
 
 <script>

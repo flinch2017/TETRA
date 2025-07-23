@@ -1,115 +1,80 @@
+<!-- Floating Plus Button -->
+<a href="javascript:void(0);" class="floating-plus" id="plusButton" title="Create">+</a>
+<div class="plus-options" id="plusOptions">
+  <a href="/create-post">Create Post</a>
+  <a href="javascript:void(0);" id="releaseLink">Release</a>
+</div>
+
+<!-- Music Drawer -->
+<div id="musicDrawer" class="music-drawer collapsed">
+  <div class="music-bar">
+    <div class="track-info">
+      <strong>Now Playing:</strong> <span id="currentTrackTitle">Electric Sunrise</span> — <span id="currentArtist">AuroraDreams</span>
+    </div>
+    <div class="controls">
+      <button id="playPauseBtn">⏯</button>
+      <button id="nextBtn">⏭</button>
+    </div>
+  </div>
+  <div class="music-expanded">
+    <img src="/uploads/electric-sunrise-cover.jpg" alt="Album Art" class="album-art" id="albumArt">
+    <div class="track-details" id="expandedTrackTitle">Electric Sunrise</div>
+    <div class="artist" id="expandedArtist">AuroraDreams</div>
+    <div class="seekbar-with-time">
+  <div class="time-display">
+    <span id="currentTime">0:00</span>
+    <span id="totalDuration">0:00</span>
+  </div>
+  <input type="range" min="0" max="100" value="0" id="seekbar" />
+</div>
+
+
+    <div class="expanded-controls">
+      <button id="prevBtn">⏮</button>
+      <button id="playPauseBtnExpanded">⏯</button>
+      <button id="nextBtnExpanded">⏭</button>
+    </div>
+  </div>
+  <audio id="audioPlayer"></audio>
+
+</div>
+
+<!-- Release Modal -->
+<div id="releaseModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h3>Select Release Type</h3>
+    <div class="release-options">
+      <a href="/submission?type=single" class="release-card">
+        <i class="fas fa-music"></i><br>Single
+      </a>
+      <a href="/submission?type=ep" class="release-card">
+        <i class="fas fa-compact-disc"></i><br>EP
+      </a>
+      <a href="/submission?type=album" class="release-card">
+        <i class="fas fa-record-vinyl"></i><br>Album
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Style Section -->
 <style>
-    .floating-plus {
-  position: fixed;
-  bottom: 70px;
-  right: 20px;
-  background-color: #007aff;
-  color: white;
-  font-size: 1rem;
-  width: 90px;
-  height: 40px;
-  border-radius: 999px;
-  box-shadow: 0 0 8px rgba(0, 122, 255, 0.6), 0 0 16px rgba(0, 122, 255, 0.4);
-  text-decoration: none;
-  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease, bottom 0.3s ease;
-  z-index: 1001;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.floating-plus:hover {
-  background-color: #005fc1;
-  transform: scale(1.1);
-  box-shadow: 0 0 12px rgba(0, 122, 255, 0.8), 0 0 24px rgba(0, 122, 255, 0.5);
-}
-
-
-.floating-plus.up {
-  bottom: 440px; /* Matches expanded drawer height + spacing */
-}
-
-.music-drawer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
+.seekbar-with-time {
   width: 100%;
-  background: #101840;
-  color: white;
-  transition: height 0.3s ease, transform 0.3s ease;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.4);
-  border-top-left-radius: 12px;
-  border-top-right-radius: 12px;
-  overflow: hidden;
-  z-index: 900;
+  padding: 0 1rem 1rem;
+  box-sizing: border-box;
 }
 
-.music-drawer.collapsed {
-  height: 60px;
-}
-
-.music-drawer.expanded {
-  height: 430px;
-}
-
-.music-bar {
-  height: 60px;
+.seekbar-with-time .time-display {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  padding: 0 1rem;
-  cursor: pointer;
-  background-color: #18214d;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 0.25rem;
 }
 
-.music-bar .track-info {
-  font-size: 0.9rem;
-}
-
-.music-bar .controls button {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 1.2rem;
-  margin-left: 0.5rem;
-  cursor: pointer;
-}
-
-.music-expanded {
-  padding: 1rem;
-  display: none;
-  text-align: center;
-}
-
-.music-drawer.expanded .music-expanded {
-  display: block;
-}
-
-.album-art {
-  width: 120px;
-  height: 120px;
-  border-radius: 12px;
-  margin: 0 auto 1rem;
-  display: block;
-}
-
-.track-details {
-  font-size: 1rem;
-  font-weight: bold;
-}
-
-.artist {
-  font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.6);
-  margin-bottom: 1rem;
-}
-
-.seekbar {
-  width: 90%;
-  margin: 0 auto 1rem;
-}
-
-.seekbar input[type="range"] {
+.seekbar-with-time input[type="range"] {
   width: 100%;
   height: 6px;
   background: #ccc;
@@ -119,140 +84,258 @@
   outline: none;
 }
 
-.expanded-controls {
-  display: flex;
-  justify-content: center;
-  gap: 1.5rem;
-}
 
-.expanded-controls button {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 1.6rem;
-  cursor: pointer;
-}
 
-@media screen and (max-width: 600px) {
 
+
+  /* Floating Plus */
   .floating-plus {
-    width: 50px;
-    height: 50px;
-    font-size: 1.8rem;
-    bottom: 65px;
+    position: fixed;
+    bottom: 70px;
     right: 20px;
+    background-color: #007aff;
+    color: white;
+    font-size: 1rem;
+    width: 90px;
+    height: 40px;
+    border-radius: 999px;
+    box-shadow: 0 0 8px rgba(0, 122, 255, 0.6), 0 0 16px rgba(0, 122, 255, 0.4);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    z-index: 1001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .floating-plus:hover {
+    background-color: #005fc1;
+    transform: scale(1.1);
+  }
+  .floating-plus.up {
+    bottom: 440px;
   }
 
-  .floating-plus.up {
-    bottom: 420px;
+  .plus-options {
+    position: fixed;
+    bottom: 120px;
+    right: 20px;
+    background-color: #12193a;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    display: none;
+    flex-direction: column;
+    min-width: 140px;
+    z-index: 1002;
   }
+  .plus-options a {
+    padding: 0.6rem 1rem;
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    font-size: 0.9rem;
+    text-align: left;
+  }
+  .plus-options a:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  /* Music Drawer */
+  .music-drawer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #101840;
+    color: white;
+    transition: height 0.3s ease;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.4);
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    overflow: hidden;
+    z-index: 900;
+  }
+  .music-drawer.collapsed { height: 60px; }
+  .music-drawer.expanded { height: 430px; }
+
+  .music-bar {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1rem;
+    background-color: #18214d;
+    cursor: pointer;
+  }
+  .music-bar .track-info { font-size: 0.9rem; }
+  .music-bar .controls button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    margin-left: 0.5rem;
+    cursor: pointer;
+  }
+
+  .music-expanded {
+    padding: 1rem;
+    display: none;
+    text-align: center;
+  }
+  .music-drawer.expanded .music-expanded { display: block; }
 
   .album-art {
-    width: 90px;
-    height: 90px;
+    width: 120px;
+    height: 120px;
+    border-radius: 12px;
+    margin: 0 auto 1rem;
   }
-
   .track-details {
-    font-size: 0.95rem;
+    font-size: 1rem;
+    font-weight: bold;
   }
-
   .artist {
-    font-size: 0.75rem;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 1rem;
   }
 
+  
+
+  .expanded-controls {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+  }
   .expanded-controls button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.6rem;
+    cursor: pointer;
+  }
+
+  /* Modal */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1500;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.6);
+    animation: fadeIn 0.3s ease forwards;
+  }
+  @keyframes fadeIn {
+    from { background-color: rgba(0,0,0,0); }
+    to { background-color: rgba(0,0,0,0.6); }
+  }
+  .modal-content {
+    background-color: #12193a;
+    margin: 10% auto;
+    padding: 1.5rem;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 350px;
+    color: white;
+    text-align: center;
+    animation: popIn 0.3s ease forwards;
+  }
+  @keyframes popIn {
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .modal-content h3 {
+    margin: 0 0 1rem;
+    font-size: 1.2rem;
+  }
+  .release-options {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 1rem;
+  }
+  .release-card {
+    flex: 1 1 100px;
+    max-width: 100px;
+    background-color: #1c2a5a;
+    border: 1px solid rgba(255,255,255,0.1);
+    color: white;
+    padding: 0.8rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: transform 0.2s ease, background-color 0.3s;
+    text-align: center;
+    word-break: break-word;
+  }
+  .release-card i {
     font-size: 1.4rem;
+    margin-bottom: 0.4rem;
+    display: block;
+  }
+  .release-card:hover {
+    background-color: #007aff;
+    transform: translateY(-4px);
   }
 
-  .music-drawer.expanded {
-    height: 410px;
+  .close {
+    color: rgba(255,255,255,0.8);
+    float: right;
+    font-size: 1.4rem;
+    cursor: pointer;
   }
-}
 
-.plus-options {
-  position: fixed;
-  bottom: 120px; /* place above the plus button */
-  right: 20px;
-  background-color: #12193a;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-  overflow: hidden;
-  z-index: 1002;
-  display: none; /* hidden by default */
-  flex-direction: column;
-  min-width: 140px;
-}
-
-.plus-options a {
-  padding: 0.6rem 1rem;
-  color: rgba(255, 255, 255, 0.9);
-  text-decoration: none;
-  font-size: 0.9rem;
-  text-align: left;
-}
-
-.plus-options a:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
+  /* Mobile Adjustments */
+  @media screen and (max-width: 600px) {
+    .floating-plus {
+      width: 50px;
+      height: 50px;
+      font-size: 1.8rem;
+      bottom: 65px;
+    }
+    .floating-plus.up { bottom: 420px; }
+    .album-art {
+      width: 90px;
+      height: 90px;
+    }
+    .track-details { font-size: 0.95rem; }
+    .artist { font-size: 0.75rem; }
+    .expanded-controls button { font-size: 1.4rem; }
+    .music-drawer.expanded { height: 410px; }
+  }
+  @media (max-width: 500px) {
+    .modal-content {
+      margin-top: 30%;
+      padding: 1rem;
+    }
+    .release-options {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .release-card {
+      max-width: none;
+      width: 90%;
+      font-size: 1rem;
+      padding: 0.9rem;
+    }
+  }
 </style>
 
-<a href="javascript:void(0);" class="floating-plus" id="plusButton" title="Create">+</a>
-
-<div class="plus-options" id="plusOptions">
-  <a href="/create-post">Create Post</a>
-  <a href="javascript:void(0);" id="releaseLink">Release</a>
-
-</div>
-
-
-<!-- Peeking Music Bar / Player -->
-<div id="musicDrawer" class="music-drawer collapsed">
-  <div class="music-bar">
-    <div class="track-info">
-      <strong>Now Playing:</strong> Electric Sunrise — AuroraDreams
-    </div>
-    <div class="controls">
-      <button>⏯</button>
-      <button>⏭</button>
-    </div>
-  </div>
-  <div class="music-expanded">
-  <img src="/uploads/electric-sunrise-cover.jpg" alt="Album Art" class="album-art">
-  <div class="track-details">Electric Sunrise</div>
-  <div class="artist">AuroraDreams</div>
-
-  <div class="seekbar">
-    <input type="range" min="0" max="100" value="40" />
-  </div>
-
-  <div class="expanded-controls">
-    <button>⏮</button>
-    <button>⏯</button>
-    <button>⏭</button>
-  </div>
-</div>
-
-</div>
-
+<!-- Script Section -->
 <script>
   const drawer = document.getElementById('musicDrawer');
   const bar = drawer.querySelector('.music-bar');
-  const plusButton = document.getElementById('plusButton'); // only declare once
+  const plusButton = document.getElementById('plusButton');
   const plusOptions = document.getElementById('plusOptions');
+  const releaseLink = document.getElementById('releaseLink');
+  const releaseModal = document.getElementById('releaseModal');
+  const closeModal = releaseModal.querySelector('.close');
 
   bar.addEventListener('click', () => {
-    const isExpanded = drawer.classList.contains('expanded');
     drawer.classList.toggle('expanded');
     drawer.classList.toggle('collapsed');
-
-    if (!isExpanded) {
-      plusButton.classList.add('up');
-    } else {
-      plusButton.classList.remove('up');
-    }
-
-    // Also hide plusOptions when drawer toggles
+    plusButton.classList.toggle('up');
     plusOptions.style.display = 'none';
   });
 
@@ -261,172 +344,161 @@
     plusOptions.style.display = (plusOptions.style.display === 'flex') ? 'none' : 'flex';
   });
 
-  // Close menu when clicking elsewhere
   document.addEventListener('click', () => {
     plusOptions.style.display = 'none';
   });
+
+  releaseLink.addEventListener('click', (e) => {
+    e.stopPropagation();
+    plusOptions.style.display = 'none';
+    releaseModal.style.display = 'block';
+
+    const content = releaseModal.querySelector('.modal-content');
+    content.style.animation = 'none';
+    void content.offsetWidth;
+    content.style.animation = 'popIn 0.3s ease forwards';
+  });
+
+  closeModal.addEventListener('click', () => {
+    releaseModal.style.display = 'none';
+  });
+
+  window.addEventListener('click', (e) => {
+    if (e.target === releaseModal) {
+      releaseModal.style.display = 'none';
+    }
+  });
+
+  document.querySelectorAll('.clickable-song').forEach(item => {
+    item.addEventListener('click', async () => {
+      const songId = item.dataset.songId;
+      try {
+        const res = await fetch(`/api/song-info/${songId}`);
+        const data = await res.json();
+        updateUIAndPlay(data);
+      } catch (err) {
+        console.error('Failed to fetch song:', err);
+      }
+    });
+  });
+
+  function updateUIAndPlay({ title, artist, coverUrl, audioUrl }) {
+    document.getElementById('currentTrackTitle').textContent = title;
+    document.getElementById('currentArtist').textContent = artist;
+    document.getElementById('expandedTrackTitle').textContent = title;
+    document.getElementById('expandedArtist').textContent = artist;
+    document.getElementById('albumArt').src = coverUrl;
+
+    const audio = document.getElementById('audioPlayer');
+    audio.src = audioUrl;
+    audio.play().catch(err => console.error('Autoplay failed:', err));
+  }
 </script>
 
-<!-- Release Modal -->
-<div id="releaseModal" class="modal">
-  <div class="modal-content">
-    <span class="close">&times;</span>
-    <h3>Select Release Type</h3>
-    <div class="release-options">
-  <a href="/submission?type=single" class="release-card">
-    <i class="fas fa-music"></i><br>Single
-  </a>
-  <a href="/submission?type=ep" class="release-card">
-    <i class="fas fa-compact-disc"></i><br>EP
-  </a>
-  <a href="/submission?type=album" class="release-card">
-    <i class="fas fa-record-vinyl"></i><br>Album
-  </a>
-</div>
+<script>
+  const audio = document.getElementById('audioPlayer');
+  const seekbar = document.getElementById('seekbar');
 
-  </div>
-</div>
+  // Update seekbar as the audio plays
+  audio.addEventListener('timeupdate', () => {
+    if (!audio.duration) return;
+    const percent = (audio.currentTime / audio.duration) * 100;
+    seekbar.value = percent;
+  });
 
-
-<style>
-
-  .release-card i {
-  font-size: 1.4rem;
-  margin-bottom: 0.4rem;
-  display: block;
-}
-
-  /* Modal Styles */
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 1500;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0,0,0,0.6);
-  animation: fadeIn 0.3s ease forwards;
-}
-
-@keyframes fadeIn {
-  from { background-color: rgba(0,0,0,0); }
-  to { background-color: rgba(0,0,0,0.6); }
-}
-
-.modal-content {
-  background-color: #12193a;
-  margin: 10% auto;
-  padding: 1.5rem;
-  border-radius: 12px;
-  width: 90%;
-  max-width: 350px;
-  color: white;
-  text-align: center;
-  transform: scale(0.8);
-  opacity: 0;
-  animation: popIn 0.3s ease forwards;
-}
-
-@keyframes popIn {
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-.modal-content h3 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  font-size: 1.2rem;
-}
-
-.release-options {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin-top: 1rem;
-}
-
-.release-card {
-  flex: 1 1 100px;               /* grow/shrink, base width 100px */
-  max-width: 100px;             /* don’t let it go beyond 100px */
-  background-color: #1c2a5a;
-  border: 1px solid rgba(255,255,255,0.1);
-  color: white;
-  padding: 0.8rem;
-  border-radius: 8px;
-  text-decoration: none;
-  font-size: 0.95rem;
-  transition: transform 0.2s ease, background-color 0.3s;
-  text-align: center;
-  word-break: break-word;
-}
-
-
-.release-card:hover {
-  background-color: #007aff;
-  transform: translateY(-4px);
-}
-
-.close {
-  color: rgba(255,255,255,0.8);
-  float: right;
-  font-size: 1.4rem;
-  cursor: pointer;
-}
-
-@media (max-width: 500px) {
-  .modal-content {
-    margin-top: 30%;
-    padding: 1rem;
-  }
-
-  .release-options {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .release-card {
-    max-width: none;            /* allow full width on small screens */
-    width: 90%;
-    flex: none;
-    font-size: 1rem;
-    padding: 0.9rem;
-  }
-}
-
-
-
-</style>
+  // Allow user to seek manually
+  seekbar.addEventListener('input', () => {
+    if (!audio.duration) return;
+    const time = (seekbar.value / 100) * audio.duration;
+    audio.currentTime = time;
+  });
+</script>
 
 <script>
-  const releaseLink = document.getElementById('releaseLink');
-const releaseModal = document.getElementById('releaseModal');
-const closeModal = releaseModal.querySelector('.close');
+  const playPauseBtn = document.getElementById('playPauseBtn');
+  const playPauseBtnExpanded = document.getElementById('playPauseBtnExpanded');
+  const nextBtn = document.getElementById('nextBtn');
+  const nextBtnExpanded = document.getElementById('nextBtnExpanded');
+  const prevBtn = document.getElementById('prevBtn');
 
-releaseLink.addEventListener('click', (e) => {
-  e.stopPropagation();
-  plusOptions.style.display = 'none';
-  releaseModal.style.display = 'block';
+  const currentTimeDisplay = document.getElementById('currentTime');
+  const totalDurationDisplay = document.getElementById('totalDuration');
 
-  // Restart animation
-  const content = releaseModal.querySelector('.modal-content');
-  content.style.animation = 'none';
-  void content.offsetWidth; // trigger reflow
-  content.style.animation = 'popIn 0.3s ease forwards';
+
+  // Prevent drawer from expanding when control buttons are clicked
+[playPauseBtn, playPauseBtnExpanded, nextBtn, nextBtnExpanded, prevBtn].forEach(btn => {
+  btn.addEventListener('click', e => e.stopPropagation());
 });
 
-closeModal.addEventListener('click', () => {
-  releaseModal.style.display = 'none';
-});
 
-window.addEventListener('click', (e) => {
-  if (e.target == releaseModal) {
-    releaseModal.style.display = 'none';
+ function togglePlayback() {
+  if (audio.paused) {
+    audio.play();
+  } else {
+    audio.pause();
   }
-});
+  updatePlayPauseIcons();
+}
+
+function updatePlayPauseIcons() {
+  const isPlaying = !audio.paused;
+  const icon = isPlaying ? '⏸' : '▶️'; // or use other emojis/icons as you prefer
+  playPauseBtn.textContent = icon;
+  playPauseBtnExpanded.textContent = icon;
+}
+
+audio.addEventListener('play', updatePlayPauseIcons);
+audio.addEventListener('pause', updatePlayPauseIcons);
 
 
+
+  playPauseBtn.addEventListener('click', togglePlayback);
+  playPauseBtnExpanded.addEventListener('click', togglePlayback);
+
+  // Optional next/prev logic
+  const songQueue = []; // Add song IDs here when building playlist
+  let currentIndex = -1;
+
+  function playNext() {
+    if (songQueue.length && currentIndex < songQueue.length - 1) {
+      currentIndex++;
+      fetchAndPlay(songQueue[currentIndex]);
+    }
+  }
+
+  function playPrev() {
+    if (songQueue.length && currentIndex > 0) {
+      currentIndex--;
+      fetchAndPlay(songQueue[currentIndex]);
+    }
+  }
+
+  nextBtn.addEventListener('click', playNext);
+  nextBtnExpanded.addEventListener('click', playNext);
+  prevBtn.addEventListener('click', playPrev);
+
+  function fetchAndPlay(songId) {
+    fetch(`/api/song-info/${songId}`)
+      .then(res => res.json())
+      .then(updateUIAndPlay)
+      .catch(err => console.error('Failed to load song:', err));
+  }
+
+  // Format time (e.g., 90 → "1:30")
+  function formatTime(seconds) {
+    const min = Math.floor(seconds / 60);
+    const sec = Math.floor(seconds % 60).toString().padStart(2, '0');
+    return `${min}:${sec}`;
+  }
+
+  audio.addEventListener('loadedmetadata', () => {
+    totalDurationDisplay.textContent = formatTime(audio.duration);
+  });
+
+  audio.addEventListener('timeupdate', () => {
+    if (!audio.duration) return;
+    const percent = (audio.currentTime / audio.duration) * 100;
+    seekbar.value = percent;
+    currentTimeDisplay.textContent = formatTime(audio.currentTime);
+  });
 </script>

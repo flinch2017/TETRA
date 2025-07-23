@@ -42,6 +42,8 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 
+
+
 // EJS setup
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -112,10 +114,15 @@ app.use(helmet({
       imgSrc: [
         "'self'",
         "data:",
+        "blob:",
         "https://www.transparenttextures.com",
         "https://www.paypalobjects.com",
-        "https://tetrametropolis.s3.us-east-1.amazonaws.com"
+        "https://tetrametropolis.s3.us-east-1.amazonaws.com",
+        "https://tetrametropolis.s3.amazonaws.com",
+        "https://s3.amazonaws.com",
+        "http://192.168.1.7:3000"
       ],
+
       frameSrc: [
         "'self'",
         "https://js.stripe.com",
