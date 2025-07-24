@@ -19,6 +19,7 @@ const paypal = require('@paypal/checkout-server-sdk');
 const postRoutes = require('./routes/postRoutes');
 const dotenv = require('dotenv');
 const pool = require('./utils/db'); // adjust path if needed
+const s3ImageRoute = require('./routes/s3Image');
 
 
 
@@ -150,7 +151,7 @@ app.use(helmet({
 
 
 // Routes
-app.use('/', postRoutes);
+app.use('/', postRoutes, s3ImageRoute);
 
 
 const sslOptions = {

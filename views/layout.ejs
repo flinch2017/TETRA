@@ -1,11 +1,11 @@
+<!-- layout.ejs -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title><%= artist.name %> | TETRA</title>
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title || 'TETRA' %></title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css" />
 <style>
   body {
     margin: 0;
@@ -353,202 +353,23 @@
 </head>
 <body>
 
-<div class="fixed-header">
+  <div class="fixed-header">
   <%- include('partials/console_header') %>
 </div>
 
-<main id="appContent">
   
-</main>
 
-<div class="artist-header" style="background-image: url('<%= artist.bannerUrl %>')">
-  <div class="overlay"></div>
-  <% if (artist.rank && artist.rank <= 500) { %>
-  <div class="artist-rank">
-    #<%= artist.rank %>
-  </div>
-<% } %>
+  <!-- 🔁 Changing content goes here -->
+  <main id="appContent">
+    <%- body %>
+  </main>
 
-
-  <div class="artist-info">
-    <div class="artist-name"><%= artist.name %></div>
-    <div class="artist-follow"><%= artist.followers %> followers</div>
-    <div class="header-actions">
-      <button 
-  class="follow-btn" 
-  data-target="<%= artist.acode %>" 
-  data-following="<%= isFollowing ? 'true' : 'false' %>">
-  <%= isFollowing ? 'Following' : 'Follow' %>
-</button>
-
-
-
-
-      <div class="artist-dropdown">
-        <i class="fas fa-ellipsis-v artist-dropdown-toggle"></i>
-        <div class="artist-dropdown-menu">
-          <% if (isOwnProfile) { %>
-  <a href="/edit-profile?acode=<%= artist.acode %>">Edit Profile</a>
-<% } %>
-
-          <a href="#">Add to Favorites</a>
-          <a href="#">Report</a>
-          <a href="#">Block Artist</a>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-
-<% if (isOwnProfile && (!artist.account_mode || artist.account_mode === 'regular')) { %>
-  <div class="setup-artist-container">
-    <a href="/edit-profile?acode=<%= artist.acode %>" class="setup-artist-btn">Setup Artist Profile</a>
-  </div>
-<% } %>
-
-
-
-<main class="artist-profile">
-  <div class="section">
-  <h2>Popular Songs</h2>
-  <% if (artist.songs && artist.songs.length > 0) { %>
-    <% artist.songs.forEach(song => { %>
-      <div class="song-item clickable-song" data-song-id="<%= song.id %>">
-        <div class="song-info">
-          <img src="<%= song.coverUrl %>" alt="Cover">
-          <div>
-            <div class="song-title"><%= song.title %></div>
-            <div class="release-meta"><%= song.streams %> streams</div>
-          </div>
-        </div>
-        <div class="song-actions">
-          <i class="fas fa-heart"></i>
-          <i class="fas fa-ellipsis-v"></i>
-        </div>
-      </div>
-    <% }) %>
-  <% } else { %>
-    <p style="color: rgba(255,255,255,0.6); font-size:0.95rem;">No available songs</p>
-  <% } %>
-</div>
-
-
-  <div class="section">
-  <h2>Latest Albums</h2>
-  <% if (artist.releases && artist.releases.length > 0) { %>
-    <div class="releases-grid">
-      <% artist.releases.forEach(release => { %>
-        <a href="/album/<%= release.id %>" class="release-card-link">
-          <div class="release-card">
-            <img class="release-cover" src="<%= release.coverUrl %>" alt="<%= release.title %>">
-            <div class="release-details">
-              <div class="release-title-with-badge">
-                <span class="release-title"><%= release.title %></span>
-                <% if (release.explicit === 'Yes') { %>
-                  <span class="explicit-e-badge">E</span>
-                <% } %>
-              </div>
-              <% if (release.releasedOn) { %>
-                <div class="release-meta">Released on <%= release.releasedOn %></div>
-              <% } %>
-            </div>
-          </div>
-        </a>
-      <% }) %>
-    </div>
-  <% } else { %>
-    <p style="color: rgba(255,255,255,0.6); font-size:0.95rem;">No available albums</p>
-  <% } %>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-  <div class="section">
-    <h2>About</h2>
-    <% if (artist.bio) { %>
-      <div class="artist-details">
-        <%= artist.bio %>
-      </div>
-    <% } %>
-  </div>
-</main>
-
-
-
-<div class="fixed-bar">
+  <div class="fixed-bar">
   <%- include('partials/music_bar') %>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('.artist-dropdown-toggle').forEach(toggle => {
-    toggle.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const menu = toggle.nextElementSibling;
-      menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
-    });
-  });
-  document.addEventListener('click', () => {
-    document.querySelectorAll('.artist-dropdown-menu').forEach(menu => {
-      menu.style.display = 'none';
-    });
-  });
-});
-
-</script>
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const followBtn = document.querySelector('.follow-btn');
-  if (followBtn) {
-    followBtn.addEventListener('click', async () => {
-      const targetAcode = followBtn.getAttribute('data-target');
-      const isFollowing = followBtn.getAttribute('data-following') === 'true';
-
-      try {
-        const url = isFollowing ? '/unfollow' : '/follow';
-        const res = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ targetAcode })
-        });
-        const data = await res.json();
-
-        if (data.success) {
-          followBtn.textContent = isFollowing ? 'Follow' : 'Following';
-          followBtn.setAttribute('data-following', isFollowing ? 'false' : 'true');
-
-          // Optional: update follower count
-          const followerCountElem = document.querySelector('.artist-follow');
-          if (followerCountElem) {
-            let count = parseInt(followerCountElem.textContent) || 0;
-            count = isFollowing ? count - 1 : count + 1;
-            followerCountElem.textContent = `${count} followers`;
-          }
-        } else {
-          alert(data.message || 'Action failed');
-        }
-      } catch (err) {
-        console.error('Follow/unfollow failed:', err);
-        alert('An error occurred');
-      }
-    });
-  }
-});
-</script>
-
-
-
+  <!-- Scripts go here -->
+  <script src="/js/ajax-loader.js"></script>
+  <script src="/js/profile.js"></script>
 </body>
 </html>

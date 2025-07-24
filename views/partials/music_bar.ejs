@@ -9,35 +9,54 @@
 <div id="musicDrawer" class="music-drawer collapsed">
   <div class="music-bar">
     <div class="track-info">
-      <strong>Now Playing:</strong> <span id="currentTrackTitle">Electric Sunrise</span> — <span id="currentArtist">AuroraDreams</span>
-    </div>
+  <img id="currentArtwork" src="/drawables/disc_default.png" alt="Artwork" class="track-artwork" />
+  <div class="track-details">
+    <div id="currentTrackTitle" class="track-title">—</div>
+    <div id="currentArtist" class="track-artist dimmed-text">—</div>
+  </div>
+</div>
+
     <div class="controls">
-      <button id="playPauseBtn">⏯</button>
-      <button id="nextBtn">⏭</button>
+      <!-- Collapsed player -->
+<button id="playPauseBtn">
+  <img id="playPauseIcon" src="/drawables/play_default.png" alt="Play" width="20" />
+</button>
+
+      <button id="nextBtn">
+  <img src="/drawables/next_default.png" alt="Next" />
+</button>
+
     </div>
   </div>
   <div class="music-expanded">
-    <img src="/uploads/electric-sunrise-cover.jpg" alt="Album Art" class="album-art" id="albumArt">
-    <div class="track-details" id="expandedTrackTitle">Electric Sunrise</div>
-    <div class="artist" id="expandedArtist">AuroraDreams</div>
+    <img src="/drawables/disc_default.png" alt="Album Art" class="album-art" id="albumArt">
+    <div class="track-details" id="expandedTrackTitle">—</div>
+    <div class="artist" id="expandedArtist">—</div>
     <div class="seekbar-with-time">
-  <div class="time-display">
-    <span id="currentTime">0:00</span>
-    <span id="totalDuration">0:00</span>
-  </div>
-  <input type="range" min="0" max="100" value="0" id="seekbar" />
+      <div class="time-display">
+        <span id="currentTime">0:00</span>
+        <span id="totalDuration">0:00</span>
+      </div>
+      <input type="range" min="0" max="100" value="0" id="seekbar" />
+    </div>
+    <div class="expanded-controls">
+  <button id="prevBtn">
+    <img src="/drawables/prev_default.png" alt="Previous" width="20" />
+  </button>
+
+  <button id="playPauseBtnExpanded">
+    <img id="playPauseIconExpanded" src="/drawables/play_default.png" alt="Play" width="20" />
+  </button>
+
+  <button id="nextBtnExpanded">
+    <img src="/drawables/next_default.png" alt="Next" width="20" />
+  </button>
 </div>
 
-
-    <div class="expanded-controls">
-      <button id="prevBtn">⏮</button>
-      <button id="playPauseBtnExpanded">⏯</button>
-      <button id="nextBtnExpanded">⏭</button>
-    </div>
   </div>
   <audio id="audioPlayer"></audio>
-
 </div>
+
 
 <!-- Release Modal -->
 <div id="releaseModal" class="modal">
@@ -60,6 +79,72 @@
 
 <!-- Style Section -->
 <style>
+
+  .expanded-controls button img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  display: block;
+  pointer-events: none; /* So clicks go to the button, not the image */
+}
+
+.expanded-controls button {
+  background: transparent;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+}
+
+
+  #nextBtn img {
+  height: 24px;
+  width: 24px;
+  object-fit: contain;
+  display: block;
+}
+
+  .music-bar .controls {
+  display: flex;
+  align-items: center; /* ✅ vertically center buttons */
+  gap: 0.5rem;          /* optional: add spacing between buttons */
+}
+
+
+button img {
+  display: block;
+  width: 24px;
+  height: 24px;
+}
+
+
+  .track-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.track-artwork {
+  width: 50px;
+  height: 50px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.track-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.track-title {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.track-artist {
+  font-size: 14px;
+  color: #888;
+}
+
 .seekbar-with-time {
   width: 100%;
   padding: 0 1rem 1rem;
@@ -383,16 +468,22 @@
   });
 
   function updateUIAndPlay({ title, artist, coverUrl, audioUrl }) {
-    document.getElementById('currentTrackTitle').textContent = title;
-    document.getElementById('currentArtist').textContent = artist;
-    document.getElementById('expandedTrackTitle').textContent = title;
-    document.getElementById('expandedArtist').textContent = artist;
-    document.getElementById('albumArt').src = coverUrl;
+  // Collapsed bar updates
+  document.getElementById('currentTrackTitle').textContent = title;
+  document.getElementById('currentArtist').textContent = artist;
+  document.getElementById('currentArtwork').src = coverUrl || '/default/disc_default.png';
 
-    const audio = document.getElementById('audioPlayer');
-    audio.src = audioUrl;
-    audio.play().catch(err => console.error('Autoplay failed:', err));
-  }
+  // Expanded view updates
+  document.getElementById('expandedTrackTitle').textContent = title;
+  document.getElementById('expandedArtist').textContent = artist;
+  document.getElementById('albumArt').src = coverUrl || '/default/disc_default.png';
+
+  // Audio
+  const audio = document.getElementById('audioPlayer');
+  audio.src = audioUrl;
+  audio.play().catch(err => console.error('Autoplay failed:', err));
+}
+
 </script>
 
 <script>
@@ -442,10 +533,16 @@
 
 function updatePlayPauseIcons() {
   const isPlaying = !audio.paused;
-  const icon = isPlaying ? '⏸' : '▶️'; // or use other emojis/icons as you prefer
-  playPauseBtn.textContent = icon;
-  playPauseBtnExpanded.textContent = icon;
+  const icon = isPlaying ? '/drawables/paused_default.png' : '/drawables/play_default.png';
+
+  document.getElementById('playPauseIcon').src = icon;
+  document.getElementById('playPauseIconExpanded').src = icon;
+
+  // Optionally update alt text too
+  document.getElementById('playPauseIcon').alt = isPlaying ? 'Pause' : 'Play';
+  document.getElementById('playPauseIconExpanded').alt = isPlaying ? 'Pause' : 'Play';
 }
+
 
 audio.addEventListener('play', updatePlayPauseIcons);
 audio.addEventListener('pause', updatePlayPauseIcons);
@@ -501,4 +598,45 @@ audio.addEventListener('pause', updatePlayPauseIcons);
     seekbar.value = percent;
     currentTimeDisplay.textContent = formatTime(audio.currentTime);
   });
+</script>
+
+<script>
+window.addEventListener('beforeunload', () => {
+  const state = {
+    src: audio.src,
+    currentTime: audio.currentTime,
+    isPlaying: !audio.paused,
+    metadata: {
+      title: document.getElementById('currentTrackTitle').textContent,
+      artist: document.getElementById('currentArtist').textContent,
+      coverUrl: document.getElementById('currentArtwork').src,
+    }
+  };
+  localStorage.setItem('playerState', JSON.stringify(state));
+});
+</script>
+
+<script>
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('playerState');
+  if (!saved) return;
+
+  const { src, currentTime, isPlaying, metadata } = JSON.parse(saved);
+
+  audio.src = src;
+  audio.currentTime = currentTime || 0;
+
+  // Update UI
+  document.getElementById('currentTrackTitle').textContent = metadata.title;
+  document.getElementById('currentArtist').textContent = metadata.artist;
+  document.getElementById('currentArtwork').src = metadata.coverUrl;
+  document.getElementById('expandedTrackTitle').textContent = metadata.title;
+  document.getElementById('expandedArtist').textContent = metadata.artist;
+  document.getElementById('albumArt').src = metadata.coverUrl;
+
+  // Optionally wait a bit before playing to avoid race conditions
+  if (isPlaying) {
+    setTimeout(() => audio.play().catch(console.error), 500);
+  }
+});
 </script>
