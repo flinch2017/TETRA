@@ -1,22 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Music Dashboard | TETRA</title>
-
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css" />
-  <link rel="stylesheet" href="/css/dashboard.css" />
-  <link rel="stylesheet" href="/css/console_header.css" />
-  <link rel="stylesheet" href="/css/music_bar.css" />
-</head>
-<body>
-  <div class="fixed-header">
-    <%- include('partials/console_header') %>
-  </div>
-  
-
-  <main class="newsfeed">
+<main class="newsfeed">
   <% if (posts.length === 0) { %>
     <div style="text-align: center; margin-top: 3rem; color: rgba(255, 255, 255, 0.6); font-size: 1.1rem;">
       🚫 No posts yet. Stay tuned!
@@ -75,19 +57,3 @@
 
 
 
-
-<div class="fixed-bar">
-    <%- include('partials/music_bar') %>
-  </div>
-
-
-
-
-<script src="/js/dashboard.js"></script>
-<script src="/js/profile.js"></script>
-<script src="/js/music_bar.js"></script>
-
-
-
-</body>
-</html>

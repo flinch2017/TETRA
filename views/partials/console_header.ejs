@@ -1,9 +1,6 @@
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css" />
-
-
 
 <header>
-  <div class="logo">TETRA</div>
+  <a href="/dashboard" class="logo ajax-link">TETRA</a>
   <div class="nav-links">
     <a href="/charts" class="nav-item">
       <span class="nav-icon"><i class="fas fa-chart-bar"></i></span>
@@ -34,23 +31,4 @@
 </header>
 
 
-<script>
-  const profile = document.getElementById('profileDropdown');
-
-  profile.addEventListener('click', () => {
-    profile.classList.toggle('active');
-  });
-
-  document.addEventListener('click', (e) => {
-    if (!profile.contains(e.target)) {
-      profile.classList.remove('active');
-    }
-  });
-</script>
-
-<script>
-  document.querySelector('.logo').addEventListener('click', function() {
-    window.location.href = '/dashboard';
-  });
-</script>
 

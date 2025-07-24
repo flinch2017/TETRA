@@ -52,8 +52,12 @@ router.get('/submission', async (req, res) => {
     const releaseId = Array.from(crypto.randomBytes(12))
       .map(byte => 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'[byte % 62])
       .join('');
+      
+
+      const isAjax = req.xhr || req.headers['x-requested-with'] === 'XMLHttpRequest';
 
     res.render(template, {
+      layout: isAjax ? false : 'layout', // skip full layout for AJAX
       pfpUrl: presignedPfpUrl,
       userAcode: userRow?.acode,
       releaseType,

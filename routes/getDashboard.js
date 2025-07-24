@@ -17,6 +17,8 @@ const uploadCanvasToS3 = require('../utils/uploadCanvasToS3');
 const compCheck = require('../middleware/compCheck.js');
 const path = require('path');
 
+const expressLayouts = require('express-ejs-layouts');
+
 
 
 router.get('/dashboard', compCheck, async (req, res) => {
@@ -87,10 +89,14 @@ router.get('/dashboard', compCheck, async (req, res) => {
       };
     }));
 
+    
+const isAjax = req.xhr || req.headers['x-requested-with'] === 'XMLHttpRequest';
+
     res.render('dashboard', {
+      layout: isAjax ? false : 'layout', // skip full layout for AJAX
       user: req.session.user,
-      userAcode: userRow.acode,   // current logged-in user's acode
-      pfpUrl: presignedPfpUrl,    // current logged-in user's pfp
+      userAcode: userRow.acode,
+      pfpUrl: presignedPfpUrl,
       posts
     });
 

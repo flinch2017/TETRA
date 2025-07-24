@@ -135,4 +135,5 @@ main.form-container {
 
 .logo {
   cursor: pointer;
+  text-decoration: none;
 }

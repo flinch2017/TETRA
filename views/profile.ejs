@@ -1,22 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title><%= artist.name %> | TETRA</title>
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css" />
-<link rel="stylesheet" href="/css/profile.css" />
-<link rel="stylesheet" href="/css/dashboard.css" />
-  <link rel="stylesheet" href="/css/console_header.css" />
-  <link rel="stylesheet" href="/css/music_bar.css" />
-</head>
-<body>
-
-<div class="fixed-header">
-  <%- include('partials/console_header') %>
-</div>
-
 
 
 <div class="artist-header" style="background-image: url('<%= artist.bannerUrl %>')">
@@ -42,9 +23,9 @@
 
 
 
-      <div class="artist-dropdown">
-        <i class="fas fa-ellipsis-v artist-dropdown-toggle"></i>
-        <div class="artist-dropdown-menu">
+      <div class="more-dropdown">
+        <i class="fas fa-ellipsis-v more-dropdown-toggle"></i>
+        <div class="more-dropdown-menu">
           <% if (isOwnProfile) { %>
   <a href="/edit-profile?acode=<%= artist.acode %>">Edit Profile</a>
 <% } %>
@@ -143,15 +124,3 @@
 </main>
 
 
-
-<div class="fixed-bar">
-  <%- include('partials/music_bar') %>
-</div>
-
-<script src="/js/profile.js"></script>
-<script src="/js/music_bar.js"></script>
-
-
-
-</body>
-</html>

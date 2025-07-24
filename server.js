@@ -21,7 +21,7 @@ const dotenv = require('dotenv');
 const pool = require('./utils/db'); // adjust path if needed
 const s3ImageRoute = require('./routes/s3Image');
 
-
+const expressLayouts = require('express-ejs-layouts');
 
 
 
@@ -46,6 +46,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 // EJS setup
+app.use(expressLayouts);
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 

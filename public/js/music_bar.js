@@ -221,3 +221,27 @@ window.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => audio.play().catch(console.error), 500);
   }
 });
+
+
+function bindSongClickHandlers() {
+  document.querySelectorAll('.clickable-song').forEach(item => {
+    item.addEventListener('click', async () => {
+      const songId = item.dataset.songId;
+      try {
+        const res = await fetch(`/api/song-info/${songId}`);
+        const data = await res.json();
+        updateUIAndPlay(data);
+      } catch (err) {
+        console.error('Failed to fetch song:', err);
+      }
+    });
+  });
+}
+
+// Initial bind
+bindSongClickHandlers();
+
+// Re-bind after AJAX navigation replaces #appContent
+window.addEventListener('page:loaded', () => {
+  bindSongClickHandlers();
+});

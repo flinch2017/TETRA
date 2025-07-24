@@ -18,6 +18,8 @@ const compCheck = require('../middleware/compCheck.js');
 const generatePostId = require('../middleware/generatePostId.js');
 const path = require('path');
 
+const expressLayouts = require('express-ejs-layouts');
+
 
 router.get('/create-post', async (req, res) => {
   try {
@@ -36,7 +38,10 @@ router.get('/create-post', async (req, res) => {
       presignedPfpUrl = await generatePresignedUrl('drawables/default_pfp.png');
     }
 
+    const isAjax = req.xhr || req.headers['x-requested-with'] === 'XMLHttpRequest';
+
     res.render('posting', {
+      layout: isAjax ? false : 'layout', // skip full layout for AJAX
       pfpUrl: presignedPfpUrl,
       userAcode: userRow?.acode // ✅ pass the user's acode to EJS
     });

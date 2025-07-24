@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title><%= title || 'TETRA' %></title>
+  
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css" />
 
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="/css/posting.css" />
   <link rel="stylesheet" href="/css/releaseform.css" />
 </head>
-<body>
+<body data-user-acode="<%= userAcode %>">
 
   <div class="fixed-header">
   <%- include('partials/console_header') %>
@@ -34,11 +34,17 @@
 
   <!-- Scripts go here -->
 
-  <script src="/js/dashboard.js"></script>
+
+
+<script src="/js/dashboard.js"></script>
+<script src="/js/console_header.js"></script>
 <script src="/js/profile.js"></script>
+<script src="/js/follow.js"></script>
 <script src="/js/music_bar.js"></script>
 <script src="/js/posting.js"></script>
 <script src="/js/releaseform.js"></script>
+<script src="/js/ajax-navigation.js"></script>
+
 
 </body>
 </html>

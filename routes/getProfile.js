@@ -156,6 +156,8 @@ router.get('/profile', compCheck, async (req, res) => {
       releases
     };
 
+    
+
     res.render('profile', {
       artist,
       pfpUrl: headerPfpUrl,
