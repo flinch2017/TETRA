@@ -1,0 +1,363 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #0a0f2c;
+  color: white;
+}
+
+
+
+.releaseform {
+  max-width: 700px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: rgba(255,255,255,0.05);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+
+.releaseform h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.4rem;
+  color: rgba(255,255,255,0.9);
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 0.5rem;
+  border: none;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.1);
+  color: white;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  background: rgba(255,255,255,0.2);
+}
+
+.submit-btn {
+  display: block;
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #007bff;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: background-color 0.2s ease;
+}
+
+.submit-btn:hover {
+  background-color: #0056b3;
+}
+
+
+.track-item {
+  background: rgba(255,255,255,0.08);
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.track-meta {
+  display: none;
+  margin-top: 0.5rem;
+  background: rgba(255,255,255,0.05);
+  padding: 0.5rem;
+  border-radius: 6px;
+}
+
+
+.tracklist-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-top: 0.5rem;
+}
+
+.add-track {
+  background-color: #007aff;
+  color: white;
+  padding: 0.6rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 300px;
+  margin-top: 0.5rem;
+  transition: background-color 0.3s;
+}
+
+.add-track:hover {
+  background-color: #005fc1;
+}
+
+.track-card {
+  background-color: #1c2a5a;
+  border-radius: 8px;
+  padding: 0.6rem;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.track-card:hover {
+  background-color: #25366e;
+}
+
+.track-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.track-filename {
+  font-size: 0.9rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.track-remove {
+  color: rgba(255,255,255,0.8);
+  cursor: pointer;
+}
+
+.track-remove:hover {
+  color: #ff4c4c;
+}
+
+.track-fields {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 0.6rem;
+}
+
+.track-fields input {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.6rem 0.8rem;       /* ↑ more vertical and horizontal padding */
+  margin: 0.4rem 0;             /* ↑ more space between fields */
+  border-radius: 6px;           /* slightly rounder corners */
+  border: none;
+  font-size: 0.95rem;           /* larger text */
+  background-color: rgba(255,255,255,0.1);
+  color: white;
+}
+
+
+.track-fields input::placeholder {
+  color: rgba(255,255,255,0.7);
+}
+
+
+.track-audio {
+  width: 100%;
+  margin-top: 0.4rem;
+  border-radius: 4px;
+}
+
+
+.track-fields select {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.6rem 0.8rem;
+  margin: 0.4rem 0;
+  border-radius: 6px;
+  border: none;
+  font-size: 0.95rem;
+  background-color: rgba(255,255,255,0.1);
+  color: white;
+}
+
+.track-fields select option {
+  color: black; /* keep dropdown list readable */
+}
+
+.audio-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 0.6rem;
+}
+
+.progress-circle {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: conic-gradient(#007aff 0deg, rgba(255,255,255,0.1) 0deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.play-btn {
+  color: white;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.upload-progress {
+  width: 100%;
+  height: 4px;
+  background-color: rgba(255,255,255,0.1);
+  border-radius: 2px;
+  margin-top: 0.4rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.upload-progress::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  height: 100%;
+  width: var(--upload-percent, 0%);
+  background-color: #007aff;
+  transition: width 0.2s linear;
+}
+
+
+select[name="timezone"] {
+  color: black;
+}
+
+.artwork-upload {
+  width: 200px;
+  height: 200px;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background-color: #f9f9f9;
+}
+
+.plus-icon {
+  font-size: 3rem;
+  color: #aaa;
+}
+
+.artwork-upload img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+
+
+
+.drag-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* space between lines and number */
+  margin-bottom: 0.5rem; /* optional: space below the container */
+}
+
+.drag-handle {
+  cursor: grab;
+  font-size: 1.2rem; /* adjust as needed */
+  user-select: none;
+}
+
+.track-number {
+  font-weight: bold;
+  color: #ffffff; /* adjust color */
+}
+
+.canvas-upload {
+  position: relative;
+  width: 200px;       /* adjust size as needed */
+  height: 355px;      /* keeps roughly 9:16 */
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.canvas-upload .plus-icon {
+  font-size: 3rem;
+  color: #ccc;
+  z-index: 1;
+}
+
+.canvas-upload video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.artist-alert {
+  background-color: #ffcc00;
+  color: #333;
+  padding: 8px 12px;
+  margin-top: 8px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  animation: fadeInOut 3s forwards;
+}
+@keyframes fadeInOut {
+  0% { opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { opacity: 0; }
+}
+/* keep your previous styles */
+.primary-artist-container, .featured-artist-container { margin-top: 0.5rem; position: relative; }
+.selected-artists, .selected-featured-artists { display: flex; flex-wrap: wrap; margin-top: 0.3rem; gap: 0.3rem; }
+.artist-capsule {
+  display: inline-flex; align-items: center;
+  background: #007aff; color: white; padding: 2px 8px;
+  border-radius: 12px; font-size: 0.8rem;
+}
+.artist-capsule .remove-artist { margin-left: 4px; cursor: pointer; }
+.artist-dropdown {
+  position: absolute; top: 100%; left: 0;
+  background: white; border: 1px solid #ccc;
+  width: 100%; max-height: 150px; overflow-y: auto;
+  z-index: 10; color: black;
+}
+.artist-item {
+  display: flex; align-items: center;
+  padding: 4px 6px; cursor: pointer;
+}
+.artist-item:hover { background: #f0f0f0; }
+.artist-avatar {
+  width: 24px; height: 24px;
+  border-radius: 50%; margin-right: 6px; object-fit: cover;
+}
+
+.no-results-item {
+  padding: 6px;
+  color: #888;
+  text-align: center;
+  font-size: 0.85rem;
+}

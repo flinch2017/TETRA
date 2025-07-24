@@ -1,0 +1,325 @@
+.expanded-controls button img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  display: block;
+  pointer-events: none; /* So clicks go to the button, not the image */
+}
+
+.expanded-controls button {
+  background: transparent;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+}
+
+
+  #nextBtn img {
+  height: 24px;
+  width: 24px;
+  object-fit: contain;
+  display: block;
+}
+
+  .music-bar .controls {
+  display: flex;
+  align-items: center; /* ✅ vertically center buttons */
+  gap: 0.5rem;          /* optional: add spacing between buttons */
+}
+
+
+button img {
+  display: block;
+  width: 24px;
+  height: 24px;
+}
+
+
+  .track-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.track-artwork {
+  width: 50px;
+  height: 50px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.track-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.track-title {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.track-artist {
+  font-size: 14px;
+  color: #888;
+}
+
+.seekbar-with-time {
+  width: 100%;
+  padding: 0 1rem 1rem;
+  box-sizing: border-box;
+}
+
+.seekbar-with-time .time-display {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 0.25rem;
+}
+
+.seekbar-with-time input[type="range"] {
+  width: 100%;
+  height: 6px;
+  background: #ccc;
+  border-radius: 5px;
+  accent-color: #007aff;
+  appearance: none;
+  outline: none;
+}
+
+
+
+
+
+  /* Floating Plus */
+  .floating-plus {
+    position: fixed;
+    bottom: 70px;
+    right: 20px;
+    background-color: #007aff;
+    color: white;
+    font-size: 1rem;
+    width: 90px;
+    height: 40px;
+    border-radius: 999px;
+    box-shadow: 0 0 8px rgba(0, 122, 255, 0.6), 0 0 16px rgba(0, 122, 255, 0.4);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    z-index: 1001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .floating-plus:hover {
+    background-color: #005fc1;
+    transform: scale(1.1);
+  }
+  .floating-plus.up {
+    bottom: 440px;
+  }
+
+  .plus-options {
+    position: fixed;
+    bottom: 120px;
+    right: 20px;
+    background-color: #12193a;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    display: none;
+    flex-direction: column;
+    min-width: 140px;
+    z-index: 1002;
+  }
+  .plus-options a {
+    padding: 0.6rem 1rem;
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    font-size: 0.9rem;
+    text-align: left;
+  }
+  .plus-options a:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  /* Music Drawer */
+  .music-drawer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #101840;
+    color: white;
+    transition: height 0.3s ease;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.4);
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    overflow: hidden;
+    z-index: 900;
+  }
+  .music-drawer.collapsed { height: 60px; }
+  .music-drawer.expanded { height: 430px; }
+
+  .music-bar {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1rem;
+    background-color: #18214d;
+    cursor: pointer;
+  }
+  .music-bar .track-info { font-size: 0.9rem; }
+  .music-bar .controls button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    margin-left: 0.5rem;
+    cursor: pointer;
+  }
+
+  .music-expanded {
+    padding: 1rem;
+    display: none;
+    text-align: center;
+  }
+  .music-drawer.expanded .music-expanded { display: block; }
+
+  .album-art {
+    width: 120px;
+    height: 120px;
+    border-radius: 12px;
+    margin: 0 auto 1rem;
+  }
+  .track-details {
+    font-size: 1rem;
+    font-weight: bold;
+  }
+  .artist {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 1rem;
+  }
+
+  
+
+  .expanded-controls {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+  }
+  .expanded-controls button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.6rem;
+    cursor: pointer;
+  }
+
+  /* Modal */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1500;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.6);
+    animation: fadeIn 0.3s ease forwards;
+  }
+  @keyframes fadeIn {
+    from { background-color: rgba(0,0,0,0); }
+    to { background-color: rgba(0,0,0,0.6); }
+  }
+  .modal-content {
+    background-color: #12193a;
+    margin: 10% auto;
+    padding: 1.5rem;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 350px;
+    color: white;
+    text-align: center;
+    animation: popIn 0.3s ease forwards;
+  }
+  @keyframes popIn {
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .modal-content h3 {
+    margin: 0 0 1rem;
+    font-size: 1.2rem;
+  }
+  .release-options {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 1rem;
+  }
+  .release-card {
+    flex: 1 1 100px;
+    max-width: 100px;
+    background-color: #1c2a5a;
+    border: 1px solid rgba(255,255,255,0.1);
+    color: white;
+    padding: 0.8rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: transform 0.2s ease, background-color 0.3s;
+    text-align: center;
+    word-break: break-word;
+  }
+  .release-card i {
+    font-size: 1.4rem;
+    margin-bottom: 0.4rem;
+    display: block;
+  }
+  .release-card:hover {
+    background-color: #007aff;
+    transform: translateY(-4px);
+  }
+
+  .close {
+    color: rgba(255,255,255,0.8);
+    float: right;
+    font-size: 1.4rem;
+    cursor: pointer;
+  }
+
+  /* Mobile Adjustments */
+  @media screen and (max-width: 600px) {
+    .floating-plus {
+      width: 50px;
+      height: 50px;
+      font-size: 1.8rem;
+      bottom: 65px;
+    }
+    .floating-plus.up { bottom: 420px; }
+    .album-art {
+      width: 90px;
+      height: 90px;
+    }
+    .track-details { font-size: 0.95rem; }
+    .artist { font-size: 0.75rem; }
+    .expanded-controls button { font-size: 1.4rem; }
+    .music-drawer.expanded { height: 410px; }
+  }
+  @media (max-width: 500px) {
+    .modal-content {
+      margin-top: 30%;
+      padding: 1rem;
+    }
+    .release-options {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .release-card {
+      max-width: none;
+      width: 90%;
+      font-size: 1rem;
+      padding: 0.9rem;
+    }
+  }
