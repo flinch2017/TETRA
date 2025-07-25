@@ -1,128 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Sign Up | TETRA</title>
-  <link rel="stylesheet" href="/styles.css" />
-  <style>
-    :root {
-      --blue-dark: #0a0f2c;
-      --blue-darker: #050a1f;
-      --accent-blue: #007aff;
-      --glass-bg: rgba(255, 255, 255, 0.05);
-      --border-color: rgba(255, 255, 255, 0.15);
-    }
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif;
-      background: linear-gradient(135deg, var(--blue-darker), var(--blue-dark));
-      color: white;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
-    }
-    .signup-container {
-      background: var(--glass-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 30px;
-      padding: 2.5rem 3rem;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
-      backdrop-filter: blur(12px);
-      max-width: 400px;
-      width: 100%;
-      text-align: center;
-    }
-    /* ERROR MESSAGE CONTAINER */
-    .error-message {
-      background-color: #ff4c4c;
-      color: white;
-      padding: 0.75rem 1rem;
-      border-radius: 15px;
-      margin-bottom: 1rem;
-      font-weight: 600;
-      display: none; /* hidden by default */
-      text-align: center;
-      box-shadow: 0 0 10px #ff4c4c;
-    }
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 1.5rem;
-      text-shadow: 0 0 10px rgba(0, 122, 255, 0.2);
-    }
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      text-align: left;
-    }
-    label {
-      font-weight: 600;
-      font-size: 0.9rem;
-      margin-bottom: 0.25rem;
-    }
-    input, select {
-      padding: 0.75rem 1rem;
-      border-radius: 25px;
-      border: 1px solid var(--border-color);
-      background: rgba(255, 255, 255, 0.1);
-      color: white;
-      font-size: 1rem;
-      outline: none;
-      transition: border-color 0.3s ease;
-      width: 100%;
-      box-sizing: border-box;
-    }
-    input::placeholder {
-      color: rgba(255, 255, 255, 0.6);
-    }
-    input:focus, select:focus {
-      border-color: var(--accent-blue);
-      background: rgba(255, 255, 255, 0.15);
-    }
-    .btn {
-      background-color: var(--accent-blue);
-      color: white;
-      font-weight: 600;
-      padding: 0.75rem 1.5rem;
-      border: none;
-      border-radius: 25px;
-      font-size: 1rem;
-      cursor: pointer;
-      text-align: center;
-      transition: background-color 0.3s ease;
-      margin-top: 1rem;
-      width: 100%;
-    }
-    .btn:hover {
-      background-color: #005fd9;
-    }
-    .login-link {
-      margin-top: 1rem;
-      text-align: center;
-      font-size: 0.9rem;
-      color: rgba(255, 255, 255, 0.7);
-    }
-    .login-link a {
-      color: var(--accent-blue);
-      text-decoration: none;
-      font-weight: 600;
-    }
-    .login-link a:hover {
-      text-decoration: underline;
-    }
-    @media (max-width: 450px) {
-      .signup-container {
-        padding: 2rem 1.5rem;
-      }
-    }
-  </style>
-</head>
-<body>
-  <div class="signup-container">
+
+  <div class="signup-page">
+    <div class="signup-container">
     <div class="error-message" id="errorMessage" style="<%= error ? 'display: block;' : 'display: none;' %>">
   <%= error || '' %>
 </div>
@@ -148,6 +26,8 @@
       Already have an account? <a href="/login">Log in</a>
     </p>
   </div>
+  </div>
+  
 
   <script>
     const form = document.getElementById('signupForm');
@@ -164,5 +44,3 @@
       }
     });
   </script>
-</body>
-</html>

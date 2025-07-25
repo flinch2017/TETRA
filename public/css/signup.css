@@ -1,0 +1,131 @@
+:root {
+  --blue-dark: #0a0f2c;
+  --blue-darker: #050a1f;
+  --accent-blue: #007aff;
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Scope everything to .signup-page */
+.signup-page {
+  background-color: var(--blue-dark);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  overflow-x: hidden;
+}
+
+.signup-page .signup-container {
+  background: var(--glass-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 15px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  width: 100%;
+  max-width: 400px;
+  box-sizing: border-box;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.signup-page h1 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  text-shadow: 0 0 10px rgba(0, 122, 255, 0.2);
+}
+
+.signup-page form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  text-align: left;
+}
+
+.signup-page label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+}
+
+.signup-page input,
+.signup-page select {
+  padding: 0.75rem 1rem;
+  border-radius: 25px;
+  border: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.signup-page input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.signup-page input:focus,
+.signup-page select:focus {
+  border-color: var(--accent-blue);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.signup-page .btn {
+  background-color: var(--accent-blue);
+  color: white;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 25px;
+  font-size: 1rem;
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 0.3s ease;
+  margin-top: 1rem;
+  width: 100%;
+}
+
+.signup-page .btn:hover {
+  background-color: #005fd9;
+}
+
+.signup-page .login-link {
+  margin-top: 1rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.signup-page .login-link a {
+  color: var(--accent-blue);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.signup-page .login-link a:hover {
+  text-decoration: underline;
+}
+
+.signup-page .error-message {
+  background-color: #ff4c4c;
+  color: white;
+  padding: 0.75rem 1rem;
+  border-radius: 15px;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  text-align: center;
+  box-shadow: 0 0 10px #ff4c4c;
+}
+
+@media (max-width: 450px) {
+  .signup-page .signup-container {
+    padding: 2rem 1.5rem;
+  }
+}

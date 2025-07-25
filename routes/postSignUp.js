@@ -26,8 +26,16 @@ const client = new paypal.core.PayPalHttpClient(environment);
 
 router.get('/auth', (req, res) => {
   const email = req.query.email; // safely extract email from URL query
-  res.render('auth', { email, error: null });
+  res.render('auth', {
+    email,
+    error: null,
+    userAcode: null,
+    pfpUrl: null,
+    showHeader: false,     // or true to show
+    showMusicBar: false    // or true to show
+  });
 });
+
 
 
 router.post('/signup', async (req, res) => {
@@ -220,8 +228,14 @@ await pool.query(
 
 // GET route for pricing page
 router.get('/pricing', (req, res) => {
-  res.render('pricing'); // This assumes you have a 'pricing.ejs' file in your views folder
+  res.render('pricing', {
+    userAcode: null,
+    pfpUrl: null,
+    showHeader: false,     // or true to show
+    showMusicBar: false    // or true to show
+  });
 });
+
 
 
 

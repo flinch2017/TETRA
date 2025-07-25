@@ -58,8 +58,16 @@ const getLogOut = require('./getLogOut.js');
 
 // Routes
 router.get('/', (req, res) => {
-  res.render('welcome', { appName: 'TETRA' });
+  res.render('welcome', {
+    appName: 'TETRA',
+    userAcode: null,
+    pfpUrl: null,
+    showHeader: false,     // or true to show
+    showMusicBar: false    // or true to show
+  });
 });
+
+
 
 
 router.use('/', getSignUp, getLogIn, getDashboard, getProfile, getCreatePost, getEditProfile, getMedia, getSubmission, getSearchArtists, getMusicPlay, getLogOut);
