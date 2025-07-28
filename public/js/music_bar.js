@@ -245,3 +245,69 @@ bindSongClickHandlers();
 window.addEventListener('page:loaded', () => {
   bindSongClickHandlers();
 });
+
+
+
+let isShuffling = false;
+let repeatMode = 'off'; // 'off', 'all', 'one'
+let isLiked = false;
+
+const shuffleBtn = document.getElementById('shuffleBtn');
+const repeatBtn = document.getElementById('repeatBtn');
+const likeBtn = document.getElementById('likeBtn');
+const repeatIcon = document.getElementById('repeatIcon');
+const likeIcon = document.getElementById('likeIcon');
+
+// Shuffle toggle
+shuffleBtn.addEventListener('click', () => {
+  isShuffling = !isShuffling;
+  shuffleBtn.classList.toggle('active', isShuffling);
+  shuffleBtn.querySelector('i').style.color = isShuffling ? '#1DB954' : '';
+});
+
+repeatBtn.addEventListener('click', () => {
+  if (repeatMode === 'off') {
+    repeatMode = 'all';
+    repeatIcon.className = 'fas fa-repeat';
+    repeatIcon.style.color = '#1DB954';
+    repeatIcon.removeAttribute('data-one');
+  } else if (repeatMode === 'all') {
+    repeatMode = 'one';
+    repeatIcon.className = 'fas fa-repeat';
+    repeatIcon.style.color = '#1DB954';
+    repeatIcon.setAttribute('data-one', 'true');
+  } else {
+    repeatMode = 'off';
+    repeatIcon.className = 'fas fa-repeat';
+    repeatIcon.style.color = '';
+    repeatIcon.removeAttribute('data-one');
+  }
+});
+
+
+// Like toggle
+likeBtn.addEventListener('click', () => {
+  isLiked = !isLiked;
+  likeIcon.className = isLiked ? 'fas fa-heart' : 'far fa-heart';
+  likeIcon.style.color = isLiked ? '#e74c3c' : '';
+});
+
+
+
+function getNextTrackIndex(currentIndex, playlist) {
+  if (repeatMode === 'one') return currentIndex;
+
+  if (isShuffling) {
+    let randomIndex;
+    do {
+      randomIndex = Math.floor(Math.random() * playlist.length);
+    } while (randomIndex === currentIndex);
+    return randomIndex;
+  }
+
+  if (repeatMode === 'all') {
+    return (currentIndex + 1) % playlist.length;
+  }
+
+  return currentIndex + 1;
+}

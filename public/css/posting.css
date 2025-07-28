@@ -289,11 +289,15 @@ body {
   }
 }
 
+.form-container {
+  position: relative; /* Needed for absolute alert positioning */
+}
+
 .alert-box {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background-color: #4BB543; /* Green */
+  position: absolute; /* was fixed */
+  top: 10px;
+  right: 10px;
+  background-color: #4BB543;
   color: white;
   padding: 1rem 1.5rem;
   border-radius: 8px;
@@ -306,7 +310,7 @@ body {
   opacity: 0;
   transform: translateY(-20px);
   transition: opacity 0.4s ease, transform 0.4s ease;
-  z-index: 9999;
+  z-index: 999;
 }
 
 .alert-box.show {

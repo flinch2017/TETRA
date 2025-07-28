@@ -659,6 +659,8 @@ document.getElementById('releaseForm').addEventListener('submit', async function
         progressBar.textContent = 'Upload complete!';
         setTimeout(() => {
           const userAcode = document.body.dataset.userAcode;
+          formSubmitted = true; // ✅ prevent delete on unload
+
             window.location.href = `/profile?acode=${userAcode}`;
 
         }, 800); // brief pause to show completion

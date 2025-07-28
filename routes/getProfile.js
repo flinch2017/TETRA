@@ -87,21 +87,24 @@ router.get('/profile', compCheck, async (req, res) => {
 
     // ✅ Fetch top tracks (with explicit)
     const { rows: trackRows } = await pool.query(`
-      SELECT 
-        t.track_id, t.track_title, t.explicit,
-        a.artwork_url,
-        COALESCE(s.stream_count, 0) AS streams
-      FROM tracks t
-      INNER JOIN albums a ON t.release_id = a.release_id
-      LEFT JOIN (
-        SELECT track_id, COUNT(*)::int AS stream_count
-        FROM streams WHERE verified = 'Yes'
-        GROUP BY track_id
-      ) s ON t.track_id = s.track_id
-      WHERE a.acode = $1
-      ORDER BY streams DESC
-      LIMIT 10
-    `, [targetAcode]);
+  SELECT 
+    t.track_id, t.track_title, t.explicit,
+    a.artwork_url,
+    COALESCE(s.stream_count, 0) AS streams
+  FROM tracks t
+  INNER JOIN albums a ON t.release_id = a.release_id
+  LEFT JOIN (
+    SELECT track_id, COUNT(*)::int AS stream_count
+    FROM streams WHERE verified = 'Yes'
+    GROUP BY track_id
+  ) s ON t.track_id = s.track_id
+  WHERE 
+    t.primary_artist ILIKE $1
+    OR t.features ILIKE $1
+  ORDER BY streams DESC
+  LIMIT 10
+`, [`%${targetAcode}%`]);
+
 
     const songs = [];
     for (const track of trackRows) {
@@ -119,14 +122,15 @@ router.get('/profile', compCheck, async (req, res) => {
       });
     }
 
-    // ✅ Fetch albums/releases (with explicit)
+    
     const { rows: albumRows } = await pool.query(`
-      SELECT release_id, release_title, artwork_url, release_date, explicit
-      FROM albums
-      WHERE acode = $1
-      ORDER BY upload_date DESC
-      LIMIT 5
-    `, [targetAcode]);
+  SELECT release_id, release_title, artwork_url, release_date, explicit
+  FROM albums
+  WHERE acode ILIKE $1
+  ORDER BY upload_date DESC
+  LIMIT 5
+`, [`%${targetAcode}%`]);
+
 
     const releases = [];
     for (const album of albumRows) {

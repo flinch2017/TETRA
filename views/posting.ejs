@@ -1,5 +1,10 @@
 
 <div class="form-container">
+  <div id="alertBox" class="alert-box hidden">
+  <span class="checkmark">✔</span>
+  <span id="alertMessage"></span>
+</div>
+  
   <h6>Create a New Post</h6>
   <form id="postForm" action="/create-post" method="POST" enctype="multipart/form-data">
     <label for="caption">What's on your mind?</label>
@@ -27,10 +32,7 @@
   <a class="back ajax-link" href="/dashboard">Back to Dashboard</a>
 </div>
 
-<div id="alertBox" class="alert-box hidden">
-  <span class="checkmark">✔</span>
-  <span id="alertMessage"></span>
-</div>
+
 
 
 <script src="/js/posting.js"></script>

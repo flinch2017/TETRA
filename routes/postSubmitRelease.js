@@ -21,12 +21,11 @@ const upload = require('../middleware/multer-setup.js');
 router.post('/submit-release', upload.any(), async (req, res) => {
   try {
     const {
-      release_id, release_title, acode, genre, explicit,
+      release_id, release_title, genre, explicit,
       upc, copyright, phonograph, record_label,
       release_date, release_time, release_zone, track_order, release_type
     } = req.body;
 
-    // Find uploaded files
     const artFile = req.files.find(f => f.fieldname === 'art_url') || null;
     const canvasFile = req.files.find(f => f.fieldname === 'canvas_url') || null;
 
@@ -34,7 +33,44 @@ router.post('/submit-release', upload.any(), async (req, res) => {
     if (artFile) artKey = await uploadArtworkToS3(artFile, release_id);
     if (canvasFile) canvasKey = await uploadCanvasToS3(canvasFile, release_id);
 
-    // Insert album (set null if field is empty string or undefined)
+    // Parse tracks
+    let tracks = [];
+    if (req.body.tracks) {
+      try {
+        tracks = JSON.parse(req.body.tracks);
+      } catch (e) {
+        console.error('Could not parse tracks JSON:', e);
+      }
+    }
+
+    // === Build acode logic here ===
+    let albumAcodesSet = new Set();
+
+    if (tracks.length === 1) {
+      const track = tracks[0];
+      const primary = (track.primaryArtistAcodes || '').split(',').map(a => a.trim());
+      const features = (track.featuredArtistAcodes || '').split(',').map(a => a.trim());
+      [...primary, ...features].forEach(acode => {
+        if (acode) albumAcodesSet.add(acode);
+      });
+    } else if (tracks.length > 1) {
+      let commonPrimary = null;
+      for (const track of tracks) {
+        const primaries = new Set((track.primaryArtistAcodes || '').split(',').map(a => a.trim()).filter(Boolean));
+        if (!commonPrimary) {
+          commonPrimary = primaries;
+        } else {
+          commonPrimary = new Set([...commonPrimary].filter(a => primaries.has(a)));
+        }
+      }
+      if (commonPrimary) {
+        commonPrimary.forEach(a => albumAcodesSet.add(a));
+      }
+    }
+
+    const albumAcodes = [...albumAcodesSet].join(',') || null;
+
+    // Insert into albums
     await pool.query(`
       INSERT INTO albums
       (release_id, acode, release_title, artwork_url, canvas_url, genre, explicit, upc, tracks,
@@ -42,7 +78,7 @@ router.post('/submit-release', upload.any(), async (req, res) => {
       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)
     `, [
       release_id || null,
-      acode || null,
+      albumAcodes,
       release_title || null,
       artKey,
       canvasKey,
@@ -59,22 +95,11 @@ router.post('/submit-release', upload.any(), async (req, res) => {
       release_type || null
     ]);
 
-    // Parse tracks
-    let tracks = [];
-    if (req.body.tracks) {
-      try {
-        tracks = JSON.parse(req.body.tracks);
-      } catch (e) {
-        console.error('Could not parse tracks JSON:', e);
-      }
-    }
-    console.log('Parsed tracks:', tracks);
-
     // Track order array
     const trackOrderArray = (track_order || '').split(',');
 
     for (const track of tracks) {
-      if (!track.trackId || !track.s3Key) continue; // skip invalid
+      if (!track.trackId || !track.s3Key) continue;
 
       let orderIndex = trackOrderArray.indexOf(track.trackId);
       if (orderIndex === -1) orderIndex = 0;
@@ -87,7 +112,7 @@ router.post('/submit-release', upload.any(), async (req, res) => {
       `, [
         track.trackId || null,
         release_id || null,
-        acode || null,
+        albumAcodes,
         track.title?.trim() || null,
         track.primaryArtistAcodes?.trim() || null,
         track.featuredArtistAcodes?.trim() || null,
@@ -111,6 +136,7 @@ router.post('/submit-release', upload.any(), async (req, res) => {
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });
+
 
 
 module.exports = router;

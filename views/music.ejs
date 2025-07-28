@@ -1,0 +1,72 @@
+<div class="dashboard-wrapper">
+    
+
+
+    <!-- Main Content -->
+    <main class="main-dashboard">
+      <!-- Section 1: Promotional Posts / Releases -->
+      <section class="section promo-section">
+  <h2>New Releases</h2>
+
+  <% if (promotionalPosts.length === 0) { %>
+    <p style="margin-left: 1rem; color: #888;">No available content</p>
+  <% } else { %>
+    <div class="horizontal-scroll">
+      <% promotionalPosts.forEach(release => { %>
+        <div class="card promo-card">
+          <img src="<%= release.coverUrl %>" alt="Promo Cover">
+          <h3><%= release.title %></h3>
+          <p><%= release.artist %></p>
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
+</section>
+
+      <!-- Section 2: Recently Played -->
+      <section class="section recents-section">
+  <h2>Recently Played</h2>
+  <div class="horizontal-scroll">
+    <% recentTracks.forEach(track => { %>
+      <div class="card track-card">
+        <img src="<%= track.coverUrl %>" alt="Cover">
+        <h3><%= track.title %></h3>
+        <p><%= track.artist %></p>
+        
+      </div>
+    <% }) %>
+  </div>
+</section>
+
+
+      <!-- Section 3: Playlists -->
+      <section class="section playlists-section">
+        <h2>Discover</h2>
+        <div class="grid-layout">
+          <% playlists.forEach(playlist => { %>
+            <div class="card playlist-card">
+              <img src="<%= playlist.coverUrl %>" alt="Playlist Cover">
+              <h3><%= playlist.name %></h3>
+              <p><%= playlist.track_count %> Tracks</p>
+
+            </div>
+          <% }) %>
+        </div>
+      </section>
+
+      <!-- Section 4: Top Videos -->
+      <section class="section videos-section">
+        <h2>Top Videos</h2>
+        <div class="grid-layout">
+          <% topVideos.forEach(video => { %>
+  <div class="card video-card">
+    <video src="<%= video.videoUrl || '#' %>" poster="<%= video.thumbnail %>" controls></video>
+    <h3><%= video.title %></h3>
+    <p><%= video.artist %></p>
+  </div>
+<% }) %>
+
+        </div>
+      </section>
+    </main>
+  </div>

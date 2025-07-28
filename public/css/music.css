@@ -1,0 +1,184 @@
+/* music.css */
+
+.dashboard-wrapper {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 220px;
+  background-color: #1e1e1e;
+  padding: 1.5rem;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.sidebar h2 {
+  font-size: 1.8rem;
+  margin-bottom: 2rem;
+  color: #1db954;
+}
+
+.sidebar nav ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar nav ul li {
+  margin-bottom: 1rem;
+}
+
+.sidebar nav ul li a {
+  text-decoration: none;
+  color: #ffffff;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.sidebar nav ul li a:hover {
+  color: #1db954;
+}
+
+/* Main Dashboard */
+.main-dashboard {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+.section {
+  margin-bottom: 3rem;
+}
+
+.section h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.horizontal-scroll {
+  display: flex;
+  overflow-x: auto;
+  gap: 0.75rem;
+  padding-bottom: 0.5rem;
+}
+
+.horizontal-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.horizontal-scroll::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 10px;
+}
+
+.grid-layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 0.75rem;
+}
+
+/* Universal Card Style */
+.card {
+  border-radius: 10px;
+  text-align: center;
+  transition: transform 0.3s ease;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 0.75rem;
+  background: transparent; /* remove background */
+  box-shadow: none;        /* remove shadows if any */
+}
+
+/* Images and Videos */
+.card img,
+.card video {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 0.4rem;
+}
+
+/* Text inside cards */
+.card h3 {
+  font-size: 0.85rem;
+  margin: 0.4rem 0 0.2rem;
+  color: #ffffff;
+}
+
+.card p {
+  font-size: 0.75rem;
+  color: #bbbbbb;
+}
+
+.card:hover {
+  transform: scale(1.05);
+}
+
+/* Play Button */
+.play-btn {
+  margin-top: 0.4rem;
+  padding: 0.4rem 0.8rem;
+  background-color: #1db954;
+  border: none;
+  border-radius: 50px;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.75rem;
+  transition: background-color 0.3s;
+}
+
+.play-btn:hover {
+  background-color: #17a74a;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .dashboard-wrapper {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+  }
+
+  .main-dashboard {
+    padding: 1rem;
+  }
+
+  .grid-layout {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  }
+}
+
+/* Optional: Ensure horizontal scroll cards match style */
+.horizontal-scroll .card {
+  width: 120px;
+  flex: 0 0 auto;
+}
+
+
+/* Rectangular style specifically for video cards */
+.video-card {
+  width: 100%;
+  max-width: 500px; /* ⬅️ Increase size */
+  aspect-ratio: 16 / 9;
+  margin: 0 auto;
+}
+
+.video-card video {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 12px; /* Slightly more rounded */
+  display: block;
+}
+

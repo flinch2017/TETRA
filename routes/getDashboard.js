@@ -45,11 +45,19 @@ router.get('/dashboard', compCheck, async (req, res) => {
 
     // Fetch posts including poster's artist_name, username, acode, and pfp_url
     const postsResult = await pool.query(
-      `SELECT p.*, u.username, u.artist_name, u.acode, u.pfp_url
-       FROM posts p
-       JOIN users u ON u.acode = p.acode
-       ORDER BY p.date DESC`
-    );
+  `SELECT p.*, u.username, u.artist_name, u.acode, u.pfp_url
+   FROM posts p
+   JOIN users u ON u.acode = p.acode
+   WHERE p.acode = $1
+      OR p.acode IN (
+        SELECT following_acode
+        FROM follows
+        WHERE follower_acode = $1
+      )
+   ORDER BY p.date DESC`,
+  [userRow.acode]
+);
+
 
     const posts = await Promise.all(postsResult.rows.map(async post => {
       const images = post.image || [];

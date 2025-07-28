@@ -1,8 +1,9 @@
 <!-- Floating Plus Button -->
 <a href="javascript:void(0);" class="floating-plus" id="plusButton" title="Create">+</a>
 <div class="plus-options" id="plusOptions">
-  <a href="/create-post" class="logo ajax-link">Create Post</a>
   <a href="javascript:void(0);" id="releaseLink">Release</a>
+  <a href="/create-post" class="ajax-link">Create Post</a>
+  <a href="/create-post" class="ajax-link">Promote</a>
 </div>
 
 <!-- Music Drawer -->
@@ -40,18 +41,34 @@
       <input type="range" min="0" max="100" value="0" id="seekbar" />
     </div>
     <div class="expanded-controls">
-  <button id="prevBtn">
-    <img src="/drawables/prev_default.png" alt="Previous" width="20" />
+      <button id="prevBtn">
+        <img src="/drawables/prev_default.png" alt="Previous" width="20" />
+      </button>
+
+      <button id="playPauseBtnExpanded">
+        <img id="playPauseIconExpanded" src="/drawables/play_default.png" alt="Play" width="20" />
+      </button>
+
+      <button id="nextBtnExpanded">
+        <img src="/drawables/next_default.png" alt="Next" width="20" />
+      </button>
+    </div>
+    <div class="player-options">
+  <button id="shuffleBtn" title="Shuffle">
+    <i class="fas fa-random"></i>
   </button>
 
-  <button id="playPauseBtnExpanded">
-    <img id="playPauseIconExpanded" src="/drawables/play_default.png" alt="Play" width="20" />
-  </button>
+  <button id="repeatBtn" title="Repeat" style="position: relative;">
+  <i id="repeatIcon" class="fas fa-repeat"></i>
+</button>
 
-  <button id="nextBtnExpanded">
-    <img src="/drawables/next_default.png" alt="Next" width="20" />
+
+  <button id="likeBtn" title="Like">
+    <i id="likeIcon" class="far fa-heart"></i>
   </button>
 </div>
+
+
 
   </div>
   <audio id="audioPlayer"></audio>
@@ -72,6 +89,9 @@
       </a>
       <a href="/submission?type=album" class="release-card">
         <i class="fas fa-record-vinyl"></i><br>Album
+      </a>
+      <a href="/submission?type=video" class="release-card">
+        <i class="fas fa-film"></i><br>Video
       </a>
     </div>
   </div>

@@ -44,7 +44,10 @@ router.get('/submission', async (req, res) => {
       template = 'release-ep';
     } else if (releaseType === 'album') {
       template = 'release-album';
-    } else {
+    } else if (releaseType === 'video') {
+      template = 'release-video';
+    }
+    else {
       return res.status(400).send('Invalid release type.');
     }
 

@@ -10,33 +10,37 @@
 
 
   <div class="artist-info">
-    <div class="artist-name"><%= artist.name %></div>
-    <div class="artist-follow"><%= artist.followers %> followers</div>
-    <div class="header-actions">
+  <div class="artist-name"><%= artist.name %></div>
+  <div class="artist-follow"><%= artist.followers %> followers</div>
+  <div class="header-actions">
+    <% if (!isOwnProfile) { %>
       <button 
-  class="follow-btn" 
-  data-target="<%= artist.acode %>" 
-  data-following="<%= isFollowing ? 'true' : 'false' %>">
-  <%= isFollowing ? 'Following' : 'Follow' %>
-</button>
+        class="follow-btn" 
+        data-target="<%= artist.acode %>" 
+        data-following="<%= isFollowing ? 'true' : 'false' %>">
+        <%= isFollowing ? 'Following' : 'Follow' %>
+      </button>
+    <% } %>
 
+    <div class="more-dropdown">
+      <i class="fas fa-ellipsis-v more-dropdown-toggle"></i>
+      <div class="more-dropdown-menu">
+        <% if (isOwnProfile) { %>
+          <a href="/edit-profile?acode=<%= artist.acode %>">Edit Profile</a>
+          <a href="#">View Analytics</a>
+        <% } %>
 
+        <a href="#">Add to Favorites</a>
 
-
-      <div class="more-dropdown">
-        <i class="fas fa-ellipsis-v more-dropdown-toggle"></i>
-        <div class="more-dropdown-menu">
-          <% if (isOwnProfile) { %>
-  <a href="/edit-profile?acode=<%= artist.acode %>">Edit Profile</a>
-<% } %>
-
-          <a href="#">Add to Favorites</a>
+        <% if (!isOwnProfile) { %>
           <a href="#">Report</a>
           <a href="#">Block Artist</a>
-        </div>
+        <% } %>
       </div>
     </div>
   </div>
+</div>
+
 </div>
 
 
