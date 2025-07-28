@@ -288,3 +288,12 @@
 .post-actions button:hover {
   color: #ffffff;
 }
+
+
+
+.post-dropdown-menu {
+  display: none;
+}
+.post-dropdown-menu.show {
+  display: block;
+}

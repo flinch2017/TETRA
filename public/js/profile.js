@@ -1,9 +1,13 @@
-document.addEventListener('DOMContentLoaded', () => {
+
+
+
+
+
+function bindProfileEvents() {
   const bannerInput = document.getElementById('banner');
   const bannerPreview = document.getElementById('bannerPreview');
   const plusIcon = document.querySelector('.plus-icon');
 
-  // Hide plus icon if bannerPreview already has a source (e.g., when pfpUrl exists)
   if (bannerPreview && bannerPreview.src && bannerPreview.src.trim() !== '' && bannerPreview.style.display !== 'none') {
     if (plusIcon) plusIcon.style.display = 'none';
   }
@@ -18,10 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
-});
 
-
-document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.more-dropdown-toggle').forEach(toggle => {
     toggle.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -29,10 +30,10 @@ document.addEventListener('DOMContentLoaded', () => {
       menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
     });
   });
+
   document.addEventListener('click', () => {
     document.querySelectorAll('.more-dropdown-menu').forEach(menu => {
       menu.style.display = 'none';
     });
   });
-});
-
+}

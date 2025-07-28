@@ -27,7 +27,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (newContent) {
         document.querySelector('#appContent').innerHTML = newContent.innerHTML;
         window.history.pushState({}, '', href);
-        window.dispatchEvent(new Event('page:loaded'));
+        bindAllPageEvents(); // already enough
+
+
       }
     } catch (err) {
       console.error('AJAX navigation failed:', err);
@@ -44,7 +46,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const newContent = doc.querySelector('#appContent');
       if (newContent) {
         document.querySelector('#appContent').innerHTML = newContent.innerHTML;
-        window.dispatchEvent(new Event('page:loaded'));
+        bindAllPageEvents(); // already enough
+
+
+
       }
     } catch {
       location.reload();
@@ -53,7 +58,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-// ajax-navigation.js
 function bindAjaxLinks() {
   document.querySelectorAll('a.ajax-link').forEach(link => {
     link.addEventListener('click', function (e) {
@@ -70,12 +74,13 @@ function bindAjaxLinks() {
 
           history.pushState(null, '', url);
 
-          // 🔁 REBIND EVENTS AFTER CONTENT LOAD
-          bindSongClickEvents();
+          // 🔁 THIS is what was missing 👇
+          bindAllPageEvents();
         });
     });
   });
 }
+
 
 function bindSongClickEvents() {
   document.querySelectorAll('.song-item').forEach(item => {
@@ -107,9 +112,19 @@ window.addEventListener('popstate', () => {
 
 
 document.addEventListener('DOMContentLoaded', () => {
-  initFollowButton(); // For initial load
+  bindAllPageEvents(); // Bind everything on initial load
 });
 
-window.addEventListener('ajaxContentLoaded', () => {
-  initFollowButton(); // After AJAX nav
-});
+
+
+
+
+
+
+function bindAllPageEvents() {
+  bindSongClickEvents();
+  initFollowButton();
+  bindDropdownToggles(); // you’ll define this next
+  bindProfileEvents();   // for banner image preview and more menu
+  bindPostActionButtons(); // ← Add this if not yet done
+}
