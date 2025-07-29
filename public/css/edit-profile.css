@@ -1,0 +1,137 @@
+
+
+  .editProf {
+    max-width: 600px;
+    margin: 100px auto 40px;
+    margin-bottom: 60px;
+    padding: 2rem;
+    background-color: rgba(18, 25, 58, 0.8);
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(0,123,255,0.2);
+  }
+
+  .editProf h1 {
+    text-align: center;
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .editProf form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .editProf label {
+    font-size: 0.95rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .editProf input[type="text"],
+textarea,
+select {
+  padding: 0.6rem 1rem;            /* more horizontal padding left & right */
+  border-radius: 6px;
+  border: none;
+  font-size: 1rem;
+  width: 100%;
+  background-color: rgba(255,255,255,0.1);
+  color: white;
+  box-sizing: border-box;          /* ensures padding doesn’t cause overflow */
+  margin-right: auto;              /* ensures no flush to right edge */
+}
+
+
+  .editProf input[type="file"] {
+    border: none;
+    font-size: 0.95rem;
+    color: white;
+  }
+
+  .editProf button {
+  padding: 0.75rem;
+  border: none;
+  border-radius: 999px;
+  background-color: #007bff;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(0,123,255,0.4), 0 0 20px rgba(0,123,255,0.2);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.editProf button:hover {
+  background-color: #005fc1;
+  box-shadow: 0 0 15px rgba(0,123,255,0.6), 0 0 30px rgba(0,123,255,0.4);
+}
+
+
+  @media (max-width: 600px) {
+  .editProf {
+    margin: 80px 1rem 100px;
+    padding: 1.2rem;
+  }
+
+  .editProf h1 {
+    font-size: 1.5rem;
+  }
+
+  .editProf input[type="text"],
+  textarea,
+  select {
+    font-size: 0.95rem;
+    padding: 0.5rem 1rem;   /* keep good side padding even on small screens */
+  }
+
+  .editProf button {
+    font-size: 0.95rem;
+    padding: 0.65rem;
+  }
+}
+
+.editProf select {
+  color: white;                /* dropdown text color */
+  
+}
+
+.editProf select option {
+  color: black;                /* option text color */
+  background-color: white;     /* option background */
+}
+
+
+.editProf .banner-upload {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.editProf .banner-box {
+  width: 300px;
+  height: 150px;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+  background-color: #f9f9f9;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.editProf .banner-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.editProf .plus-icon {
+  font-size: 2.5rem;
+  color: #aaa;
+  z-index: 1;
+}
+

@@ -6,6 +6,8 @@
   const releaseLink = document.getElementById('releaseLink');
   const releaseModal = document.getElementById('releaseModal');
   const closeModal = releaseModal.querySelector('.close');
+  let streamTrackId = null;
+let isOrganic = true;
 
   bar.addEventListener('click', () => {
     drawer.classList.toggle('expanded');
@@ -57,7 +59,7 @@
     });
   });
 
-  function updateUIAndPlay({ title, artist, coverUrl, audioUrl }) {
+  function updateUIAndPlay({ title, artist, coverUrl, audioUrl, track_id }) {
   // Collapsed bar updates
   document.getElementById('currentTrackTitle').textContent = title;
   document.getElementById('currentArtist').textContent = artist;
@@ -71,8 +73,15 @@
   // Audio
   const audio = document.getElementById('audioPlayer');
   audio.src = audioUrl;
-  audio.play().catch(err => console.error('Autoplay failed:', err));
+
+  streamTrackId = track_id;
+  isOrganic = true;
+
+  audio.play().catch(err => {
+    console.error('Autoplay failed:', err);
+  });
 }
+
 
 
   const audio = document.getElementById('audioPlayer');
@@ -91,6 +100,28 @@
     const time = (seekbar.value / 100) * audio.duration;
     audio.currentTime = time;
   });
+
+  audio.addEventListener('seeking', () => {
+  isOrganic = false;
+});
+
+audio.addEventListener('pause', () => {
+  if (!audio.ended) {
+    isOrganic = false;
+  }
+});
+
+audio.addEventListener('ended', () => {
+  if (streamTrackId && isOrganic) {
+    fetch('/api/log-stream', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ track_id: streamTrackId })
+    }).catch(err => console.warn('Failed to log stream:', err));
+  }
+  streamTrackId = null;
+  isOrganic = true;
+});
 
   const playPauseBtn = document.getElementById('playPauseBtn');
   const playPauseBtnExpanded = document.getElementById('playPauseBtnExpanded');

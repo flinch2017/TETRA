@@ -41,32 +41,36 @@
       <input type="range" min="0" max="100" value="0" id="seekbar" />
     </div>
     <div class="expanded-controls">
-      <button id="prevBtn">
-        <img src="/drawables/prev_default.png" alt="Previous" width="20" />
-      </button>
+  <!-- Centered group: shuffle, prev, play, next, repeat -->
+  <div class="centered-controls">
+    <button id="shuffleBtn" title="Shuffle">
+      <i class="fas fa-random"></i>
+    </button>
 
-      <button id="playPauseBtnExpanded">
-        <img id="playPauseIconExpanded" src="/drawables/play_default.png" alt="Play" width="20" />
-      </button>
+    <button id="prevBtn">
+      <img src="/drawables/prev_default.png" alt="Previous" width="20" />
+    </button>
 
-      <button id="nextBtnExpanded">
-        <img src="/drawables/next_default.png" alt="Next" width="20" />
-      </button>
-    </div>
-    <div class="player-options">
-  <button id="shuffleBtn" title="Shuffle">
-    <i class="fas fa-random"></i>
+    <button id="playPauseBtnExpanded">
+      <img id="playPauseIconExpanded" src="/drawables/play_default.png" alt="Play" width="20" />
+    </button>
+
+    <button id="nextBtnExpanded">
+      <img src="/drawables/next_default.png" alt="Next" width="20" />
+    </button>
+
+    <button id="repeatBtn" title="Repeat" style="position: relative;">
+    <i id="repeatIcon" class="fas fa-repeat"></i>
   </button>
+  </div>
 
-  <button id="repeatBtn" title="Repeat" style="position: relative;">
-  <i id="repeatIcon" class="fas fa-repeat"></i>
-</button>
-
-
-  <button id="likeBtn" title="Like">
+  <!-- Right-side like button -->
+  <button id="likeBtn" class="like-btn" title="Like">
     <i id="likeIcon" class="far fa-heart"></i>
   </button>
 </div>
+
+
 
 
 

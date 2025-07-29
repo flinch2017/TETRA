@@ -32,6 +32,7 @@ const postUploadTrack = require('./postUploadTrack.js');
 const postDeleteTrack = require('./postDeleteTrack.js');
 const postCheckDuplicates = require('./postCheckDuplicates.js');
 const postSubmitRelease = require('./postSubmitRelease.js');
+const postMusicPlay = require('./postMusicPlay.js');
 
 const getDashboard = require('./getDashboard.js');
 const getCreatePost = require('./getCreatePost.js');
@@ -74,7 +75,7 @@ router.get('/', (req, res) => {
 
 router.use('/', getSignUp, getLogIn, getDashboard, getProfile, getCreatePost, getEditProfile, getMedia, getSubmission, getSearchArtists, getMusicPlay, getLogOut, getMusic);
 
-router.use('/', postLogIn, postSignUp, postFollowUnfollow, postEditProfile, postUpdateArtist, postCreatePost, postUploadTrack, postDeleteTrack, postCheckDuplicates, postSubmitRelease);
+router.use('/', postLogIn, postSignUp, postFollowUnfollow, postEditProfile, postUpdateArtist, postCreatePost, postUploadTrack, postDeleteTrack, postCheckDuplicates, postSubmitRelease, postMusicPlay);
 
 
 

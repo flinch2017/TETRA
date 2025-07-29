@@ -37,3 +37,31 @@ function bindProfileEvents() {
     });
   });
 }
+
+
+
+  document.getElementById('editArtistForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const form = e.target;
+    const formData = new FormData(form);
+
+    try {
+      const response = await fetch('/update-artist', {
+        method: 'POST',
+        body: formData
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        alert('Profile updated successfully!');
+        window.location.href = '/profile';   // redirect after success
+      } else {
+        alert('Update failed: ' + (result.message || 'Unknown error'));
+      }
+    } catch (err) {
+      console.error('AJAX error:', err);
+      alert('An error occurred.');
+    }
+  });

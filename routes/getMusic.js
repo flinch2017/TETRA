@@ -109,16 +109,67 @@ if (followedAcodes.length > 0) {
 
 
 
-    // ---------- Other Static Sections ----------
-    const recentTracks = [
-      {
-        title: 'Night Drive',
-        artist: 'SynthNova',
-        acode: 'A2001',
-        coverUrl: await generatePresignedUrl('drawables/disc_default.png'),
-        audioUrl: '/static/audio/sample1.mp3'
-      }
-    ];
+    // ---------- Recent Tracks (from recents table) ----------
+let recentTracks = [];
+
+const { rows: recentRows } = await pool.query(`
+  SELECT DISTINCT ON (r.track_id)
+    r.track_id,
+    r.viewed_acode,
+    t.track_title AS title,
+    t.primary_artist,
+    t.features,
+    a.artwork_url,
+    t.audio_url,
+    r.accessed_time
+  FROM recents r
+  JOIN tracks t ON r.track_id = t.track_id
+  JOIN albums a ON t.release_id = a.release_id
+  WHERE r.owner_acode = $1
+  ORDER BY r.track_id, r.accessed_time DESC
+  LIMIT 10
+`, [userRow.acode]);
+
+
+for (const row of recentRows) {
+  const primaryCodes = row.primary_artist?.split(',').map(c => c.trim()) || [];
+  const featureCodes = row.features?.split(',').map(c => c.trim()) || [];
+
+  let artistName = '';
+  if (primaryCodes.length > 0) {
+    const { rows: primaries } = await pool.query(
+      `SELECT artist_name FROM users WHERE acode = ANY($1)`, [primaryCodes]
+    );
+    artistName += primaries.map(p => p.artist_name).join(', ');
+  }
+
+  if (featureCodes.length > 0) {
+    const { rows: features } = await pool.query(
+      `SELECT artist_name FROM users WHERE acode = ANY($1)`, [featureCodes]
+    );
+    if (features.length > 0) {
+      artistName += ` feat. ${features.map(f => f.artist_name).join(', ')}`;
+    }
+  }
+
+  const coverUrl = row.artwork_url
+    ? await generatePresignedUrl(`artworks/${row.artwork_url.split('/').pop()}`)
+    : await generatePresignedUrl('drawables/disc_default.png');
+
+  const audioUrl = row.audio_url
+    ? await generatePresignedUrl(row.audio_url)
+    : null;
+
+  recentTracks.push({
+    track_id: row.track_id,
+    title: row.title,
+    artist: artistName,
+    acode: row.viewed_acode,
+    coverUrl,
+    audioUrl
+  });
+}
+
 
     const playlists = [
       {
