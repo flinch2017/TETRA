@@ -29,10 +29,8 @@ router.get('/profile', compCheck, async (req, res) => {
     const targetAcode = queryAcode || loggedInUser.acode;
     isOwnProfile = (targetAcode === loggedInUser.acode);
 
-    // ✅ Use reusable function
     const headerPfpUrl = await getHeaderPfpUrl(loggedInUser.id);
 
-    // ✅ Target artist
     const { rows: userRows } = await pool.query(
       'SELECT account_mode, acode, pfp_url, artist_name, bio FROM users WHERE acode = $1',
       [targetAcode]
@@ -59,7 +57,6 @@ router.get('/profile', compCheck, async (req, res) => {
 
     const user = userRows[0];
 
-    // ✅ Banner
     let bannerUrl = await generatePresignedUrl('drawables/banner_default.png');
     if (user.pfp_url) {
       const filename = user.pfp_url.split('/').pop();
@@ -68,14 +65,12 @@ router.get('/profile', compCheck, async (req, res) => {
 
     const encryptedAcode = encrypt(user.acode);
 
-    // ✅ Followers
     const { rows: followerRows } = await pool.query(
       'SELECT COUNT(*)::int AS count FROM follows WHERE following_acode = $1',
       [user.acode]
     );
     const followerCount = followerRows[0]?.count || 0;
 
-    // ✅ Follow state
     let isFollowing = false;
     if (!isOwnProfile) {
       const followCheck = await pool.query(
@@ -85,26 +80,30 @@ router.get('/profile', compCheck, async (req, res) => {
       isFollowing = followCheck.rowCount > 0;
     }
 
-    // ✅ Fetch top tracks (with explicit)
     const { rows: trackRows } = await pool.query(`
-  SELECT 
-    t.track_id, t.track_title, t.explicit,
-    a.artwork_url,
-    COALESCE(s.stream_count, 0) AS streams
-  FROM tracks t
-  INNER JOIN albums a ON t.release_id = a.release_id
-  LEFT JOIN (
-    SELECT track_id, COUNT(*)::int AS stream_count
-    FROM streams WHERE verified = 'Yes'
-    GROUP BY track_id
-  ) s ON t.track_id = s.track_id
-  WHERE 
-    t.primary_artist ILIKE $1
-    OR t.features ILIKE $1
-  ORDER BY streams DESC
-  LIMIT 10
-`, [`%${targetAcode}%`]);
+      SELECT 
+        t.track_id, t.track_title, t.explicit,
+        a.artwork_url,
+        COALESCE(s.stream_count, 0) AS streams
+      FROM tracks t
+      INNER JOIN albums a ON t.release_id = a.release_id
+      LEFT JOIN (
+        SELECT track_id, COUNT(*)::int AS stream_count
+        FROM streams WHERE verified = 'Yes'
+        GROUP BY track_id
+      ) s ON t.track_id = s.track_id
+      WHERE 
+        t.primary_artist ILIKE $1
+        OR t.features ILIKE $1
+      ORDER BY streams DESC
+      LIMIT 10
+    `, [`%${targetAcode}%`]);
 
+    const likedResult = await pool.query(
+      'SELECT track_id FROM likes WHERE acode = $1 AND track_id IS NOT NULL',
+      [loggedInUser.acode]
+    );
+    const likedTrackIds = likedResult.rows.map(row => row.track_id);
 
     const songs = [];
     for (const track of trackRows) {
@@ -118,19 +117,18 @@ router.get('/profile', compCheck, async (req, res) => {
         title: track.track_title,
         coverUrl,
         streams: track.streams,
-        explicit: track.explicit
+        explicit: track.explicit,
+        isLiked: likedTrackIds.includes(track.track_id)
       });
     }
 
-    
     const { rows: albumRows } = await pool.query(`
-  SELECT release_id, release_title, artwork_url, release_date, explicit
-  FROM albums
-  WHERE acode ILIKE $1
-  ORDER BY upload_date DESC
-  LIMIT 5
-`, [`%${targetAcode}%`]);
-
+      SELECT release_id, release_title, artwork_url, release_date, explicit
+      FROM albums
+      WHERE acode ILIKE $1
+      ORDER BY upload_date DESC
+      LIMIT 5
+    `, [`%${targetAcode}%`]);
 
     const releases = [];
     for (const album of albumRows) {
@@ -148,7 +146,46 @@ router.get('/profile', compCheck, async (req, res) => {
       });
     }
 
-    // ✅ Final object
+    const { rows: monthlyListenerRows } = await pool.query(`
+      SELECT COUNT(DISTINCT s.acode) AS listener_count
+      FROM streams s
+      JOIN tracks t ON s.track_id = t.track_id
+      WHERE 
+        (t.primary_artist = $1 OR t.features ILIKE $2)
+        AND s.date >= date_trunc('month', CURRENT_DATE)
+    `, [targetAcode, `%${targetAcode}%`]);
+
+    const monthlyListeners = monthlyListenerRows[0]?.listener_count || 0;
+
+    const { rows: rankRows } = await pool.query(`
+      WITH artist_streams AS (
+        SELECT s.acode AS listener, UNNEST(STRING_TO_ARRAY(t.primary_artist, ',')) AS artist_acode
+        FROM streams s
+        JOIN tracks t ON s.track_id = t.track_id
+        WHERE s.date >= date_trunc('month', CURRENT_DATE)
+
+        UNION ALL
+
+        SELECT s.acode AS listener, UNNEST(STRING_TO_ARRAY(t.features, ',')) AS artist_acode
+        FROM streams s
+        JOIN tracks t ON s.track_id = t.track_id
+        WHERE s.date >= date_trunc('month', CURRENT_DATE)
+          AND t.features IS NOT NULL
+      )
+      SELECT TRIM(artist_acode) AS acode, COUNT(DISTINCT listener) AS listeners
+      FROM artist_streams
+      GROUP BY TRIM(artist_acode)
+      ORDER BY listeners DESC
+    `);
+
+    let rank = null;
+    for (let i = 0; i < rankRows.length; i++) {
+      if (rankRows[i].acode === targetAcode) {
+        rank = i + 1;
+        break;
+      }
+    }
+
     const artist = {
       name: user.artist_name?.trim() || loggedInUser.username || 'Unknown Artist',
       bannerUrl,
@@ -157,10 +194,10 @@ router.get('/profile', compCheck, async (req, res) => {
       account_mode: user.account_mode,
       acode: encryptedAcode,
       songs,
-      releases
+      releases,
+      monthlyListeners,
+      rank
     };
-
-    
 
     res.render('profile', {
       artist,

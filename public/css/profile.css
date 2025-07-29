@@ -331,3 +331,27 @@ body {
 .clickable-song:hover {
   background-color: rgba(255, 255, 255, 0.05);
 }
+
+
+.like-track.liked {
+  color: #2196f3; /* blue */
+  text-shadow: 0 0 5px #2196f3, 0 0 10px #2196f3, 0 0 15px #2196f3;
+}
+
+
+.explicit-badge {
+  background-color: #b50000;
+  color: white;
+  font-size: 0.55rem;          /* smaller text */
+  padding: 1px 4px;            /* tighter padding */
+  margin-left: 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  font-weight: 600;
+  vertical-align: super;       /* move it slightly upward */
+}
+
+.explicit-badge.clean {
+  background-color: #3498db;
+}
+

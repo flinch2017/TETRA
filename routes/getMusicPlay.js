@@ -18,7 +18,7 @@ const compCheck = require('../middleware/compCheck.js');
 
 router.get('/api/song-info/:id', async (req, res) => {
   const songId = req.params.id;
-  const viewer_acode = req.session?.user?.acode; // Make sure the user is logged in
+  const viewer_acode = req.session?.user?.acode;
 
   try {
     // Fetch song info including primary artist, features, and artwork
@@ -68,7 +68,7 @@ router.get('/api/song-info/:id', async (req, res) => {
       }
     }
 
-    // Generate presigned URL for audio
+    // Generate presigned URLs
     let audioUrl = null;
     if (song.audio_url) {
       try {
@@ -78,7 +78,6 @@ router.get('/api/song-info/:id', async (req, res) => {
       }
     }
 
-    // Generate presigned URL for artwork
     let coverUrl = null;
     if (song.coverUrl) {
       try {
@@ -93,38 +92,49 @@ router.get('/api/song-info/:id', async (req, res) => {
         ? `${primaryArtistNames.join(', ')} feat. ${featureNames.join(', ')}`
         : primaryArtistNames.join(', ');
 
-    // Insert into recents table
+    // Check if the track is liked by the user
+    let liked = false;
     if (viewer_acode) {
-  // Check if this song was already added recently by this user
-  const recentExists = await pool.query(`
-    SELECT 1 FROM recents 
-    WHERE owner_acode = $1 AND track_id = $2 
-    AND accessed_time::timestamp > NOW() - INTERVAL '5 seconds'
-    LIMIT 1
-  `, [viewer_acode, songId]);
+      const likeResult = await pool.query(
+        `SELECT 1 FROM likes WHERE acode = $1 AND track_id = $2 LIMIT 1`,
+        [viewer_acode, songId]
+      );
+      liked = likeResult.rows.length > 0;
+    }
 
-  if (recentExists.rows.length === 0) {
-    await pool.query(`
-      INSERT INTO recents (recent_id, viewed_acode, release_id, track_id, owner_acode, accessed_time)
-      VALUES ($1, $2, $3, $4, $5, NOW()::text)
-    `, [
-      crypto.randomUUID(),
-      song.acode,
-      song.release_id,
-      songId,
-      viewer_acode
-    ]);
-  }
-}
+    // Insert into recents if not played in last 5 seconds
+    if (viewer_acode) {
+      const recentExists = await pool.query(`
+        SELECT 1 FROM recents 
+        WHERE owner_acode = $1 AND track_id = $2 
+        AND accessed_time::timestamp > NOW() - INTERVAL '5 seconds'
+        LIMIT 1
+      `, [viewer_acode, songId]);
 
+      if (recentExists.rows.length === 0) {
+        await pool.query(`
+          INSERT INTO recents (recent_id, viewed_acode, release_id, track_id, owner_acode, accessed_time)
+          VALUES ($1, $2, $3, $4, $5, NOW()::text)
+        `, [
+          crypto.randomUUID(),
+          song.acode,
+          song.release_id,
+          songId,
+          viewer_acode
+        ]);
+      }
+    }
 
     res.json({
-      track_id: songId,
-      title: song.title,
-      artist: artistString,
-      coverUrl,
-      audioUrl
-    });
+  track_id: songId,
+  title: song.title,
+  artist: artistString,
+  coverUrl,
+  audioUrl,
+  isLiked: liked // ✅ now matches frontend expectation
+});
+
+
 
   } catch (err) {
     console.error('Error fetching song info:', err);

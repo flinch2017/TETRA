@@ -2,6 +2,8 @@
 
 <div class="editProf">
   <h1>Edit Artist Profile</h1>
+  
+
   <form id="editArtistForm" enctype="multipart/form-data">
     <input type="hidden" name="acode" value="<%= user.acode %>">
     <div>
@@ -58,10 +60,11 @@
 
 
     <button type="submit">Save Changes</button>
+    <div id="floatingMessage" class="floating-message hidden"></div>
   </form>
 </div>
 
 
 
 
-<script src="/js/profile.js"></script>
+

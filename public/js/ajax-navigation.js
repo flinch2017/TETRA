@@ -26,11 +26,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (newContent) {
         document.querySelector('#appContent').innerHTML = newContent.innerHTML;
+        
+        // ✅ Force scroll to top
+        window.scrollTo(0, 0);
+        
         window.history.pushState({}, '', href);
         bindAllPageEvents(); // already enough
-
-
       }
+
     } catch (err) {
       console.error('AJAX navigation failed:', err);
       window.location.href = href; // fallback
@@ -46,10 +49,12 @@ document.addEventListener('DOMContentLoaded', () => {
       const newContent = doc.querySelector('#appContent');
       if (newContent) {
         document.querySelector('#appContent').innerHTML = newContent.innerHTML;
+        
+        // ✅ Force scroll to top
+        window.scrollTo(0, 0);
+        
+        window.history.pushState({}, '', href);
         bindAllPageEvents(); // already enough
-
-
-
       }
     } catch {
       location.reload();
@@ -118,13 +123,79 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
+function bindLikeButtons() {
+  document.querySelectorAll('.like-track').forEach(icon => {
+    icon.addEventListener('click', async (e) => {
+      e.stopPropagation(); // prevent triggering song play
+      const i = e.currentTarget;
+      const trackId = i.dataset.trackId;
+      const isLiked = i.dataset.liked === 'true';
+
+      // Optimistic UI
+      i.classList.toggle('fas', !isLiked);
+      i.classList.toggle('far', isLiked);
+      i.style.color = !isLiked ? '#2196f3' : '';
+      i.dataset.liked = (!isLiked).toString();
+
+      try {
+        await fetch('/api/like-track', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            track_id: trackId,
+            liked: !isLiked
+          })
+        });
+      } catch (err) {
+        console.error('Failed to toggle like:', err);
+      }
+    });
+  });
+}
+
+function showFloatingMessage(message, type = 'success') {
+  const msgBox = document.getElementById('floatingMessage');
+  msgBox.textContent = message;
+  msgBox.className = `floating-message show ${type}`;
+
+  // Show then hide after 3 seconds
+  setTimeout(() => {
+    msgBox.classList.remove('show');
+  }, 3000);
+}
+
+
+function bindEllipsisToggles() {
+  document.querySelectorAll('.toggle-details').forEach(button => {
+    button.addEventListener('click', e => {
+      e.stopPropagation();
+      const targetId = button.dataset.target;
+      const detailEl = document.getElementById(`details-${targetId}`);
+      detailEl.classList.toggle('visible');
+    });
+  });
+}
+
+
 
 
 
 function bindAllPageEvents() {
   bindSongClickEvents();
   initFollowButton();
-  bindDropdownToggles(); // you’ll define this next
-  bindProfileEvents();   // for banner image preview and more menu
-  bindPostActionButtons(); // ← Add this if not yet done
+  bindDropdownToggles();
+  bindProfileEvents();
+  bindPostActionButtons();
+  bindLikeButtons(); 
+  bindFormSubmissions();
+
+  // 👇 ADD THIS:
+  bindEllipsisToggles();
+
+  if (typeof bindSongClickHandlers === 'function') {
+    bindSongClickHandlers();
+  }
 }
+
+
+

@@ -1,5 +1,3 @@
-
-
 <div class="artist-header" style="background-image: url('<%= artist.bannerUrl %>')">
   <div class="overlay"></div>
   <% if (artist.rank && artist.rank <= 500) { %>
@@ -11,7 +9,13 @@
 
   <div class="artist-info">
   <div class="artist-name"><%= artist.name %></div>
-  <div class="artist-follow"><%= artist.followers %> followers</div>
+  <div class="artist-follow">
+    <%= artist.followers %> followers
+    ·
+    <%= artist.monthlyListeners %> monthly listeners
+  </div>
+
+  
   <div class="header-actions">
     <% if (!isOwnProfile) { %>
       <button 
@@ -43,8 +47,6 @@
 
 </div>
 
-
-
 <% if (isOwnProfile && (!artist.account_mode || artist.account_mode === 'regular')) { %>
   <div class="setup-artist-container">
     <a href="/edit-profile?acode=<%= artist.acode %>" class="setup-artist-btn">Setup Artist Profile</a>
@@ -62,14 +64,28 @@
         <div class="song-info">
           <img src="<%= song.coverUrl %>" alt="Cover">
           <div>
-            <div class="song-title"><%= song.title %></div>
+            <div class="song-title">
+  <%= song.title %>
+  <% if (song.explicit === 'Yes') { %>
+    <span class="explicit-badge">Explicit</span>
+  <% } else if (song.explicit === 'Clean Version') { %>
+    <span class="explicit-badge clean">Clean</span>
+  <% } %>
+</div>
+
             <div class="release-meta"><%= song.streams %> streams</div>
           </div>
         </div>
         <div class="song-actions">
-          <i class="fas fa-heart"></i>
-          <i class="fas fa-ellipsis-v"></i>
-        </div>
+  <i 
+  class="<%= song.isLiked ? 'fas fa-heart liked like-track' : 'far fa-heart like-track' %>" 
+  data-track-id="<%= song.id %>" 
+  data-liked="<%= song.isLiked ? 'true' : 'false' %>">
+</i>
+
+  <i class="fas fa-ellipsis-v"></i>
+</div>
+
       </div>
     <% }) %>
   <% } else { %>
@@ -105,17 +121,6 @@
     <p style="color: rgba(255,255,255,0.6); font-size:0.95rem;">No available albums</p>
   <% } %>
 </div>
-
-
-
-
-
-
-
-
-
-
-
 
   <div class="section">
     <h2>About</h2>

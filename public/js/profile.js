@@ -65,3 +65,40 @@ function bindProfileEvents() {
       alert('An error occurred.');
     }
   });
+
+
+  function bindFormSubmissions() {
+  const editForm = document.getElementById('editArtistForm');
+
+  if (editForm && !editForm.dataset.bound) {
+    editForm.dataset.bound = 'true';
+
+    editForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const formData = new FormData(editForm);
+
+      try {
+        const response = await fetch('/update-artist', {
+          method: 'POST',
+          body: formData
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          showFloatingMessage('Profile updated successfully!', 'success');
+          setTimeout(() => {
+            window.location.href = '/profile';
+          }, 1200); // give time for message to show
+        } else {
+          showFloatingMessage('Update failed: ' + (result.message || 'Unknown error'), 'error');
+        }
+      } catch (err) {
+        console.error('AJAX error:', err);
+        showFloatingMessage('An error occurred while submitting.', 'error');
+      }
+    });
+  }
+}
+

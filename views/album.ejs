@@ -1,0 +1,81 @@
+<div class="album-page">
+  <div class="album-header">
+  <div class="album-cover">
+    <img src="<%= album.coverUrl %>" alt="<%= album.title %>">
+    <div class="stream-count-badge">
+      <%= album.totalStreams.toLocaleString() %> streams
+    </div>
+  </div>
+
+  <div>
+    <h1><%= album.title %></h1>
+
+    <div class="album-tags">
+      <% if (album.releaseType) { %>
+        <span class="release-type-badge"><%= album.releaseType %></span>
+      <% } %>
+      <% if (album.explicit === 'Yes') { %>
+        <span class="explicit-e-badge">E</span>
+      <% } %>
+    </div>
+
+    <% if (album.releasedOn) { %>
+      <p>Released on <%= album.releasedOn %></p>
+    <% } %>
+
+    <p>By <%= album.artist %></p>
+  </div>
+</div>
+
+
+
+
+  <div class="tracklist">
+    <% if (album.tracks.length > 0) { %>
+      <% album.tracks.forEach(track => { %>
+        <div class="track-item clickable-song" data-song-id="<%= track.id %>">
+          <div class="track-main">
+            <div>
+              <div class="track-title">
+                <%= track.title %>
+                <% if (track.explicit === 'Yes') { %>
+                  <span class="explicit-e-badge">E</span>
+                <% } %>
+              </div>
+              <p class="track-artist"><%= track.artist %></p>
+              <p class="track-streams"><%= track.streams.toLocaleString() %> streams</p>
+            </div>
+
+            <div class="track-actions">
+              <i class="<%= track.isLiked ? 'fas fa-heart liked like-track' : 'far fa-heart like-track' %>"
+                 data-track-id="<%= track.id %>"
+                 data-liked="<%= track.isLiked ? 'true' : 'false' %>"></i>
+
+              <i class="fas fa-ellipsis-v toggle-details" data-target="<%= track.id %>"></i>
+            </div>
+          </div>
+
+          <div class="track-extra hidden" id="details-<%= track.id %>">
+            <% if (track.genre) { %><p>Genre: <%= track.genre %> (<%= track.sub_genre %>)</p><% } %>
+            <% if (track.composer) { %><p>Composer: <%= track.composer %></p><% } %>
+            <% if (track.producer) { %><p>Producer: <%= track.producer %></p><% } %>
+            <% if (track.mood) { %><p>Mood: <%= track.mood %></p><% } %>
+            <% if (track.deluxe === 'Yes') { %><p>This track is part of the deluxe version</p><% } %>
+          </div>
+        </div>
+      <% }) %>
+    <% } else { %>
+      <p>No tracks in this album yet.</p>
+    <% } %>
+  </div>
+
+  <div class="album-details">
+    <% if (album.recordLabel) { %><p>Record Label: <%= album.recordLabel %></p><% } %>
+    
+    <% if (album.phonograph) { %><p>℗ <%= album.phonograph %></p><% } %>
+    <% if (album.copyright) { %><p>© <%= album.copyright %></p><% } %>
+    <% if (album.deluxe === 'Yes') { %><p>This is a deluxe album</p><% } %>
+  </div>
+</div>
+
+

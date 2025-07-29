@@ -21,7 +21,18 @@ const upload = require('../middleware/multer-setup.js');
 router.post('/update-artist', compCheck, upload.single('banner'), async (req, res) => {
   const { artistName, genre, bio, acode } = req.body;
 
+  console.log('Received update request:');
+  console.log('Body:', { artistName, genre, bio, acode });
+  if (req.file) {
+    console.log('Received file:', {
+      originalname: req.file.originalname,
+      mimetype: req.file.mimetype,
+      size: req.file.size
+    });
+  }
+
   if (!acode) {
+    console.log('Missing acode.');
     return res.status(400).json({ message: 'Missing acode.' });
   }
 
@@ -64,21 +75,26 @@ router.post('/update-artist', compCheck, upload.single('banner'), async (req, re
     }
 
     values.push(decryptedAcode);
+
+    console.log('Final update values:', values);
+
     const query = `UPDATE users SET ${updateFields.join(', ')} WHERE acode = $${values.length}`;
     await pool.query(query, values);
 
     // Step 5: Delete the old profile picture from S3
     if (oldPfpKey) {
-  await deleteFromS3(oldPfpKey);
-}
+      console.log('Deleting old S3 key:', oldPfpKey);
+      await deleteFromS3(oldPfpKey);
+    }
 
-
+    console.log('Artist profile updated successfully.');
     res.json({ success: true });
   } catch (err) {
     console.error('Error updating artist profile:', err);
     res.status(500).json({ message: 'Server error.' });
   }
 });
+
 
 
 module.exports = router;

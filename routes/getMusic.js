@@ -113,6 +113,8 @@ if (followedAcodes.length > 0) {
 let recentTracks = [];
 
 const { rows: recentRows } = await pool.query(`
+  SELECT *
+FROM (
   SELECT DISTINCT ON (r.track_id)
     r.track_id,
     r.viewed_acode,
@@ -127,7 +129,10 @@ const { rows: recentRows } = await pool.query(`
   JOIN albums a ON t.release_id = a.release_id
   WHERE r.owner_acode = $1
   ORDER BY r.track_id, r.accessed_time DESC
-  LIMIT 10
+) sub
+ORDER BY accessed_time DESC
+LIMIT 10
+
 `, [userRow.acode]);
 
 

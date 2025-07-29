@@ -59,7 +59,7 @@ let isOrganic = true;
     });
   });
 
-  function updateUIAndPlay({ title, artist, coverUrl, audioUrl, track_id }) {
+  function updateUIAndPlay({ title, artist, coverUrl, audioUrl, track_id, isLiked: likedStatus }) {
   // Collapsed bar updates
   document.getElementById('currentTrackTitle').textContent = title;
   document.getElementById('currentArtist').textContent = artist;
@@ -77,10 +77,16 @@ let isOrganic = true;
   streamTrackId = track_id;
   isOrganic = true;
 
+  // Set like icon based on `isLiked`
+  isLiked = likedStatus;
+  likeIcon.className = isLiked ? 'fas fa-heart' : 'far fa-heart';
+  likeIcon.style.color = isLiked ? '#00BFFF' : ''; // 💙 Blue glow when liked
+
   audio.play().catch(err => {
     console.error('Autoplay failed:', err);
   });
 }
+
 
 
 
@@ -316,11 +322,33 @@ repeatBtn.addEventListener('click', () => {
 });
 
 
-// Like toggle
-likeBtn.addEventListener('click', () => {
-  isLiked = !isLiked;
-  likeIcon.className = isLiked ? 'fas fa-heart' : 'far fa-heart';
-  likeIcon.style.color = isLiked ? '#e74c3c' : '';
+// Like toggle with backend sync
+likeBtn.addEventListener('click', async () => {
+  if (!streamTrackId) return; // Safety check
+
+  const likedNow = !isLiked;
+
+  // Update UI optimistically
+  likeIcon.className = likedNow ? 'fas fa-heart' : 'far fa-heart';
+  likeIcon.style.color = likedNow ? '#00BFFF' : '';
+  isLiked = likedNow;
+
+  try {
+    await fetch('/api/like-track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        track_id: streamTrackId,
+        liked: likedNow
+      })
+    });
+  } catch (err) {
+    console.error('Error updating like status:', err);
+    // Roll back UI if request fails
+    likeIcon.className = isLiked ? 'far fa-heart' : 'fas fa-heart';
+    likeIcon.style.color = isLiked ? '' : '#00BFFF';
+    isLiked = !likedNow;
+  }
 });
 
 
@@ -342,3 +370,6 @@ function getNextTrackIndex(currentIndex, playlist) {
 
   return currentIndex + 1;
 }
+
+
+
