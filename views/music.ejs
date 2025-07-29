@@ -13,30 +13,35 @@
   <% } else { %>
     <div class="horizontal-scroll">
       <% promotionalPosts.forEach(release => { %>
-        <div class="card promo-card">
-          <img src="<%= release.coverUrl %>" alt="Promo Cover">
-          <h3><%= release.title %></h3>
-          <p><%= release.artist %></p>
-        </div>
+        <a href="/album/<%= release.id %>" class="release-card-link">
+          <div class="card promo-card">
+            <img src="<%= release.coverUrl %>" alt="Promo Cover">
+            <h3><%= release.title %></h3>
+            <p><%= release.artist %></p>
+          </div>
+        </a>
       <% }) %>
     </div>
   <% } %>
 </section>
+
 
       <!-- Section 2: Recently Played -->
       <section class="section recents-section">
   <h2>Recently Played</h2>
   <div class="horizontal-scroll">
     <% recentTracks.forEach(track => { %>
-      <div class="card track-card">
+      <div 
+        class="card track-card clickable-song" 
+        data-song-id="<%= track.track_id %>">
         <img src="<%= track.coverUrl %>" alt="Cover">
         <h3><%= track.title %></h3>
         <p><%= track.artist %></p>
-        
       </div>
     <% }) %>
   </div>
 </section>
+
 
 
       <!-- Section 3: Playlists -->

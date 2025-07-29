@@ -6,12 +6,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const href = link.getAttribute('href');
     if (!href || href.startsWith('http') || href.startsWith('#')) return;
 
-    // ✅ Skip AJAX for logout, login, submission, home
-    if (
-      href === '/logout' ||
-      href === '/login' ||
-      href.startsWith('/submission')
-    ) return;
+    if (href === '/logout') {
+  e.preventDefault();
+  handleLogout(href);
+  return;
+}
+
+if (
+  href === '/login' ||
+  href.startsWith('/submission')
+) return;
+
 
     e.preventDefault();
 
@@ -41,25 +46,35 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   window.addEventListener('popstate', async () => {
-    try {
-      const res = await fetch(location.href, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
-      const html = await res.text();
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, 'text/html');
-      const newContent = doc.querySelector('#appContent');
-      if (newContent) {
-        document.querySelector('#appContent').innerHTML = newContent.innerHTML;
-        
-        // ✅ Force scroll to top
-        window.scrollTo(0, 0);
-        
-        window.history.pushState({}, '', href);
-        bindAllPageEvents(); // already enough
-      }
-    } catch {
-      location.reload();
+  try {
+    const res = await fetch(location.href, {
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    });
+
+    if (!res.ok) throw new Error('Failed to fetch page');
+
+    const html = await res.text();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+
+    let newContent = doc.querySelector('#appContent');
+
+    if (!newContent) {
+      // Fallback: treat response as partial
+      newContent = document.createElement('div');
+      newContent.innerHTML = html;
     }
-  });
+
+    document.querySelector('#appContent').innerHTML = newContent.innerHTML;
+    window.scrollTo(0, 0);
+    bindAllPageEvents();
+  } catch (err) {
+    console.error('popstate failed:', err);
+    location.reload();
+  }
+});
+
+
 });
 
 
@@ -111,9 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
   bindSongClickEvents(); // Initial bind
 });
 
-window.addEventListener('popstate', () => {
-  location.reload(); // Optional: full reload on back/forward
-});
+
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -175,6 +188,47 @@ function bindEllipsisToggles() {
     });
   });
 }
+
+
+function handleLogout(href) {
+  // Stop audio
+  const audio = document.getElementById('audioPlayer');
+  if (audio) {
+    audio.pause();
+    audio.src = '';
+    audio.load();
+  }
+
+  // Reset UI elements
+  const titleEl = document.getElementById('currentTrackTitle');
+  const artistEl = document.getElementById('currentArtist');
+  const artEl = document.getElementById('currentArtwork');
+  const expTitleEl = document.getElementById('expandedTrackTitle');
+  const expArtistEl = document.getElementById('expandedArtist');
+  const expArtEl = document.getElementById('albumArt');
+
+  if (titleEl) titleEl.textContent = '';
+  if (artistEl) artistEl.textContent = '';
+  if (artEl) artEl.src = '/drawables/disc_default.png';
+  if (expTitleEl) expTitleEl.textContent = '';
+  if (expArtistEl) expArtistEl.textContent = '';
+  if (expArtEl) expArtEl.src = '/drawables/disc_default.png';
+
+  // Hide the drawer
+  const drawer = document.getElementById('musicDrawer');
+  if (drawer) {
+    drawer.style.display = 'none';
+    drawer.classList.remove('expanded');
+    drawer.classList.add('collapsed');
+  }
+
+  // Clear player state
+  localStorage.removeItem('playerState');
+
+  // Redirect to logout URL
+  window.location.href = href;
+}
+
 
 
 

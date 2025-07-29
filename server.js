@@ -10,30 +10,18 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const router = express.Router();
-
-
 const cron = require('node-cron');
-
 const YOUR_DOMAIN = 'https://localhost:3000'; // Or your real deployed domain
 const paypal = require('@paypal/checkout-server-sdk');
 const postRoutes = require('./routes/postRoutes');
 const dotenv = require('dotenv');
 const pool = require('./utils/db'); // adjust path if needed
 const s3ImageRoute = require('./routes/s3Image');
-
 const expressLayouts = require('express-ejs-layouts');
-
-
-
-
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-
-
-
-
 
 
 // Middleware
@@ -41,9 +29,6 @@ app.use(helmet());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
-
-
-
 
 // EJS setup
 app.use(expressLayouts);
@@ -63,11 +48,6 @@ app.use(
     cookie: { maxAge: 30 * 24 * 60 * 60 * 1000 }, // 30 days
   })
 );
-
-
-
-
-
 
 // Helper to check if username or email already exists
 async function userExists(username, email) {
@@ -145,11 +125,6 @@ app.use(helmet({
     }
   }
 }));
-
-
-
-
-
 
 // Routes
 app.use('/', postRoutes, s3ImageRoute);

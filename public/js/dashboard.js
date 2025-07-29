@@ -41,3 +41,5 @@ function bindDropdownToggles() {
     document.body.dataset.dropdownListenerBound = "true";
   }
 }
+
+

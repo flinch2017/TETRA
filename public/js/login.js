@@ -18,6 +18,7 @@ document.getElementById('loginForm').addEventListener('submit', async function (
     if (res.ok) {
       // If redirected to verification or dashboard or pricing
       if (data.redirect) {
+        
         window.location.href = data.redirect;
       }
     } else {

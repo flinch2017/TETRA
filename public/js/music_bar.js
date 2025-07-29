@@ -1,5 +1,6 @@
 
   const drawer = document.getElementById('musicDrawer');
+  
   const bar = drawer.querySelector('.music-bar');
   const plusButton = document.getElementById('plusButton');
   const plusOptions = document.getElementById('plusOptions');
@@ -59,32 +60,44 @@ let isOrganic = true;
     });
   });
 
+function updateDrawerVisibility() {
+  const hasTrack = !!audio.src && audio.src.trim() !== '';
+  drawer.style.display = hasTrack ? 'block' : 'none';
+}
+
+
+
+
+
   function updateUIAndPlay({ title, artist, coverUrl, audioUrl, track_id, isLiked: likedStatus }) {
+  // Show the drawer
+  drawer.style.display = 'block';
+
   // Collapsed bar updates
   document.getElementById('currentTrackTitle').textContent = title;
   document.getElementById('currentArtist').textContent = artist;
-  document.getElementById('currentArtwork').src = coverUrl || '/default/disc_default.png';
+  document.getElementById('currentArtwork').src = coverUrl?.trim() ? coverUrl : '/drawables/disc_default.png';
 
   // Expanded view updates
   document.getElementById('expandedTrackTitle').textContent = title;
   document.getElementById('expandedArtist').textContent = artist;
-  document.getElementById('albumArt').src = coverUrl || '/default/disc_default.png';
+  document.getElementById('albumArt').src = coverUrl?.trim() ? coverUrl : '/drawables/disc_default.png';
 
   // Audio
-  const audio = document.getElementById('audioPlayer');
   audio.src = audioUrl;
 
   streamTrackId = track_id;
   isOrganic = true;
 
-  // Set like icon based on `isLiked`
   isLiked = likedStatus;
   likeIcon.className = isLiked ? 'fas fa-heart' : 'far fa-heart';
-  likeIcon.style.color = isLiked ? '#00BFFF' : ''; // 💙 Blue glow when liked
+  likeIcon.style.color = isLiked ? '#00BFFF' : '';
 
   audio.play().catch(err => {
     console.error('Autoplay failed:', err);
   });
+
+  updateDrawerVisibility(); // 👈 Add this line
 }
 
 
@@ -169,6 +182,10 @@ function updatePlayPauseIcons() {
 
 audio.addEventListener('play', updatePlayPauseIcons);
 audio.addEventListener('pause', updatePlayPauseIcons);
+audio.addEventListener('pause', updateDrawerVisibility);
+audio.addEventListener('ended', updateDrawerVisibility);
+audio.addEventListener('play', updateDrawerVisibility);
+
 
 
 
@@ -230,7 +247,8 @@ window.addEventListener('beforeunload', () => {
     metadata: {
       title: document.getElementById('currentTrackTitle').textContent,
       artist: document.getElementById('currentArtist').textContent,
-      coverUrl: document.getElementById('currentArtwork').src,
+     coverUrl: document.getElementById('currentArtwork').getAttribute('src'),
+
     }
   };
   localStorage.setItem('playerState', JSON.stringify(state));
@@ -255,8 +273,14 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // Optionally wait a bit before playing to avoid race conditions
   if (isPlaying) {
-    setTimeout(() => audio.play().catch(console.error), 500);
-  }
+  setTimeout(() => {
+    audio.play().catch(console.error);
+    updateDrawerVisibility(); // 👈
+  }, 500);
+} else {
+  updateDrawerVisibility(); // 👈
+}
+
 });
 
 
