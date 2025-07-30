@@ -35,25 +35,26 @@
       <% album.tracks.forEach(track => { %>
         <div class="track-item clickable-song" data-song-id="<%= track.id %>">
           <div class="track-main">
-            <div>
-              <div class="track-title">
-                <%= track.title %>
-                <% if (track.explicit === 'Yes') { %>
-                  <span class="explicit-e-badge">E</span>
-                <% } %>
-              </div>
-              <p class="track-artist"><%= track.artist %></p>
-              <p class="track-streams"><%= track.streams.toLocaleString() %> streams</p>
-            </div>
+  <div class="track-infoAlbum"> <!-- ADD THIS CLASS -->
+    <div class="track-title">
+      <%= track.title %>
+      <% if (track.explicit === 'Yes') { %>
+        <span class="explicit-e-badge">E</span>
+      <% } %>
+    </div>
+    <p class="track-artist"><%= track.artist %></p>
+    <p class="track-streams"><%= track.streams.toLocaleString() %> streams</p>
+  </div>
 
-            <div class="track-actions">
-              <i class="<%= track.isLiked ? 'fas fa-heart liked like-track' : 'far fa-heart like-track' %>"
-                 data-track-id="<%= track.id %>"
-                 data-liked="<%= track.isLiked ? 'true' : 'false' %>"></i>
+  <div class="track-actions">
+    <i class="<%= track.isLiked ? 'fas fa-heart liked like-track' : 'far fa-heart like-track' %>"
+       data-track-id="<%= track.id %>"
+       data-liked="<%= track.isLiked ? 'true' : 'false' %>"></i>
 
-              <i class="fas fa-ellipsis-v toggle-details" data-target="<%= track.id %>"></i>
-            </div>
-          </div>
+    <i class="fas fa-ellipsis-v toggle-details" data-target="<%= track.id %>"></i>
+  </div>
+</div>
+
 
           <div class="track-extra hidden" id="details-<%= track.id %>">
             <% if (track.genre) { %><p>Genre: <%= track.genre %> (<%= track.sub_genre %>)</p><% } %>

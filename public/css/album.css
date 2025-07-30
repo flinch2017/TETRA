@@ -1,36 +1,42 @@
 .album-page {
-  padding: 2rem;
+  padding: 1.5rem;
   font-family: 'Segoe UI', sans-serif;
   color: #fff;
   min-height: 100vh;
 }
 
+/* Album header layout */
 .album-header {
   display: flex;
   align-items: center;
   gap: 2rem;
   margin-bottom: 3rem;
+  flex-wrap: wrap;
 }
 
+/* Album cover image */
 .album-header img {
-  width: 180px;
-  height: 180px;
+  width: 380px;
+  height: 380px;
   object-fit: cover;
   border-radius: 12px;
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
 }
 
+/* Album title */
 .album-header h1 {
   font-size: 2.2rem;
   margin: 0;
 }
 
+/* Release and artist text */
 .album-header p {
   font-size: 0.95rem;
   color: #aaa;
   margin: 0.5rem 0 0;
 }
 
+/* Explicit badge */
 .explicit-e-badge {
   display: inline-block;
   background-color: #999;
@@ -43,6 +49,7 @@
   vertical-align: middle;
 }
 
+/* Tracklist layout */
 .tracklist {
   display: flex;
   flex-direction: column;
@@ -50,6 +57,7 @@
   margin-bottom: 3rem;
 }
 
+/* Each track item */
 .track-item {
   background-color: #1e1e1e;
   padding: 1rem 1.5rem;
@@ -58,15 +66,27 @@
   cursor: pointer;
 }
 
+/* Track hover */
 .track-item:hover {
   background-color: #2a2a2a;
 }
 
+/* Track layout */
 .track-main {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 0.75rem;
 }
+
+.track-infoAlbum {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  align-items: flex-start; /* Left-aligns items */
+  text-align: left;        /* Left-aligns text */
+}
+
 
 .track-title {
   font-size: 1rem;
@@ -123,7 +143,7 @@
   margin-bottom: 50px;
 }
 
-
+/* Badges */
 .release-type-badge {
   display: inline-block;
   background-color: #444;
@@ -131,11 +151,9 @@
   font-size: 0.75rem;
   font-weight: 600;
   padding: 2px 6px;
-  
   border-radius: 4px;
   text-transform: uppercase;
 }
-
 
 .album-tags {
   display: flex;
@@ -143,7 +161,6 @@
   margin: 0.5rem 0;
   align-items: center;
 }
-
 
 .album-cover {
   display: flex;
@@ -161,4 +178,76 @@
   border-radius: 4px;
   text-transform: uppercase;
   text-align: center;
+}
+
+/* ---------- MOBILE STYLES ---------- */
+@media (max-width: 600px) {
+  .album-page {
+    padding: 1rem;
+  }
+
+  .album-header {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    gap: 1rem;
+  }
+
+  .album-header img {
+  width: 380px;
+  aspect-ratio: 1 / 1; /* Ensures it's always square */
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
+}
+
+
+
+  .album-header h1 {
+    font-size: 1.8rem;
+  }
+
+  .track-item {
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+}
+
+
+  .track-main {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .track-infoAlbum {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  align-items: flex-start; /* Ensures left alignment */
+  text-align: left;        /* Applies to text content */
+}
+
+
+  .track-actions {
+    align-self: center;
+  }
+
+
+  .track-title {
+    font-size: 1rem;
+  }
+
+  .track-artist,
+  .track-streams {
+    font-size: 0.8rem;
+  }
+
+  .album-details {
+    font-size: 0.85rem;
+  }
+
+  .stream-count-badge {
+    font-size: 0.7rem;
+  }
 }
