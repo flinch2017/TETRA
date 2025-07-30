@@ -11,11 +11,20 @@
 let isOrganic = true;
 
   bar.addEventListener('click', () => {
-    drawer.classList.toggle('expanded');
-    drawer.classList.toggle('collapsed');
-    plusButton.classList.toggle('up');
-    plusOptions.style.display = 'none';
-  });
+  const isNowExpanded = drawer.classList.toggle('expanded');
+  drawer.classList.toggle('collapsed');
+  plusButton.classList.toggle('up');
+  plusOptions.style.display = 'none';
+
+  // Use CSS class to hide/show smoothly
+  if (isNowExpanded) {
+    plusButton.classList.add('hidden');
+  } else {
+    plusButton.classList.remove('hidden');
+  }
+});
+
+
 
   plusButton.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -48,16 +57,18 @@ let isOrganic = true;
   });
 
   document.querySelectorAll('.clickable-song').forEach(item => {
-    item.addEventListener('click', async () => {
-      const songId = item.dataset.songId;
-      try {
-        const res = await fetch(`/api/song-info/${songId}`);
-        const data = await res.json();
-        updateUIAndPlay(data);
-      } catch (err) {
-        console.error('Failed to fetch song:', err);
-      }
-    });
+    item.addEventListener('click', async (e) => {
+  const clickedItem = e.currentTarget;
+  const songId = clickedItem.dataset.songId;
+  try {
+    const res = await fetch(`/api/song-info/${songId}`);
+    const data = await res.json();
+    updateUIAndPlay(data, clickedItem);  // 👈 pass the DOM node
+  } catch (err) {
+    console.error('Failed to fetch song:', err);
+  }
+});
+
   });
 
 function updateDrawerVisibility() {
@@ -69,27 +80,50 @@ function updateDrawerVisibility() {
 
 
 
-  function updateUIAndPlay({ title, artist, coverUrl, audioUrl, track_id, isLiked: likedStatus }) {
-  // Show the drawer
+  function updateUIAndPlay({ title, artist, coverUrl, audioUrl, canvasUrl, track_id, isLiked: likedStatusFromServer }, clickedElement = null) {
   drawer.style.display = 'block';
 
-  // Collapsed bar updates
   document.getElementById('currentTrackTitle').textContent = title;
   document.getElementById('currentArtist').textContent = artist;
   document.getElementById('currentArtwork').src = coverUrl?.trim() ? coverUrl : '/drawables/disc_default.png';
-
-  // Expanded view updates
   document.getElementById('expandedTrackTitle').textContent = title;
   document.getElementById('expandedArtist').textContent = artist;
   document.getElementById('albumArt').src = coverUrl?.trim() ? coverUrl : '/drawables/disc_default.png';
 
-  // Audio
-  audio.src = audioUrl;
 
+
+
+   // Handle canvas and cover fallback
+const canvasVideo = document.getElementById('canvasVideo');
+const albumArt = document.getElementById('albumArt');
+
+if (canvasUrl && canvasUrl.trim()) {
+  canvasVideo.src = canvasUrl;
+  canvasVideo.style.display = 'block';
+  albumArt.style.visibility = 'hidden'; // ✅ keeps its size
+} else {
+  canvasVideo.removeAttribute('src');
+  canvasVideo.style.display = 'none';
+  albumArt.style.visibility = 'visible';
+}
+
+
+
+  audio.src = audioUrl;
   streamTrackId = track_id;
   isOrganic = true;
 
-  isLiked = likedStatus;
+  // 🔥 Use localStorage liked state if available
+  const saved = localStorage.getItem('playerState');
+  let likedFromLocal = null;
+  if (saved) {
+    const parsed = JSON.parse(saved);
+    if (parsed.likedTracks && typeof parsed.likedTracks[track_id] !== 'undefined') {
+      likedFromLocal = parsed.likedTracks[track_id];
+    }
+  }
+
+  isLiked = (likedFromLocal !== null) ? likedFromLocal : likedStatusFromServer;
   likeIcon.className = isLiked ? 'fas fa-heart' : 'far fa-heart';
   likeIcon.style.color = isLiked ? '#00BFFF' : '';
 
@@ -97,8 +131,26 @@ function updateDrawerVisibility() {
     console.error('Autoplay failed:', err);
   });
 
-  updateDrawerVisibility(); // 👈 Add this line
+  updateDrawerVisibility();
+
+  // Update queue
+  songQueue.length = 0;
+  document.querySelectorAll('.clickable-song').forEach((el, index) => {
+    const id = el.dataset.songId;
+    songQueue.push(id);
+
+    if (clickedElement && el === clickedElement) {
+      currentIndex = index;
+    }
+  });
+
+  if (!clickedElement) {
+    const fallbackIndex = songQueue.findIndex(id => id === track_id);
+    if (fallbackIndex !== -1) currentIndex = fallbackIndex;
+  }
 }
+
+
 
 
 
@@ -138,9 +190,24 @@ audio.addEventListener('ended', () => {
       body: JSON.stringify({ track_id: streamTrackId })
     }).catch(err => console.warn('Failed to log stream:', err));
   }
+
   streamTrackId = null;
-  isOrganic = true;
+
+  // 🔁 Handle repeat behavior
+  if (repeatMode === 'one') {
+    isOrganic = false; // 👈 Mark this looped play as non-organic
+    audio.currentTime = 0;
+    audio.play().catch(console.error);
+  } else if (repeatMode === 'all' || (currentIndex + 1 < songQueue.length)) {
+    isOrganic = true;
+    playNext(); // this already respects shuffle and repeat all
+  } else {
+    isOrganic = true;
+    updateDrawerVisibility();
+  }
 });
+
+
 
   const playPauseBtn = document.getElementById('playPauseBtn');
   const playPauseBtnExpanded = document.getElementById('playPauseBtnExpanded');
@@ -197,18 +264,23 @@ audio.addEventListener('play', updateDrawerVisibility);
   let currentIndex = -1;
 
   function playNext() {
-    if (songQueue.length && currentIndex < songQueue.length - 1) {
-      currentIndex++;
-      fetchAndPlay(songQueue[currentIndex]);
-    }
-  }
+  if (!songQueue.length) return;
+  const nextIndex = getNextTrackIndex(currentIndex, songQueue);
+  if (nextIndex >= songQueue.length) return; // Out of bounds
+  currentIndex = nextIndex;
+  fetchAndPlay(songQueue[currentIndex]);
+}
 
-  function playPrev() {
-    if (songQueue.length && currentIndex > 0) {
-      currentIndex--;
-      fetchAndPlay(songQueue[currentIndex]);
-    }
+function playPrev() {
+  if (!songQueue.length) return;
+  if (audio.currentTime > 5) {
+    audio.currentTime = 0;
+    return;
   }
+  currentIndex = (currentIndex - 1 + songQueue.length) % songQueue.length;
+  fetchAndPlay(songQueue[currentIndex]);
+}
+
 
   nextBtn.addEventListener('click', playNext);
   nextBtnExpanded.addEventListener('click', playNext);
@@ -247,23 +319,35 @@ window.addEventListener('beforeunload', () => {
     metadata: {
       title: document.getElementById('currentTrackTitle').textContent,
       artist: document.getElementById('currentArtist').textContent,
-     coverUrl: document.getElementById('currentArtwork').getAttribute('src'),
-
-    }
+      coverUrl: document.getElementById('currentArtwork').getAttribute('src'),
+    },
+    queue: songQueue,
+    currentIndex,
+    repeatMode,
+    isShuffling,
+    isLiked
   };
   localStorage.setItem('playerState', JSON.stringify(state));
 });
+
 
 window.addEventListener('DOMContentLoaded', () => {
   const saved = localStorage.getItem('playerState');
   if (!saved) return;
 
-  const { src, currentTime, isPlaying, metadata } = JSON.parse(saved);
+  const { src, currentTime, isPlaying, metadata, queue, currentIndex: savedIndex, repeatMode: savedRepeat, isShuffling: savedShuffle, isLiked: savedLike } = JSON.parse(saved);
 
+  // Restore audio
   audio.src = src;
   audio.currentTime = currentTime || 0;
 
-  // Update UI
+    // ✅ Set streamTrackId so like/unlike can work after reload
+  if (Array.isArray(queue) && typeof savedIndex === 'number') {
+    streamTrackId = queue[savedIndex];
+  }
+
+
+  // Restore UI
   document.getElementById('currentTrackTitle').textContent = metadata.title;
   document.getElementById('currentArtist').textContent = metadata.artist;
   document.getElementById('currentArtwork').src = metadata.coverUrl;
@@ -271,17 +355,45 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('expandedArtist').textContent = metadata.artist;
   document.getElementById('albumArt').src = metadata.coverUrl;
 
-  // Optionally wait a bit before playing to avoid race conditions
-  if (isPlaying) {
-  setTimeout(() => {
-    audio.play().catch(console.error);
-    updateDrawerVisibility(); // 👈
-  }, 500);
-} else {
-  updateDrawerVisibility(); // 👈
-}
+  // ✅ Restore like state
+  isLiked = savedLike; // 👈 SET LIKE STATE
+  likeIcon.className = isLiked ? 'fas fa-heart' : 'far fa-heart';
+  likeIcon.style.color = isLiked ? '#00BFFF' : '';
 
+  // ✅ Restore queue state
+  if (Array.isArray(queue)) songQueue.push(...queue);
+  if (typeof savedIndex === 'number') currentIndex = savedIndex;
+  if (typeof savedRepeat === 'string') repeatMode = savedRepeat;
+  if (typeof savedShuffle === 'boolean') isShuffling = savedShuffle;
+
+  shuffleBtn.classList.toggle('active', isShuffling);
+  shuffleBtn.querySelector('i').style.color = isShuffling ? '#1DB954' : '';
+
+  if (repeatMode === 'off') {
+    repeatIcon.className = 'fas fa-repeat';
+    repeatIcon.style.color = '';
+    repeatIcon.removeAttribute('data-one');
+  } else if (repeatMode === 'all') {
+    repeatIcon.className = 'fas fa-repeat';
+    repeatIcon.style.color = '#1DB954';
+    repeatIcon.removeAttribute('data-one');
+  } else if (repeatMode === 'one') {
+    repeatIcon.className = 'fas fa-repeat';
+    repeatIcon.style.color = '#1DB954';
+    repeatIcon.setAttribute('data-one', 'true');
+  }
+
+  if (isPlaying) {
+    setTimeout(() => {
+      audio.play().catch(console.error);
+      updateDrawerVisibility();
+    }, 500);
+  } else {
+    updateDrawerVisibility();
+  }
+  
 });
+
 
 
 function bindSongClickHandlers() {
@@ -346,9 +458,8 @@ repeatBtn.addEventListener('click', () => {
 });
 
 
-// Like toggle with backend sync
 likeBtn.addEventListener('click', async () => {
-  if (!streamTrackId) return; // Safety check
+  if (!streamTrackId) return;
 
   const likedNow = !isLiked;
 
@@ -366,14 +477,26 @@ likeBtn.addEventListener('click', async () => {
         liked: likedNow
       })
     });
+
+    // ✅ Update localStorage here after successful toggle
+    const saved = localStorage.getItem('playerState');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      parsed.likedTracks = parsed.likedTracks || {};
+parsed.likedTracks[streamTrackId] = isLiked;
+
+      localStorage.setItem('playerState', JSON.stringify(parsed));
+    }
+
   } catch (err) {
     console.error('Error updating like status:', err);
-    // Roll back UI if request fails
+    // Rollback
     likeIcon.className = isLiked ? 'far fa-heart' : 'fas fa-heart';
     likeIcon.style.color = isLiked ? '' : '#00BFFF';
     isLiked = !likedNow;
   }
 });
+
 
 
 
@@ -394,6 +517,4 @@ function getNextTrackIndex(currentIndex, playlist) {
 
   return currentIndex + 1;
 }
-
-
 

@@ -31,52 +31,70 @@
     </div>
   </div>
   <div class="music-expanded">
-    <img src="https://tetrametropolis.s3.us-east-1.amazonaws.com/drawables/disc_default.png" alt="Album Art" class="album-art" id="albumArt">
-    <div class="track-details" id="expandedTrackTitle">—</div>
-    <div class="artist" id="expandedArtist">—</div>
-    <div class="seekbar-with-time">
-      <div class="time-display">
-        <span id="currentTime">0:00</span>
-        <span id="totalDuration">0:00</span>
+    <div class="drawer-main-content" >
+      
+      <div class="drawer-tool">
+        <video 
+        id="canvasVideo" 
+        class="canvas-video" 
+        muted 
+        autoplay 
+        loop 
+        playsinline 
+        style="max-width: 100%; border-radius: 12px; display: none;">
+      </video>
+
+       <div class="canvas-overlay"></div>
+
+        <div class="album-art-holder" id="albumArtContainer">
+        <img src="/drawables/disc_default.png" alt="Album Art" class="album-art" id="albumArt">
       </div>
-      <input type="range" min="0" max="100" value="0" id="seekbar" />
-    </div>
-    <div class="expanded-controls">
-        <!-- Centered group: shuffle, prev, play, next, repeat -->
-        <div class="centered-controls">
-          <button id="shuffleBtn" title="Shuffle">
-            <i class="fas fa-random"></i>
-          </button>
 
-          <button id="prevBtn">
-            <img src="/drawables/prev_default.png" alt="Previous" width="20" />
-          </button>
-
-          <button id="playPauseBtnExpanded">
-            <img id="playPauseIconExpanded" src="/drawables/play_default.png" alt="Play" width="20" />
-          </button>
-
-          <button id="nextBtnExpanded">
-            <img src="/drawables/next_default.png" alt="Next" width="20" />
-          </button>
-
-          <button id="repeatBtn" title="Repeat" style="position: relative;">
-          <i id="repeatIcon" class="fas fa-repeat"></i>
-        </button>
+        <div class="track-details" id="expandedTrackTitle">—</div>
+        <div class="artist" id="expandedArtist">—</div>
+        <div class="seekbar-with-time">
+          <div class="time-display">
+            <span id="currentTime">0:00</span>
+            <span id="totalDuration">0:00</span>
+          </div>
+          <input type="range" min="0" max="100" value="0" id="seekbar" />
         </div>
+        <div class="expanded-controls">
+        
+          <div class="centered-controls">
+            <button id="shuffleBtn" title="Shuffle">
+              <i class="fas fa-random"></i>
+            </button>
 
-        <!-- Right-side like button -->
-        <button id="likeBtn" class="like-btn" title="Like">
-          <i id="likeIcon" class="far fa-heart"></i>
-        </button>
+            <button id="prevBtn">
+              <img src="/drawables/prev_default.png" alt="Previous" width="20" />
+            </button>
+
+            <button id="playPauseBtnExpanded">
+              <img id="playPauseIconExpanded" src="/drawables/play_default.png" alt="Play" width="20" />
+            </button>
+
+            <button id="nextBtnExpanded">
+              <img src="/drawables/next_default.png" alt="Next" width="20" />
+            </button>
+
+            <button id="repeatBtn" title="Repeat" style="position: relative;">
+            <i id="repeatIcon" class="fas fa-repeat"></i>
+            </button>
+          </div>
+
+          <!-- Right-side like button -->
+          <button id="likeBtn" class="like-btn" title="Like">
+            <i id="likeIcon" class="far fa-heart"></i>
+          </button>
+        </div>
       </div>
-
-
-
-
-
-  </div>
-  <audio id="audioPlayer"></audio>
+      
+      
+      
+    </div>
+    </div>
+    <audio id="audioPlayer"></audio>
 </div>
 
 

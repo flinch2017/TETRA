@@ -21,13 +21,14 @@ router.get('/api/song-info/:id', async (req, res) => {
   const viewer_acode = req.session?.user?.acode;
 
   try {
-    // Fetch song info including primary artist, features, and artwork
+    // Fetch song info including primary artist, features, artwork, and canvas
     const result = await pool.query(`
       SELECT 
         t.track_title AS title, 
         t.primary_artist, 
         t.features, 
         a.artwork_url AS "coverUrl", 
+        a.canvas_url,
         t.audio_url,
         t.acode,
         t.release_id
@@ -55,7 +56,7 @@ router.get('/api/song-info/:id', async (req, res) => {
       }
     }
 
-    // Get feature names
+    // Get feature artist names
     let featureNames = [];
     if (song.features) {
       const featureCodes = song.features.split(',').map(code => code.trim());
@@ -68,7 +69,7 @@ router.get('/api/song-info/:id', async (req, res) => {
       }
     }
 
-    // Generate presigned URLs
+    // Generate presigned URL for audio
     let audioUrl = null;
     if (song.audio_url) {
       try {
@@ -78,6 +79,7 @@ router.get('/api/song-info/:id', async (req, res) => {
       }
     }
 
+    // Generate presigned URL for cover artwork
     let coverUrl = null;
     if (song.coverUrl) {
       try {
@@ -87,12 +89,22 @@ router.get('/api/song-info/:id', async (req, res) => {
       }
     }
 
-    const artistString =
-      featureNames.length > 0
-        ? `${primaryArtistNames.join(', ')} feat. ${featureNames.join(', ')}`
-        : primaryArtistNames.join(', ');
+    // Generate presigned URL for canvas
+    let canvasUrl = null;
+    if (song.canvas_url) {
+      try {
+        canvasUrl = await generatePresignedUrl(song.canvas_url);
+      } catch (err) {
+        console.warn(`Failed to generate presigned URL for canvas:`, err);
+      }
+    }
 
-    // Check if the track is liked by the user
+    // Combine artist names
+    const artistString = featureNames.length > 0
+      ? `${primaryArtistNames.join(', ')} feat. ${featureNames.join(', ')}`
+      : primaryArtistNames.join(', ');
+
+    // Check if track is liked by the current user
     let liked = false;
     if (viewer_acode) {
       const likeResult = await pool.query(
@@ -102,45 +114,42 @@ router.get('/api/song-info/:id', async (req, res) => {
       liked = likeResult.rows.length > 0;
     }
 
-    // Insert into recents if not played in last 5 seconds
+    // Overwrite old entry in recents with new one
     if (viewer_acode) {
-      const recentExists = await pool.query(`
-        SELECT 1 FROM recents 
-        WHERE owner_acode = $1 AND track_id = $2 
-        AND accessed_time::timestamp > NOW() - INTERVAL '5 seconds'
-        LIMIT 1
+      await pool.query(`
+        DELETE FROM recents 
+        WHERE owner_acode = $1 AND track_id = $2
       `, [viewer_acode, songId]);
 
-      if (recentExists.rows.length === 0) {
-        await pool.query(`
-          INSERT INTO recents (recent_id, viewed_acode, release_id, track_id, owner_acode, accessed_time)
-          VALUES ($1, $2, $3, $4, $5, NOW()::text)
-        `, [
-          crypto.randomUUID(),
-          song.acode,
-          song.release_id,
-          songId,
-          viewer_acode
-        ]);
-      }
+      await pool.query(`
+        INSERT INTO recents (recent_id, viewed_acode, release_id, track_id, owner_acode, accessed_time)
+        VALUES ($1, $2, $3, $4, $5, NOW()::text)
+      `, [
+        crypto.randomUUID(),
+        song.acode,
+        song.release_id,
+        songId,
+        viewer_acode
+      ]);
     }
 
+    // Return JSON response
     res.json({
-  track_id: songId,
-  title: song.title,
-  artist: artistString,
-  coverUrl,
-  audioUrl,
-  isLiked: liked // ✅ now matches frontend expectation
-});
-
-
+      track_id: songId,
+      title: song.title,
+      artist: artistString,
+      coverUrl,
+      audioUrl,
+      canvasUrl,
+      isLiked: liked
+    });
 
   } catch (err) {
     console.error('Error fetching song info:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 
 

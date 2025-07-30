@@ -65,28 +65,27 @@
           <img src="<%= song.coverUrl %>" alt="Cover">
           <div>
             <div class="song-title">
-  <%= song.title %>
-  <% if (song.explicit === 'Yes') { %>
-    <span class="explicit-badge">Explicit</span>
-  <% } else if (song.explicit === 'Clean Version') { %>
-    <span class="explicit-badge clean">Clean</span>
-  <% } %>
-</div>
+              <%= song.title %>
+              <% if (song.explicit === 'Yes') { %>
+                <span class="explicit-badge">Explicit</span>
+              <% } else if (song.explicit === 'Clean Version') { %>
+                <span class="explicit-badge clean">Clean</span>
+              <% } %>
+            </div>
 
             <div class="release-meta"><%= song.streams %> streams</div>
           </div>
         </div>
         <div class="song-actions">
-  <i 
-  class="<%= song.isLiked ? 'fas fa-heart liked like-track' : 'far fa-heart like-track' %>" 
-  data-track-id="<%= song.id %>" 
-  data-liked="<%= song.isLiked ? 'true' : 'false' %>">
-</i>
+        <i 
+        class="<%= song.isLiked ? 'fas fa-heart liked like-track' : 'far fa-heart like-track' %>" 
+        data-track-id="<%= song.id %>" 
+        data-liked="<%= song.isLiked ? 'true' : 'false' %>">
+        </i>
 
-  <i class="fas fa-ellipsis-v"></i>
-</div>
-
+        <i class="fas fa-ellipsis-v"></i>
       </div>
+    </div>
     <% }) %>
   <% } else { %>
     <p style="color: rgba(255,255,255,0.6); font-size:0.95rem;">No available songs</p>

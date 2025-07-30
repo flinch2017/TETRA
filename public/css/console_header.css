@@ -1,12 +1,19 @@
 /* Header container */
 header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
   background: #050a1f;
-  padding: 1rem 2rem;
+  padding: 0 2rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 1000;
 }
+
 
 /* Logo */
 .logo {

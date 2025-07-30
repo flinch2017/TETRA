@@ -172,6 +172,13 @@ button img {
   color: #1db954;
 }
 
+
+.drawer-main-content {
+  flex: 1;
+  overflow-y: auto;
+}
+
+
 /* ========== MUSIC DRAWER ========== */
 
 .music-drawer {
@@ -187,6 +194,8 @@ button img {
   border-top-right-radius: 12px;
   overflow: hidden;
   z-index: 900;
+  display: flex;
+  flex-direction: column;
 }
 
 .music-drawer.collapsed { height: 60px; }
@@ -214,11 +223,20 @@ button img {
 }
 
 .music-expanded {
+
   padding: 1rem;
-  display: none;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
   text-align: center;
+  overflow: hidden;
+  
 }
+
+
 .music-drawer.expanded .music-expanded { display: block; }
+
+
 
 /* ========== FLOATING PLUS ========== */
 
@@ -340,22 +358,91 @@ button img {
 /* ========== MOBILE RESPONSIVE ========== */
 
 @media screen and (max-width: 600px) {
+
+  .music-expanded {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+  text-align: center;
+  height: 100vh; /* or 100% if constrained by a parent */
+  position: relative;
+}
+
+.drawer-tool {
+  position: relative;
+  z-index: 1;
+  padding: 16px;
+  color: white;
+  overflow: hidden; /* ✨ Ensures video is cropped to this box */
+  border-radius: 12px; /* Optional */
+}
+
+/* Video fills .drawer-tool and gets cropped by overflow: hidden */
+.canvas-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* ✨ Crop instead of squeeze/stretch */
+  z-index: 0;
+  pointer-events: none;
+  display: block;
+  border-radius: 12px; /* Match drawer-tool */
+}
+
+/* Dim + blur overlay, layered between video and content */
+.drawer-tool::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35); /* ✨ Adjust dim level */
+  backdrop-filter: blur(4px);
+  z-index: 1;
+  pointer-events: none;
+  border-radius: 12px;
+}
+
+/* Content (album art, titles, etc.) stays on top */
+.drawer-tool > *:not(.canvas-video) {
+  position: relative;
+  z-index: 2;
+}
+
+
+
+
+.album-art-holder {
+  width: 100%;
+  height: 200px; /* Fixed height */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.album-art {
+  max-height: 100%;
+  border-radius: 8px;
+}
+
+
   .floating-plus {
     width: 50px;
     height: 50px;
     font-size: 1.8rem;
     bottom: 65px;
   }
-  .floating-plus.up { bottom: 420px; }
+  .floating-plus.up { bottom: 530px; }
 
   .album-art {
-    width: 90px;
-    height: 90px;
+    width: 200px;
+    height: 200px;
   }
   .track-details { font-size: 0.95rem; }
   .artist { font-size: 0.75rem; }
   .expanded-controls button { font-size: 1.4rem; }
-  .music-drawer.expanded { height: 410px; }
+  .music-drawer.expanded { height: 520px; }
 }
 
 @media (max-width: 500px) {
@@ -412,5 +499,17 @@ button img {
 
 #musicDrawer {
   display: none;
+}
+
+.floating-plus.hidden {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.95);
+}
+
+
+.floating-plus {
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 

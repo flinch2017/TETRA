@@ -242,9 +242,12 @@ function bindAllPageEvents() {
   bindPostActionButtons();
   bindLikeButtons(); 
   bindFormSubmissions();
+  bindSongClickHandlers();
+  
 
   // 👇 ADD THIS:
   bindEllipsisToggles();
+
 
   if (typeof bindSongClickHandlers === 'function') {
     bindSongClickHandlers();
