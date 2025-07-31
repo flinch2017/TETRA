@@ -5,26 +5,25 @@
     </div>
   <% } else { %>
     <% posts.forEach(post => { %>
-      <div class="post">
+      <div class="post" data-href="/post?postId=<%= post.post_id %>" style="cursor: pointer;">
+        
         <div class="post-header">
-  <div class="post-user-info">
-    <a href="/profile?acode=<%= post.acode %>">
-      <div class="post-profile-pic" style="background-image: url('<%= post.posterPfpUrl %>');"></div>
-    </a>
-    <a href="/profile?acode=<%= post.acode %>" class="post-username">
-      <%= post.displayName %>
-    </a>
-  </div>
-  <div class="post-dropdown">
-    <i class="fas fa-ellipsis-v post-dropdown-toggle"></i>
-    <div class="post-dropdown-menu">
-      <a href="#">Save</a>
-      <a href="#">Report</a>
-    </div>
-  </div>
-</div>
-
-
+          <div class="post-user-info">
+            <a href="/profile?acode=<%= post.acode %>">
+              <div class="post-profile-pic" style="background-image: url('<%= post.posterPfpUrl %>');"></div>
+            </a>
+            <a href="/profile?acode=<%= post.acode %>" class="post-username">
+              <%= post.displayName %>
+            </a>
+          </div>
+          <div class="post-dropdown">
+            <i class="fas fa-ellipsis-v post-dropdown-toggle"></i>
+            <div class="post-dropdown-menu">
+              <a href="#">Save</a>
+              <a href="#">Report</a>
+            </div>
+          </div>
+        </div>
 
         <p><%= post.caption %></p>
 
@@ -46,14 +45,21 @@
         <div class="timestamp">Posted <%= post.timeAgo %></div>
 
         <div class="post-actions">
-          <button title="Like"><i class="fas fa-heart"></i></button>
-          <button title="Comment"><i class="fas fa-comment"></i></button>
-          <button title="Share"><i class="fas fa-share"></i></button>
-        </div>
+  <button class="post-like-btn" data-post-id="<%= post.post_id %>" title="Like">
+    <i class="fa-heart <%= post.isLiked ? 'fa-solid' : 'fa-regular' %>"></i>
+    <span><%= post.likeCount %></span>
+  </button>
+
+  <button class="post-comment-btn" title="Comment">
+    <i class="fa-regular fa-comment"></i>
+  </button>
+
+  <button class="post-share-btn" title="Share">
+    <i class="fa-regular fa-share-from-square"></i>
+  </button>
+</div>
+
       </div>
     <% }) %>
   <% } %>
 </main>
-
-
-

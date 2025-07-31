@@ -1,22 +1,55 @@
 function bindPostActionButtons() {
-  document.querySelectorAll('.post-actions button[title="Like"]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      console.log('Liked a post');
+  // Like buttons
+  document.querySelectorAll('.post-like-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation(); // Prevent post click
+      const postId = btn.dataset.postId;
+      const icon = btn.querySelector('i');
+      const isLiked = icon.classList.contains('fa-solid');
+
+      // Optimistic toggle
+      icon.classList.toggle('fa-solid', !isLiked);
+      icon.classList.toggle('fa-regular', isLiked);
+
+      try {
+        const res = await fetch(`/api/posts/${postId}/like`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ liked: !isLiked })
+        });
+
+        const data = await res.json();
+        if (!res.ok || !data.success) throw new Error('Failed to toggle like');
+      } catch (err) {
+        console.error('Like failed:', err);
+        // Revert optimistic update
+        icon.classList.toggle('fa-solid', isLiked);
+        icon.classList.toggle('fa-regular', !isLiked);
+      }
     });
   });
 
-  document.querySelectorAll('.post-actions button[title="Comment"]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      console.log('Comment clicked');
+  // Comment buttons
+  document.querySelectorAll('.post-comment-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation(); // Prevent post click
+      const commentBox = btn.closest('.post')?.querySelector('.comment-input-wrapper');
+      if (commentBox) {
+        const input = commentBox.querySelector('textarea');
+        if (input) input.focus();
+      }
     });
   });
 
-  document.querySelectorAll('.post-actions button[title="Share"]').forEach(btn => {
-    btn.addEventListener('click', () => {
+  // Share buttons
+  document.querySelectorAll('.post-share-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation(); // Prevent post click
       console.log('Share clicked');
     });
   });
 }
+
 
 function bindDropdownToggles() {
   document.querySelectorAll('.post-dropdown-toggle').forEach(toggle => {
@@ -43,3 +76,43 @@ function bindDropdownToggles() {
 }
 
 
+function bindPostClickEvents() {
+  console.log('🔍 Running bindPostClickEvents');
+  document.querySelectorAll('.post[data-href]').forEach(post => {
+    console.log('➡️ Binding post click:', post);
+    post.addEventListener('click', async (e) => {
+      
+
+
+      if (e.target.closest('button') || e.target.closest('a')) return;
+
+      const href = post.dataset.href;
+      console.log('🖱️ Post clicked');
+      console.log('📎 href:', href); // ⬅️ ADD THIS HERE
+      if (!href) return;
+
+      try {
+        const res = await fetch(href, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+        if (!res.ok) throw new Error('Failed to fetch post');
+
+        
+
+        const html = await res.text();
+        console.log('📄 AJAX HTML Response:', html); // 🔍 ADD THIS LINE
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const newContent = doc.querySelector('#appContent');
+
+        if (newContent) {
+          document.querySelector('#appContent').innerHTML = newContent.innerHTML;
+          window.scrollTo(0, 0);
+          window.history.pushState({}, '', href);
+          bindAllPageEvents();
+        }
+      } catch (err) {
+        console.error('AJAX post navigation failed:', err);
+        window.location.href = href;
+      }
+    });
+  });
+}

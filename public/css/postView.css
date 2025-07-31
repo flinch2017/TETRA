@@ -1,0 +1,261 @@
+.post-detailX {
+  max-width: 600px;
+  margin: 20px auto 90px auto;
+  background-color: #0a0f2c;
+  color: #fff;
+  border: 1px solid #1e2338;
+  border-radius: 12px;
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.post-headerX a {
+  color: #1da1f2;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.post-bodyX {
+  margin-top: 12px;
+}
+
+.post-captionX {
+  font-size: 16px;
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+.post-imageX,
+.post-videoX {
+  width: 100%;
+  border-radius: 12px;
+  margin-top: 10px;
+  object-fit: cover;
+}
+
+.post-audioX {
+  width: 100%;
+  margin-top: 12px;
+}
+
+.post-actionsX {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #1e2338;
+  flex-wrap: wrap;
+}
+
+.post-actionsX button {
+  background: none;
+  border: none;
+  color: #bbb;
+  font-size: 18px;
+  cursor: pointer;
+  transition: color 0.2s;
+  margin: 4px 8px;
+}
+
+.post-actionsX button:hover {
+  color: #1da1f2;
+}
+
+.timestampX {
+  margin-top: 12px;
+  font-size: 12px;
+  color: #888;
+}
+
+.post-commentsX {
+  margin-top: 18px;
+  border-top: 1px solid #1e2338;
+  padding-top: 12px;
+}
+
+.no-commentsX {
+  color: #555;
+  font-size: 14px;
+  text-align: center;
+}
+
+.comment-pfp {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  margin-right: 6px;
+  object-fit: cover;
+  vertical-align: middle;
+}
+
+.comment-countX {
+  margin-bottom: 2rem;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.comment-input-wrapper {
+  border-top: 1px solid #1e2338;
+  padding-top: 12px;
+  margin-top: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#commentInput {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: 24px;
+  border: 1px solid #333;
+  background-color: #0f153a;
+  color: white;
+  font-size: 14px;
+  outline: none;
+  resize: none;
+  overflow: hidden;
+  min-height: 38px;
+  max-height: 160px; /* limit to 6-ish lines */
+  line-height: 1.4;
+}
+
+
+#commentForm {
+  display: flex;
+  width: 100%;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: nowrap; /* ✅ enforce single-line layout */
+}
+
+
+#commentInput {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: 24px;
+  border: 1px solid #333;
+  background-color: #0f153a;
+  color: white;
+  font-size: 14px;
+  outline: none;
+}
+
+#commentInput::placeholder {
+  color: #888;
+}
+
+#commentForm button {
+  background: none;
+  border: none;
+  color: #1da1f2;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 6px;
+  transition: color 0.2s;
+  flex-shrink: 0;
+  flex-grow: 0;
+  width: auto;
+}
+
+
+#commentForm button:hover {
+  color: #63c1ff;
+}
+
+/* 🔽 Mobile optimization below 600px */
+@media (max-width: 600px) {
+  .post-detailX {
+    margin: 12px 8px 90px 8px;
+    padding: 16px;
+    border-radius: 8px;
+  }
+
+  .post-captionX {
+    font-size: 15px;
+  }
+
+  .post-headerX a {
+    font-size: 13px;
+  }
+
+  .post-actionsX {
+    justify-content: space-between;
+    gap: 6px;
+  }
+
+  .post-actionsX button {
+    font-size: 16px;
+    flex: 1;
+    text-align: center;
+  }
+
+  .comment-pfp {
+    width: 24px;
+    height: 24px;
+  }
+
+  .timestampX {
+    font-size: 11px;
+  }
+
+  #commentInput {
+    font-size: 13px;
+    padding: 8px 10px;
+  }
+
+  #commentForm button {
+    font-size: 16px;
+  }
+
+  .comment-countX {
+    font-size: 0.85rem;
+  }
+
+  
+}
+
+
+.comment-itemX {
+  padding: 10px 0;
+  border-bottom: 1px solid #222; /* subtle line */
+}
+
+.comment-itemX:last-child {
+  border-bottom: none;
+}
+
+.comment-itemX {
+  padding: 10px 0;
+  border-bottom: 1px solid #222;
+}
+
+.comment-itemX:last-child {
+  border-bottom: none;
+}
+
+.comment-headerX {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.comment-metaX {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #ccc;
+}
+
+.comment-usernameX {
+  font-weight: bold;
+  color: #fff;
+}
+
+.comment-textX {
+  font-size: 14px;
+  margin-left: 34px; /* aligns with start of username after avatar (28px + 6px gap) */
+  line-height: 1.4;
+  word-break: break-word;
+}

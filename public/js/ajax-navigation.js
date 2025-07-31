@@ -124,14 +124,11 @@ function bindSongClickEvents() {
 document.addEventListener('DOMContentLoaded', () => {
   bindAjaxLinks();
   bindSongClickEvents(); // Initial bind
-});
-
-
-
-
-document.addEventListener('DOMContentLoaded', () => {
   bindAllPageEvents(); // Bind everything on initial load
 });
+
+
+
 
 
 
@@ -243,16 +240,22 @@ function bindAllPageEvents() {
   bindLikeButtons(); 
   bindFormSubmissions();
   bindSongClickHandlers();
-  
-
-  // 👇 ADD THIS:
+  bindPostClickEvents();
   bindEllipsisToggles();
 
 
   if (typeof bindSongClickHandlers === 'function') {
     bindSongClickHandlers();
   }
+
+  if (typeof bindPostViewEvents === 'function') {
+    bindPostViewEvents();
+  }
 }
+
+
+
+
 
 
 
