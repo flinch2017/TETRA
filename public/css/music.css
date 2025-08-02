@@ -64,14 +64,15 @@
   padding-bottom: 0.5rem;
 }
 
-.horizontal-scroll::-webkit-scrollbar {
-  height: 6px;
+.horizontal-scroll {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;  /* IE 10+ */
 }
 
-.horizontal-scroll::-webkit-scrollbar-thumb {
-  background: #333;
-  border-radius: 10px;
+.horizontal-scroll::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
+
 
 .grid-layout {
   display: grid;

@@ -118,9 +118,6 @@ body {
   transition: background-color 0.3s;
 }
 
-.track-card:hover {
-  background-color: #25366e;
-}
 
 .track-header {
   display: flex;

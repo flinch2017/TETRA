@@ -28,9 +28,6 @@ router.get('/post', compCheck, async (req, res) => {
 
   
 
-  if (!postId) {
-    return res.status(400).send('Missing postId');
-  }
 
   try {
 
@@ -59,19 +56,15 @@ router.get('/post', compCheck, async (req, res) => {
 
     const post = await getPostById(postId, userRow.acode);
 
-    if (!post) {
-      return res.status(404).render('404', { message: 'Post not found' });
-    }
-
-    // Check for AJAX request
-    const isAjax = req.get('X-Requested-With') === 'XMLHttpRequest';
+   
+    
 
     return res.render('postView', {
+      
       user: req.session.user,
       userAcode: userRow.acode,
       pfpUrl: presignedPfpUrl,
-      post,
-      layout: isAjax ? false : 'layout' // Skip layout for AJAX requests
+      post
     });
 
   } catch (err) {

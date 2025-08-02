@@ -328,9 +328,7 @@ body {
   transition: background-color 0.2s ease;
 }
 
-.clickable-song:hover {
-  background-color: rgba(255, 255, 255, 0.05);
-}
+
 
 
 .like-track.liked {
@@ -354,4 +352,37 @@ body {
 .explicit-badge.clean {
   background-color: #3498db;
 }
+
+
+.artist-nav-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  background-color: #0a0f2c;
+  padding: 1rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.artist-tab {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  border-radius: 999px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.artist-tab:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.artist-tab.active {
+  background-color: #007bff;
+  color: white;
+}
+
 

@@ -47,13 +47,20 @@
 
 </div>
 
+
+
+
 <% if (isOwnProfile && (!artist.account_mode || artist.account_mode === 'regular')) { %>
   <div class="setup-artist-container">
     <a href="/edit-profile?acode=<%= artist.acode %>" class="setup-artist-btn">Setup Artist Profile</a>
   </div>
 <% } %>
 
-
+<div class="artist-nav-tabs">
+  <button class="artist-tab active" data-tab="songs">Songs</button>
+  <button class="artist-tab" data-tab="posts">Posts</button>
+  <button class="artist-tab" data-tab="store">Store</button>
+</div>
 
 <main class="artist-profile">
   <div class="section">
