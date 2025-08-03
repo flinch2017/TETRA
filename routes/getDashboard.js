@@ -93,24 +93,34 @@ router.get('/dashboard', compCheck, async (req, res) => {
   );
   const isLiked = isLikedResult.rowCount > 0;
 
+  // Get comment count for this post
+const commentCountResult = await pool.query(
+  'SELECT COUNT(*) FROM comments WHERE post_id = $1',
+  [post.post_id]
+);
+const commentCount = parseInt(commentCountResult.rows[0].count, 10);
+
+
   // Poster PFP
   const presignedPosterPfpUrl = post.pfp_url
     ? await generatePresignedUrl(`pfp/${path.basename(post.pfp_url)}`)
     : await generatePresignedUrl('drawables/banner_default.png');
 
   return {
-    post_id: post.post_id,
-    acode: post.acode,
-    caption: post.caption,
-    images: presignedImages,
-    tracks: presignedTracks,
-    videos: presignedVideos,
-    timeAgo: moment(post.date).fromNow(),
-    displayName: post.artist_name?.trim() || post.username,
-    posterPfpUrl: presignedPosterPfpUrl,
-    likeCount,
-    isLiked
-  };
+  post_id: post.post_id,
+  acode: post.acode,
+  caption: post.caption,
+  images: presignedImages,
+  tracks: presignedTracks,
+  videos: presignedVideos,
+  timeAgo: moment(post.date).fromNow(),
+  displayName: post.artist_name?.trim() || post.username,
+  posterPfpUrl: presignedPosterPfpUrl,
+  likeCount,
+  isLiked,
+  commentCount // ← new field
+};
+
 }));
 
 

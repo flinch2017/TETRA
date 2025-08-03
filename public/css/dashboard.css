@@ -488,3 +488,6 @@
   object-fit: cover;
 }
 
+.post-actions button span {
+  margin-left: 6px;
+}

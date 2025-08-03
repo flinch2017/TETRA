@@ -2,31 +2,43 @@ function bindPostViewEvents() {
 
   // Like button logic
   document.body.addEventListener('click', async (e) => {
-    const btn = e.target.closest('.post-like-btn');
-    if (!btn) return;
+  const btn = e.target.closest('.post-like-btn');
+  if (!btn) return;
 
-    const postId = btn.dataset.postId;
-    const icon = btn.querySelector('i');
-    const isLiked = icon.classList.contains('fa-solid');
+  const postId = btn.dataset.postId;
+  const icon = btn.querySelector('i');
+  const countSpan = btn.querySelector('span');
+  const isLiked = icon.classList.contains('fa-solid');
+  let currentCount = parseInt(countSpan?.textContent || '0', 10);
 
-    icon.classList.toggle('fa-solid', !isLiked);
-    icon.classList.toggle('fa-regular', isLiked);
+  // Optimistic UI update
+  icon.classList.toggle('fa-solid', !isLiked);
+  icon.classList.toggle('fa-regular', isLiked);
+  if (countSpan) {
+    countSpan.textContent = isLiked ? currentCount - 1 : currentCount + 1;
+  }
 
-    try {
-      const res = await fetch(`/api/posts/${postId}/like`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ liked: !isLiked })
-      });
+  try {
+    const res = await fetch(`/api/posts/${postId}/like`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ liked: !isLiked })
+    });
 
-      const data = await res.json();
-      if (!res.ok || !data.success) throw new Error('Like failed');
-    } catch (err) {
-      console.error('Failed to toggle like:', err);
-      icon.classList.toggle('fa-solid', isLiked);
-      icon.classList.toggle('fa-regular', !isLiked);
+    const data = await res.json();
+    if (!res.ok || !data.success) throw new Error('Like failed');
+  } catch (err) {
+    console.error('Failed to toggle like:', err);
+
+    // Revert icon and count
+    icon.classList.toggle('fa-solid', isLiked);
+    icon.classList.toggle('fa-regular', !isLiked);
+    if (countSpan) {
+      countSpan.textContent = isLiked ? currentCount : currentCount - 1;
     }
-  });
+  }
+});
+
 
   
 

@@ -9,11 +9,34 @@
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+.post-user-rowX {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+
 .post-headerX a {
-  color: #1da1f2;
+  color: #ffffff;
   text-decoration: none;
   font-size: 14px;
 }
+
+.post-profile-picX {
+    width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #ccc url('/path-to-placeholder.jpg') center/cover no-repeat;
+  border: 2px solid #007aff;
+  }
+
+  .post-usernameX {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff;
+  text-decoration: none;  /* ✅ remove underline */
+}
+
 
 .post-bodyX {
   margin-top: 12px;
@@ -175,7 +198,15 @@
   }
 
   .post-headerX a {
-    font-size: 13px;
+    font-size: 15px;
+  }
+
+  .post-profile-picX {
+    width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #ccc url('/path-to-placeholder.jpg') center/cover no-repeat;
+  border: 2px solid #007aff;
   }
 
   .post-actionsX {

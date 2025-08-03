@@ -2,11 +2,19 @@
 
 <div class="post-detailX">
   <div class="post-headerX">
-  <% if (post.authorPfpUrl) { %>
-    <img src="<%= post.authorPfpUrl %>" alt="Author PFP" class="comment-pfp" />
-  <% } %>
-  <strong><%= post.authorName %></strong>
+  <div class="post-user-rowX">
+    <a href="/profile?acode=<%= post.acode %>">
+      <% if (post.authorPfpUrl) { %>
+        <img src="<%= post.authorPfpUrl %>" alt="Author PFP" class="post-profile-picX" />
+      <% } %>
+    </a>
+
+    <a href="/profile?acode=<%= post.acode %>" class="post-usernameX">
+      <%= post.authorName %>
+    </a>
+  </div>
 </div>
+
 
 
   <div class="post-bodyX">
@@ -34,9 +42,7 @@
       <span class="like-count"><%= post.likeCount %></span>
     </button>
 
-    <button class="post-comment-btn" title="Comment" data-post-id="<%= post.post_id %>">
-      <i class="fa-regular fa-comment"></i>
-    </button>
+    
 
     <button class="post-share-btn" title="Share" data-post-id="<%= post.post_id %>">
       <i class="fa-solid fa-retweet"></i>

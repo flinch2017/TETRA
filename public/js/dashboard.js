@@ -2,31 +2,37 @@ function bindPostActionButtons() {
   // Like buttons
   document.querySelectorAll('.post-like-btn').forEach(btn => {
     btn.addEventListener('click', async (e) => {
-      e.stopPropagation(); // Prevent post click
-      const postId = btn.dataset.postId;
-      const icon = btn.querySelector('i');
-      const isLiked = icon.classList.contains('fa-solid');
+  e.stopPropagation(); // Prevent post click
+  const postId = btn.dataset.postId;
+  const icon = btn.querySelector('i');
+  const countSpan = btn.querySelector('span');
+  const isLiked = icon.classList.contains('fa-solid');
+  let currentCount = parseInt(countSpan.textContent, 10) || 0;
 
-      // Optimistic toggle
-      icon.classList.toggle('fa-solid', !isLiked);
-      icon.classList.toggle('fa-regular', isLiked);
+  // Optimistic UI update
+  icon.classList.toggle('fa-solid', !isLiked);
+  icon.classList.toggle('fa-regular', isLiked);
+  countSpan.textContent = isLiked ? currentCount - 1 : currentCount + 1;
 
-      try {
-        const res = await fetch(`/api/posts/${postId}/like`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ liked: !isLiked })
-        });
-
-        const data = await res.json();
-        if (!res.ok || !data.success) throw new Error('Failed to toggle like');
-      } catch (err) {
-        console.error('Like failed:', err);
-        // Revert optimistic update
-        icon.classList.toggle('fa-solid', isLiked);
-        icon.classList.toggle('fa-regular', !isLiked);
-      }
+  try {
+    const res = await fetch(`/api/posts/${postId}/like`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ liked: !isLiked })
     });
+
+    const data = await res.json();
+    if (!res.ok || !data.success) throw new Error('Failed to toggle like');
+  } catch (err) {
+    console.error('Like failed:', err);
+
+    // Revert icon and count
+    icon.classList.toggle('fa-solid', isLiked);
+    icon.classList.toggle('fa-regular', !isLiked);
+    countSpan.textContent = isLiked ? currentCount : currentCount - 1;
+  }
+});
+
   });
 
   // Comment buttons

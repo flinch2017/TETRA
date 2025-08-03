@@ -15,6 +15,7 @@ body {
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
       border: 1px solid rgba(255, 255, 255, 0.05);
       margin-top: 40px !important;
+      margin-bottom: 100px;
     }
 
     h6 {
@@ -112,19 +113,20 @@ body {
     }
 
     button[type="submit"] {
-      background-color: #007aff;
-      color: white;
-      border: none;
-      padding: 0.85rem 2.2rem;
-      border-radius: 12px;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
+  background-color: #007aff;
+  color: white;
+  border: none;
+  padding: 0.85rem 2.2rem;
+  border-radius: 999px; /* Changed for pill shape */
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
 
-    button[type="submit"]:hover {
-      background-color: #005fc1;
-    }
+button[type="submit"]:hover {
+  background-color: #005fc1;
+}
+
 
     .back {
       display: block;
