@@ -8,7 +8,7 @@
 
 
 .newsfeed {
-  padding: 2rem;
+  padding-top: 5px;
   max-width: 700px;
   margin: 0 auto;
   padding-bottom: 40px;
@@ -52,7 +52,10 @@
 /* ✅ Responsive Tweaks */
 @media screen and (max-width: 600px) {
   .newsfeed {
-    padding: 1rem;
+    
+    padding-bottom: 60px;
+    padding-right: 1rem;
+    padding-left: 1rem;
   }
 
   .post {
@@ -297,3 +300,191 @@
 .post-dropdown-menu.show {
   display: block;
 }
+
+
+/* Remove this from global */
+.post-collage {
+  display: grid;
+  gap: 6px;
+  margin-top: 1rem;
+  border-radius: 10px;
+  overflow: hidden;
+  grid-auto-rows: 1fr;
+}
+
+/* ✅ Only apply fixed square for 3+ images */
+.collage-3,
+.collage-4,
+.collage-5,
+.collage-6 {
+  aspect-ratio: 1 / 1;
+}
+
+.collage-2 {
+  grid-template-columns: 1fr 1fr;
+  grid-auto-rows: auto; /* allow image height to define layout */
+}
+
+.collage-1 {
+  grid-template-columns: 1fr;
+  grid-auto-rows: auto;
+}
+
+
+.post-collage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Collage styles based on count */
+.collage-1 {
+  grid-template-columns: 1fr;
+}
+
+.collage-2 {
+  grid-template-columns: 1fr 1fr;
+}
+
+.collage-3 .collage-image-wrapper:nth-child(1) { grid-area: img1; }
+.collage-3 .collage-image-wrapper:nth-child(2) { grid-area: img2; }
+.collage-3 .collage-image-wrapper:nth-child(3) { grid-area: img3; }
+
+
+.collage-4 {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+
+.collage-5,
+.collage-6 {
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+}
+
+
+
+.collage-image-wrapper {
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  border-radius: 10px; /* ✅ move border-radius here */
+  padding: 0px;
+}
+
+.collage-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+
+.more-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  color: #fff;
+  font-size: 1.8rem;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 15px;
+  border-radius: 10px;
+
+  z-index: 2;
+}
+
+.more-overlay {
+  pointer-events: none;
+}
+
+
+
+.lightbox-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(10, 10, 10, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.lightbox-modal.hidden {
+  display: none;
+}
+
+.lightbox-content {
+  position: relative;
+  max-width: 90%;
+  max-height: 90%;
+}
+
+#lightboxImg {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: -20px;
+  right: -20px;
+  color: white;
+  font-size: 2rem;
+  cursor: pointer;
+}
+
+.lightbox-prev,
+.lightbox-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  color: white;
+  background: rgba(0,0,0,0.4);
+  border: none;
+  font-size: 2rem;
+  padding: 0.5rem;
+  cursor: pointer;
+  border-radius: 50%;
+}
+
+.lightbox-prev { left: -50px; }
+.lightbox-next { right: -50px; }
+
+
+.collage-3 {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  grid-template-areas:
+    "img1 img2"
+    "img1 img3";
+  gap: 6px;
+  aspect-ratio: 2 / 1; /* Ensures collage has proper shape */
+  overflow: hidden;
+}
+
+.collage-3 .collage-image-wrapper {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.collage-3 img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+

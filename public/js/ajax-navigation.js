@@ -241,8 +241,9 @@ function bindAllPageEvents() {
   bindFormSubmissions();
   bindSongClickHandlers();
   bindPostClickEvents();
+  bindProfilePostClickEvents();
   bindEllipsisToggles();
-
+  bindArtistTabNavigation();
 
   if (typeof bindSongClickHandlers === 'function') {
     bindSongClickHandlers();
@@ -251,7 +252,14 @@ function bindAllPageEvents() {
   if (typeof bindPostViewEvents === 'function') {
     bindPostViewEvents();
   }
+
+  // ✅ NEW
+  if (typeof bindPostFormEvents === 'function') {
+    bindPostFormEvents();
+  }
 }
+
+
 
 
 

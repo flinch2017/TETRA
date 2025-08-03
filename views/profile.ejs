@@ -1,54 +1,39 @@
 <div class="artist-header" style="background-image: url('<%= artist.bannerUrl %>')">
   <div class="overlay"></div>
   <% if (artist.rank && artist.rank <= 500) { %>
-  <div class="artist-rank">
-    #<%= artist.rank %>
-  </div>
-<% } %>
-
+    <div class="artist-rank">#<%= artist.rank %></div>
+  <% } %>
 
   <div class="artist-info">
-  <div class="artist-name"><%= artist.name %></div>
-  <div class="artist-follow">
-    <%= artist.followers %> followers
-    ·
-    <%= artist.monthlyListeners %> monthly listeners
-  </div>
+    <div class="artist-name"><%= artist.name %></div>
+    <div class="artist-follow">
+      <%= artist.followers %> followers · <%= artist.monthlyListeners %> monthly listeners
+    </div>
 
-  
-  <div class="header-actions">
-    <% if (!isOwnProfile) { %>
-      <button 
-        class="follow-btn" 
-        data-target="<%= artist.acode %>" 
-        data-following="<%= isFollowing ? 'true' : 'false' %>">
-        <%= isFollowing ? 'Following' : 'Follow' %>
-      </button>
-    <% } %>
+    <div class="header-actions">
+      <% if (!isOwnProfile) { %>
+        <button class="follow-btn" data-target="<%= artist.acode %>" data-following="<%= isFollowing ? 'true' : 'false' %>">
+          <%= isFollowing ? 'Following' : 'Follow' %>
+        </button>
+      <% } %>
 
-    <div class="more-dropdown">
-      <i class="fas fa-ellipsis-v more-dropdown-toggle"></i>
-      <div class="more-dropdown-menu">
-        <% if (isOwnProfile) { %>
-          <a href="/edit-profile?acode=<%= artist.acode %>">Edit Profile</a>
-          <a href="#">View Analytics</a>
-        <% } %>
-
-        <a href="#">Add to Favorites</a>
-
-        <% if (!isOwnProfile) { %>
-          <a href="#">Report</a>
-          <a href="#">Block Artist</a>
-        <% } %>
+      <div class="more-dropdown">
+        <i class="fas fa-ellipsis-v more-dropdown-toggle"></i>
+        <div class="more-dropdown-menu">
+          <% if (isOwnProfile) { %>
+            <a href="/edit-profile?acode=<%= artist.acode %>">Edit Profile</a>
+            <a href="#">View Analytics</a>
+          <% } %>
+          <a href="#">Add to Favorites</a>
+          <% if (!isOwnProfile) { %>
+            <a href="#">Report</a>
+            <a href="#">Block Artist</a>
+          <% } %>
+        </div>
       </div>
     </div>
   </div>
 </div>
-
-</div>
-
-
-
 
 <% if (isOwnProfile && (!artist.account_mode || artist.account_mode === 'regular')) { %>
   <div class="setup-artist-container">
@@ -57,85 +42,161 @@
 <% } %>
 
 <div class="artist-nav-tabs">
-  <button class="artist-tab active" data-tab="songs">Songs</button>
-  <button class="artist-tab" data-tab="posts">Posts</button>
-  <button class="artist-tab" data-tab="store">Store</button>
+  <button class="artist-tab active" data-tab="songs">
+    <i class="fas fa-music"></i><span>Songs</span>
+  </button>
+  <button class="artist-tab" data-tab="posts">
+    <i class="fas fa-pen"></i><span>Posts</span>
+  </button>
+  <button class="artist-tab" data-tab="store">
+    <i class="fas fa-store"></i><span>Store</span>
+  </button>
 </div>
 
 <main class="artist-profile">
-  <div class="section">
-  <h2>Popular Songs</h2>
-  <% if (artist.songs && artist.songs.length > 0) { %>
-    <% artist.songs.forEach(song => { %>
-      <div class="song-item clickable-song" data-song-id="<%= song.id %>">
-        <div class="song-info">
-          <img src="<%= song.coverUrl %>" alt="Cover">
-          <div>
-            <div class="song-title">
-              <%= song.title %>
-              <% if (song.explicit === 'Yes') { %>
-                <span class="explicit-badge">Explicit</span>
-              <% } else if (song.explicit === 'Clean Version') { %>
-                <span class="explicit-badge clean">Clean</span>
-              <% } %>
-            </div>
-
-            <div class="release-meta"><%= song.streams %> streams</div>
-          </div>
-        </div>
-        <div class="song-actions">
-        <i 
-        class="<%= song.isLiked ? 'fas fa-heart liked like-track' : 'far fa-heart like-track' %>" 
-        data-track-id="<%= song.id %>" 
-        data-liked="<%= song.isLiked ? 'true' : 'false' %>">
-        </i>
-
-        <i class="fas fa-ellipsis-v"></i>
-      </div>
-    </div>
-    <% }) %>
-  <% } else { %>
-    <p style="color: rgba(255,255,255,0.6); font-size:0.95rem;">No available songs</p>
-  <% } %>
-</div>
-
-
-  <div class="section">
-  <h2>Latest Albums</h2>
-  <% if (artist.releases && artist.releases.length > 0) { %>
-    <div class="releases-grid">
-      <% artist.releases.forEach(release => { %>
-        <a href="/album/<%= release.id %>" class="release-card-link">
-          <div class="release-card">
-            <img class="release-cover" src="<%= release.coverUrl %>" alt="<%= release.title %>">
-            <div class="release-details">
-              <div class="release-title-with-badge">
-                <span class="release-title"><%= release.title %></span>
-                <% if (release.explicit === 'Yes') { %>
-                  <span class="explicit-e-badge">E</span>
-                <% } %>
+  <!-- Songs Tab -->
+  <div id="songsTabContent" class="tab-content">
+    <div class="section">
+      <h2>Popular Songs</h2>
+      <% if (artist.songs && artist.songs.length > 0) { %>
+        <% artist.songs.forEach(song => { %>
+          <div class="song-item clickable-song" data-song-id="<%= song.id %>">
+            <div class="song-info">
+              <img src="<%= song.coverUrl %>" alt="Cover">
+              <div>
+                <div class="song-title">
+                  <%= song.title %>
+                  <% if (song.explicit === 'Yes') { %>
+                    <span class="explicit-badge">Explicit</span>
+                  <% } else if (song.explicit === 'Clean Version') { %>
+                    <span class="explicit-badge clean">Clean</span>
+                  <% } %>
+                </div>
+                <div class="release-meta"><%= song.streams %> streams</div>
               </div>
-              <% if (release.releasedOn) { %>
-                <div class="release-meta">Released on <%= release.releasedOn %></div>
-              <% } %>
+            </div>
+            <div class="song-actions">
+              <i class="<%= song.isLiked ? 'fas fa-heart liked like-track' : 'far fa-heart like-track' %>" 
+                 data-track-id="<%= song.id %>" 
+                 data-liked="<%= song.isLiked ? 'true' : 'false' %>"></i>
+              <i class="fas fa-ellipsis-v"></i>
             </div>
           </div>
-        </a>
-      <% }) %>
+        <% }) %>
+      <% } else { %>
+        <p style="color: rgba(255,255,255,0.6); font-size:0.95rem;">No available songs</p>
+      <% } %>
     </div>
-  <% } else { %>
-    <p style="color: rgba(255,255,255,0.6); font-size:0.95rem;">No available albums</p>
-  <% } %>
-</div>
 
-  <div class="section">
-    <h2>About</h2>
-    <% if (artist.bio) { %>
-      <div class="artist-details">
-        <%= artist.bio %>
+    <div class="section">
+      <h2>Latest Albums</h2>
+      <% if (artist.releases && artist.releases.length > 0) { %>
+        <div class="releases-grid">
+          <% artist.releases.forEach(release => { %>
+            <a href="/album/<%= release.id %>" class="release-card-link">
+              <div class="release-card">
+                <img class="release-cover" src="<%= release.coverUrl %>" alt="<%= release.title %>">
+                <div class="release-details">
+                  <div class="release-title-with-badge">
+                    <span class="release-title"><%= release.title %></span>
+                    <% if (release.explicit === 'Yes') { %>
+                      <span class="explicit-e-badge">E</span>
+                    <% } %>
+                  </div>
+                  <% if (release.releasedOn) { %>
+                    <div class="release-meta">Released on <%= release.releasedOn %></div>
+                  <% } %>
+                </div>
+              </div>
+            </a>
+          <% }) %>
+        </div>
+      <% } else { %>
+        <p style="color: rgba(255,255,255,0.6); font-size:0.95rem;">No available albums</p>
+      <% } %>
+    </div>
+
+    <div class="section">
+      <h2>About</h2>
+      <% if (artist.bio) { %>
+        <div class="artist-details"><%= artist.bio %></div>
+      <% } else { %>
+        <p style="color: rgba(255,255,255,0.6); font-size:0.95rem;">No biography provided.</p>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Posts Tab -->
+  <div id="postsTabContent" class="tab-content" style="display: none;">
+    <div class="section">
+      <h2>Posts</h2>
+      <% if (posts && posts.length > 0) { %>
+  <% posts.forEach(post => { 
+     const previewImages = post.images?.slice(0, 4) || [];
+     const hiddenCount = post.images?.length > 4 ? post.images.length - 4 : 0;
+%>
+  <div class="postz clickable-post" data-post-id="<%= post.post_id %>" style="cursor: pointer;">
+    <div class="post-headerz">
+      <img src="<%= post.posterPfpUrl %>" class="post-pfpz" />
+      <div class="post-user-infoz">
+        <div class="post-usernamez"><%= post.displayName %></div>
+        <div class="post-timez"><%= post.timeAgo %></div>
       </div>
-    <% } %>
+    </div>
+
+    <div class="post-contentz">
+      <p><%= post.caption %></p>
+
+      <% if (previewImages.length > 0) { %>
+        <div class="post-collagez collage-<%= previewImages.length %>z">
+          <% previewImages.forEach((img, index) => { %>
+            <div class="collage-image-wrapperz">
+              <img src="<%= img %>" class="collage-imagez" alt="Post Image" />
+              <% if (index === 3 && hiddenCount > 0) { %>
+                <div class="more-overlayz">+<%= hiddenCount %></div>
+              <% } %>
+            </div>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
+
+    <div class="post-actionsz">
+      <button class="post-like-btn" data-post-id="<%= post.post_id %>" title="Like">
+    <i class="fa-heart <%= post.isLiked ? 'fa-solid' : 'fa-regular' %>"></i>
+    <span><%= post.likeCount %></span>
+  </button>
+
+  <button class="post-comment-btn" title="Comment">
+    <i class="fa-regular fa-comment"></i>
+  </button>
+
+  <button class="post-share-btn" title="Share">
+    <i class="fa-regular fa-share-from-square"></i>
+  </button>
+    </div>
+  </div>
+<% }) %>
+
+
+<% } else { %>
+  <p>No posts available.</p>
+<% } %>
+
+    </div>
+  </div>
+
+  <!-- Store Tab -->
+  <div id="storeTabContent" class="tab-content" style="display: none;">
+    <div class="section">
+      <h2>Store</h2>
+      <% if (artist.products && artist.products.length > 0) { %>
+        <% artist.products.forEach(product => { %>
+          <div class="product-item"><%= product.name %></div>
+        <% }) %>
+      <% } else { %>
+        <p style="color: rgba(255,255,255,0.6); font-size:0.95rem;">No store products listed.</p>
+      <% } %>
+    </div>
   </div>
 </main>
-
-

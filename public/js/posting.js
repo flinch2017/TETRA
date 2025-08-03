@@ -1,6 +1,13 @@
-const images = document.getElementById('images');
+function bindPostFormEvents() {
+  const images = document.getElementById('images');
   const videos = document.getElementById('videos');
   const previewContainer = document.getElementById('previewContainer');
+  const form = document.querySelector('#postForm');
+  const alertBox = document.getElementById('alertBox');
+  const alertMessage = document.getElementById('alertMessage');
+
+  if (!form || !images || !videos || !previewContainer) return;
+
   let selectedFiles = [];
 
   function updatePreview() {
@@ -73,7 +80,9 @@ const images = document.getElementById('images');
   images.addEventListener('change', () => handleFiles(images.files, 'image'));
   videos.addEventListener('change', () => handleFiles(videos.files, 'video'));
 
-  document.querySelector('form').addEventListener('submit', function (e) {
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
     const dataTransferImages = new DataTransfer();
     const dataTransferVideos = new DataTransfer();
 
@@ -87,45 +96,36 @@ const images = document.getElementById('images');
 
     document.getElementById('imagesInput').files = dataTransferImages.files;
     document.getElementById('videosInput').files = dataTransferVideos.files;
-  });
 
-  const form = document.querySelector('#postForm');
-const alertBox = document.getElementById('alertBox');
-const alertMessage = document.getElementById('alertMessage');
+    const formData = new FormData(form);
 
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
+    try {
+      const response = await fetch('/create-post', {
+        method: 'POST',
+        body: formData
+      });
 
-  const formData = new FormData(form);
+      const result = await response.json();
 
-  try {
-    const response = await fetch('/create-post', {
-      method: 'POST',
-      body: formData
-    });
+      if (result.success) {
+        alertMessage.textContent = result.message;
 
-    const result = await response.json();
+        alertBox.classList.remove('hidden');
+        setTimeout(() => alertBox.classList.add('show'), 10);
 
-    if (result.success) {
-      alertMessage.textContent = result.message;
-
-      // Show alert box with animation
-      alertBox.classList.remove('hidden');
-      setTimeout(() => alertBox.classList.add('show'), 10);
-
-      // After 2 seconds, fade out and redirect
-      setTimeout(() => {
-        alertBox.classList.remove('show');
         setTimeout(() => {
-          alertBox.classList.add('hidden');
-          window.location.href = '/dashboard';
-        }, 400); // match CSS transition time
-      }, 2000);
+          alertBox.classList.remove('show');
+          setTimeout(() => {
+            alertBox.classList.add('hidden');
+            window.location.href = '/dashboard';
+          }, 400);
+        }, 2000);
 
-    } else {
-      alert('Error: ' + result.message);
+      } else {
+        alert('Error: ' + result.message);
+      }
+    } catch (error) {
+      alert('Network error');
     }
-  } catch (error) {
-    alert('Network error');
-  }
-});
+  });
+}

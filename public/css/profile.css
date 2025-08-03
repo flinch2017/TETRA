@@ -365,24 +365,209 @@ body {
 }
 
 .artist-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
   background: none;
   border: none;
   color: white;
-  font-size: 1rem;
+  font-size: 0.8rem;
   font-weight: 500;
-  padding: 0.5rem 1rem;
+  padding: 0.25rem 0.5rem;
   cursor: pointer;
-  border-radius: 999px;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  border-radius: 6px;
+  transition: color 0.2s ease;
+}
+
+.artist-tab i {
+  font-size: 1rem;
+  transition: color 0.2s ease;
+}
+
+.artist-tab span {
+  font-size: 0.75rem;
+  transition: color 0.2s ease;
 }
 
 .artist-tab:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  color: #2196f3;
 }
 
 .artist-tab.active {
-  background-color: #007bff;
+  color: #2196f3;
+}
+
+.artist-tab.active i,
+.artist-tab.active span {
+  color: #2196f3;
+}
+
+.artist-tab.active {
+  color: #2196f3;
+}
+
+
+.postz {
+  background-color: #11152f;
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.post-headerz {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.post-pfpz {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.post-user-infoz {
+  display: flex;
+  flex-direction: column;
+}
+
+.post-usernamez {
+  font-weight: bold;
+  color: white;
+}
+
+.post-timez {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.6);
+}
+
+.post-contentz p {
+  margin: 0 0 0.75rem;
   color: white;
 }
 
 
+
+.post-actionsz {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+
+.post-actionz button {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.post-actionz button:hover {
+  color: #ffffff;
+}
+
+
+
+
+.post-actionsz {
+  display: flex;
+  gap: 1.2rem;
+  margin-top: 1rem;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.post-actionsz button {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.post-actionsz button:hover {
+  color: #1da1f2;
+  transform: scale(1.1);
+}
+
+.post-actionsz i {
+  font-size: 1.1rem;
+}
+
+.post-actionsz button span {
+  font-size: 0.95rem;
+}
+
+
+/* Collage styles */
+.post-collagez {
+  display: grid;
+  gap: 4px;
+  margin-top: 0.5rem;
+}
+
+.collage-1z {
+  grid-template-columns: 1fr;
+}
+
+.collage-2z {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.collage-3z {
+  grid-template-columns: 2fr 1fr;
+  grid-template-rows: repeat(2, 1fr);
+  grid-template-areas:
+    "big small1"
+    "big small2";
+}
+
+.collage-3z .collage-image-wrapperz:nth-child(1) {
+  grid-area: big;
+}
+.collage-3z .collage-image-wrapperz:nth-child(2) {
+  grid-area: small1;
+}
+.collage-3z .collage-image-wrapperz:nth-child(3) {
+  grid-area: small2;
+}
+
+.collage-4z {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.collage-image-wrapperz {
+  position: relative;
+  aspect-ratio: 1/1;
+  overflow: hidden;
+}
+
+.collage-imagez {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 4px;
+}
+
+.more-overlayz {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(0,0,0,0.6);
+  color: white;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+}

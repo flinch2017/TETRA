@@ -1,8 +1,3 @@
-
-
-
-
-
 function bindProfileEvents() {
   const bannerInput = document.getElementById('banner');
   const bannerPreview = document.getElementById('bannerPreview');
@@ -102,3 +97,57 @@ function bindProfileEvents() {
   }
 }
 
+function bindArtistTabNavigation() {
+  const tabs = document.querySelectorAll('.artist-tab');
+  const tabContents = {
+    songs: document.getElementById('songsTabContent'),
+    posts: document.getElementById('postsTabContent'),
+    store: document.getElementById('storeTabContent')
+  };
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      // Remove active class from all
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+
+      const selectedTab = tab.dataset.tab;
+
+      for (const [key, content] of Object.entries(tabContents)) {
+        content.style.display = (key === selectedTab) ? 'block' : 'none';
+      }
+    });
+  });
+}
+
+
+function bindProfilePostClickEvents() {
+  document.querySelectorAll('.clickable-post').forEach(postEl => {
+    postEl.addEventListener('click', function () {
+      const postId = postEl.dataset.postId;
+      if (!postId) return;
+
+      const url = `/post?postId=${postId}`;
+      
+      // Use AJAX navigation manually
+      fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, 'text/html');
+          const newContent = doc.querySelector('#appContent');
+
+          if (newContent) {
+            document.querySelector('#appContent').innerHTML = newContent.innerHTML;
+            window.scrollTo(0, 0);
+            window.history.pushState({}, '', url);
+            bindAllPageEvents();
+          } else {
+            // fallback full redirect
+            window.location.href = url;
+          }
+        })
+        .catch(() => window.location.href = url);
+    });
+  });
+}

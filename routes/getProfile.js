@@ -199,33 +199,102 @@ router.get('/profile', compCheck, async (req, res) => {
       rank
     };
 
+
+    // 📌 Fetch posts by this artist
+const { rows: postRows } = await pool.query(
+  `SELECT p.*, u.username, u.artist_name, u.acode, u.pfp_url
+   FROM posts p
+   JOIN users u ON u.acode = p.acode
+   WHERE p.acode = $1
+   ORDER BY p.date DESC`,
+  [targetAcode]
+);
+
+const posts = await Promise.all(postRows.map(async post => {
+  const images = post.image || [];
+  const tracks = post.track || [];
+  const videos = post.video || [];
+
+  const presignedImages = await Promise.all(images.map(async img => {
+    const filename = path.basename(img);
+    return await generatePresignedUrl(`images/${filename}`);
+  }));
+
+  const presignedTracks = await Promise.all(tracks.map(async track => {
+    const filename = path.basename(track);
+    return await generatePresignedUrl(`audio/${filename}`);
+  }));
+
+  const presignedVideos = await Promise.all(videos.map(async video => {
+    const filename = path.basename(video);
+    return await generatePresignedUrl(`videos/${filename}`);
+  }));
+
+  // Get like count
+  const likeCountResult = await pool.query(
+    'SELECT COUNT(*) FROM post_likes WHERE post_id = $1',
+    [post.post_id]
+  );
+  const likeCount = parseInt(likeCountResult.rows[0].count, 10);
+
+  // Check if current user liked the post
+  const isLikedResult = await pool.query(
+    'SELECT 1 FROM post_likes WHERE post_id = $1 AND acode = $2',
+    [post.post_id, loggedInUser.acode]
+  );
+  const isLiked = isLikedResult.rowCount > 0;
+
+  // Poster PFP
+  const presignedPosterPfpUrl = post.pfp_url
+    ? await generatePresignedUrl(`pfp/${path.basename(post.pfp_url)}`)
+    : await generatePresignedUrl('drawables/banner_default.png');
+
+  return {
+    post_id: post.post_id,
+    acode: post.acode,
+    caption: post.caption,
+    images: presignedImages,
+    tracks: presignedTracks,
+    videos: presignedVideos,
+    timeAgo: moment(post.date).fromNow(),
+    displayName: post.artist_name?.trim() || post.username,
+    posterPfpUrl: presignedPosterPfpUrl,
+    likeCount,
+    isLiked
+  };
+}));
+
+
     res.render('profile', {
-      artist,
-      pfpUrl: headerPfpUrl,
-      userAcode: loggedInUser.acode,
-      isOwnProfile,
-      isFollowing
-    });
+  artist,
+  pfpUrl: headerPfpUrl,
+  userAcode: loggedInUser.acode,
+  isOwnProfile,
+  isFollowing,
+  posts // ✅ included here
+});
 
   } catch (err) {
     console.error('Error fetching profile data:', err);
     res.render('profile', {
-      artist: {
-        name: loggedInUser.username || 'Unknown Artist',
-        bannerUrl: '/path/to/default/banner.png',
-        followers: '0',
-        bio: '',
-        account_mode: null,
-        acode: null,
-        songs: [],
-        releases: []
-      },
-      pfpUrl: '/path/to/default_pfp.png',
-      userAcode: loggedInUser.acode,
-      isOwnProfile,
-      isFollowing: false,
-      error: 'Failed to load profile.'
-    });
+  artist: {
+    name: loggedInUser.username || 'Unknown Artist',
+    bannerUrl: '/path/to/default/banner.png',
+    followers: '0',
+    bio: '',
+    account_mode: null,
+    acode: null,
+    songs: [],
+    releases: []
+  },
+  pfpUrl: '/path/to/default_pfp.png',
+  userAcode: loggedInUser.acode,
+  isOwnProfile,
+  isFollowing: false,
+  posts: [], // ✅ fallback
+  error: 'Failed to load profile.'
+});
+
   }
 });
 

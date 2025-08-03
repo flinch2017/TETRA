@@ -27,10 +27,24 @@
 
         <p><%= post.caption %></p>
 
-        <% post.images.forEach(imgUrl => { 
-             const filename = imgUrl.split('/').pop(); %>
-          <img src="/media/image/<%= filename %>" alt="Post image" />
-        <% }) %>
+        <% if (post.images.length > 0) { 
+     const filenames = post.images.map(url => url.split('/').pop());
+     const visibleImages = filenames.slice(0, 4);
+     const hiddenCount = filenames.length - 4;
+%>
+  <div class="post-collage collage-<%= Math.min(4, filenames.length) %>">
+    <% visibleImages.forEach((filename, index) => { %>
+      <div class="collage-image-wrapper">
+        <img src="/media/image/<%= filename %>" alt="Post image" class="collage-image" data-media-index="<%= index %>" />
+        <% if (index === 3 && hiddenCount > 0) { %>
+          <div class="more-overlay">+<%= hiddenCount %></div>
+        <% } %>
+      </div>
+    <% }) %>
+  </div>
+<% } %>
+
+
 
         <% post.tracks.forEach(trackUrl => {
              const filename = trackUrl.split('/').pop(); %>
@@ -63,3 +77,71 @@
     <% }) %>
   <% } %>
 </main>
+
+
+<div id="lightboxModal" class="lightbox-modal hidden">
+  <div class="lightbox-content">
+    <span class="lightbox-close">&times;</span>
+    <img id="lightboxImg" src="" alt="Expanded Image" />
+    <button class="lightbox-prev">&#10094;</button>
+    <button class="lightbox-next">&#10095;</button>
+  </div>
+</div>
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const modal = document.getElementById("lightboxModal");
+    const modalImg = document.getElementById("lightboxImg");
+    const closeBtn = document.querySelector(".lightbox-close");
+    const prevBtn = document.querySelector(".lightbox-prev");
+    const nextBtn = document.querySelector(".lightbox-next");
+
+    let images = [];
+    let currentIndex = 0;
+
+    document.body.addEventListener("click", (e) => {
+      const clickedImg = e.target.closest(".collage-image");
+      if (!clickedImg) return;
+
+      const postEl = clickedImg.closest(".post");
+      const postImages = postEl.querySelectorAll(".collage-image");
+      images = Array.from(postImages).map(img => img.src);
+      currentIndex = parseInt(clickedImg.dataset.mediaIndex);
+
+      openModal();
+    });
+
+    function openModal() {
+      modal.classList.remove("hidden");
+      updateModalImage();
+    }
+
+    function updateModalImage() {
+      modalImg.src = images[currentIndex];
+    }
+
+    function closeModal() {
+      modal.classList.add("hidden");
+    }
+
+    closeBtn.addEventListener("click", closeModal);
+
+    nextBtn.addEventListener("click", () => {
+      currentIndex = (currentIndex + 1) % images.length;
+      updateModalImage();
+    });
+
+    prevBtn.addEventListener("click", () => {
+      currentIndex = (currentIndex - 1 + images.length) % images.length;
+      updateModalImage();
+    });
+
+    window.addEventListener("keydown", (e) => {
+      if (modal.classList.contains("hidden")) return;
+      if (e.key === "Escape") closeModal();
+      else if (e.key === "ArrowRight") nextBtn.click();
+      else if (e.key === "ArrowLeft") prevBtn.click();
+    });
+  });
+</script>
