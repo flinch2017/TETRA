@@ -1,50 +1,50 @@
 <header>
   <a href="/dashboard" class="logo ajax-link">TETRA</a>
 
-  <!-- Search Bar -->
   <form class="header-search" action="/search" method="GET">
-    <input
-      type="text"
-      name="q"
-      placeholder="Search music, artists..."
-      aria-label="Search"
-    />
-    <button type="submit"><i class="fas fa-search"></i></button>
-  </form>
+  <input type="text" name="q" ... />
+  <button type="submit"><i class="fas fa-search"></i></button>
+</form>
+
 
   
 
-<div class="mobile-search-overlay" id="mobileSearchOverlay">
-  <input type="text" placeholder="Search..." />
+<div class="mobile-search-overlayY" id="mobileSearchOverlay">
+  <form id="mobileSearchForm" action="/search" method="GET" style="width: 100%;">
+    <input type="text" name="q" placeholder="Search..." />
+  </form>
 </div>
 
 
   <div class="nav-links">
-    <button class="mobile-search-icon" id="mobileSearchBtn">
-  <i class="fas fa-search"></i>
-</button>
-    <a href="/charts" class="nav-item">
-      <span class="nav-icon"><i class="fas fa-chart-bar"></i></span>
-      <span class="nav-label">Charts</span>
-    </a>
-    <a href="/music" class="nav-item ajax-link">
-      <span class="nav-icon"><i class="fas fa-music"></i></span>
-      <span class="nav-label">Music</span>
-    </a>
-    <a href="/notifications" class="nav-item">
-      <span class="nav-icon"><i class="fas fa-bell"></i></span>
-      <span class="nav-label">Notifications</span>
-      <span class="notification-badge">3</span>
-    </a>
-    <div class="profile-container" id="profileDropdown">
-      <div class="profile-pic" style="background-image: url('<%= pfpUrl %>');"></div>
-      <div class="dropdown">
-        <a href="/profile?acode=<%= userAcode %>">See Profile</a>
-        <a href="/logout" id="logoutLink">Logout</a>
+  <a href="/charts" class="nav-item">
+    <span class="nav-icon"><i class="fas fa-chart-bar"></i></span>
+    <span class="nav-label">Charts</span>
+  </a>
+  <a href="/music" class="nav-item ajax-link">
+    <span class="nav-icon"><i class="fas fa-music"></i></span>
+    <span class="nav-label">Music</span>
+  </a>
+  <a href="/notifications" class="nav-item">
+    <span class="nav-icon"><i class="fas fa-bell"></i></span>
+    <span class="nav-label">Notifications</span>
+    <span class="notification-badge">3</span>
+  </a>
 
-      </div>
+  <!-- 🟡 Move the search icon HERE -->
+  <button class="mobile-search-icon" id="mobileSearchBtn">
+    <i class="fas fa-search"></i>
+  </button>
+
+  <div class="profile-container" id="profileDropdown">
+    <div class="profile-pic" style="background-image: url('<%= pfpUrl %>');"></div>
+    <div class="dropdown">
+      <a href="/profile?acode=<%= userAcode %>">See Profile</a>
+      <a href="/logout" id="logoutLink">Logout</a>
     </div>
   </div>
+</div>
+
 </header>
 
 <script>
@@ -66,4 +66,33 @@
   document.addEventListener("click", () => {
     mobileSearchOverlay.classList.remove("active");
   });
+</script>
+
+
+<script>
+  const desktopSearchForm = document.querySelector('.header-search');
+  const mobileSearchForm = document.getElementById('mobileSearchForm');
+
+  // Handles search submission with AJAX
+  function handleSearchSubmit(form) {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const query = form.querySelector('input[name="q"]').value;
+      if (query.trim()) {
+        const url = `/search?q=${encodeURIComponent(query)}`;
+        // If you're using AJAX page loading
+        if (window.loadPageViaAjax) {
+          loadPageViaAjax(url); // your global AJAX page loader
+        } else {
+          // fallback to normal navigation
+          window.location.href = url;
+        }
+        // Optional: close mobile overlay
+        mobileSearchOverlay.classList.remove('active');
+      }
+    });
+  }
+
+  handleSearchSubmit(desktopSearchForm);
+  handleSearchSubmit(mobileSearchForm);
 </script>

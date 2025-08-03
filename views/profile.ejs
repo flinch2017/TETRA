@@ -41,6 +41,8 @@
   </div>
 <% } %>
 
+<% if (artist.account_mode && artist.account_mode === 'artist') { %>
+
 <div class="artist-nav-tabs">
   <button class="artist-tab active" data-tab="songs">
     <i class="fas fa-music"></i><span>Songs</span>
@@ -202,3 +204,4 @@
     </div>
   </div>
 </main>
+<% } %>

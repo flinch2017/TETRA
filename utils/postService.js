@@ -100,10 +100,15 @@ async function getPostById(postId, viewerAcode) {
 
   const comments = await Promise.all(commentResult.rows.map(async (c) => {
     let presignedPfp = null;
-    if (c.pfp_url) {
-      const filename = path.basename(c.pfp_url);
-      presignedPfp = await generatePresignedUrl(`pfp/${filename}`);
-    }
+
+if (c.pfp_url) {
+  const filename = path.basename(c.pfp_url);
+  presignedPfp = await generatePresignedUrl(`pfp/${filename}`);
+} else {
+  presignedPfp = await generatePresignedUrl('drawables/banner_default.png');
+
+}
+
 
     return {
       username: c.display_name,

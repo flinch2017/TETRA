@@ -49,6 +49,7 @@ const getLogOut = require('./getLogOut.js');
 const getMusic = require('./getMusic.js');
 const getReleaseView = require('./getReleaseView.js');
 const getPostView = require('./getPostView.js');
+const getSearch = require('./getSearch.js');
 
 
 
@@ -78,7 +79,7 @@ router.get('/', (req, res) => {
 
 
 
-router.use('/', getSignUp, getLogIn, getDashboard, getProfile, getCreatePost, getEditProfile, getMedia, getSubmission, getSearchArtists, getMusicPlay, getLogOut, getMusic, getReleaseView, getPostView);
+router.use('/', getSignUp, getLogIn, getDashboard, getProfile, getCreatePost, getEditProfile, getMedia, getSubmission, getSearchArtists, getMusicPlay, getLogOut, getMusic, getReleaseView, getPostView, getSearch);
 
 router.use('/', postLogIn, postSignUp, postFollowUnfollow, postEditProfile, postUpdateArtist, postCreatePost, postUploadTrack, postDeleteTrack, postCheckDuplicates, postSubmitRelease, postMusicPlay, postLikeTrack, postLikePost, postCommentPost);
 

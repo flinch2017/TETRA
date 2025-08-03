@@ -1,0 +1,147 @@
+<main class="search-results">
+  <%
+// Find the first non-empty result section
+let defaultTab = '';
+if (artists && artists.length) defaultTab = 'artists';
+else if (songs && songs.length) defaultTab = 'songs';
+else if (albums && albums.length) defaultTab = 'albums';
+else if (posts && posts.length) defaultTab = 'posts';
+%>
+
+<% const isEmpty = (!artists || artists.length === 0) &&
+                  (!songs || songs.length === 0) &&
+                  (!albums || albums.length === 0) &&
+                  (!posts || posts.length === 0); %>
+
+
+<% if (isEmpty) { %>
+  <div class="no-results-container">
+    <i class="fas fa-search fa-bounce no-results-icon"></i>
+    <h2 class="no-results-text">No results found</h2>
+  </div>
+<% } else { %>
+
+
+  <div class="search-tabs">
+  <% if (artists && artists.length) { %>
+    <button class="tab-button <%= defaultTab === 'artists' ? 'active' : '' %>" data-tab="artists">Artists</button>
+  <% } %>
+  <% if (songs && songs.length) { %>
+    <button class="tab-button <%= defaultTab === 'songs' ? 'active' : '' %>" data-tab="songs">Songs</button>
+  <% } %>
+  <% if (albums && albums.length) { %>
+    <button class="tab-button <%= defaultTab === 'albums' ? 'active' : '' %>" data-tab="albums">Albums</button>
+  <% } %>
+  <% if (posts && posts.length) { %>
+    <button class="tab-button <%= defaultTab === 'posts' ? 'active' : '' %>" data-tab="posts">Posts</button>
+  <% } %>
+</div>
+
+
+  <!-- Section: Artist Profiles -->
+  <% if (artists && artists.length) { %>
+    <section class="search-section tab-content" data-tab-content="artists" style="display: <%= defaultTab === 'artists' ? 'block' : 'none' %>;">
+
+      <div class="vertical-list">
+        <% artists.forEach(artist => { %>
+          <div class="list-item">
+            <a href="/profile?acode=<%= artist.acode %>" class="item-image" style="background-image: url('<%= artist.pfp_url %>');"></a>
+            <div class="item-text"><%= artist.display_name %></div>
+            <div class="item-icons">
+              <i class="fas fa-heart"></i>
+              <i class="fas fa-ellipsis-h"></i>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    </section>
+  <% } %>
+
+  <!-- Section: Songs -->
+  <% if (songs && songs.length) { %>
+    <section class="search-section tab-content" data-tab-content="songs" style="display: <%= defaultTab === 'songs' ? 'block' : 'none' %>;">
+      <div class="vertical-list">
+        <% songs.forEach(song => { %>
+          <div class="list-item clickable-song" data-song-id="<%= song.track_id %>">
+            <div class="item-image" style="background-image: url('<%= song.coverUrl %>');"></div>
+            <div class="item-text">
+              <div class="title"><%= song.title %></div>
+              <div class="subtitle"><%= song.artistName %></div>
+            </div>
+            <div class="item-icons">
+              <i class="fas fa-heart"></i>
+              <i class="fas fa-ellipsis-h"></i>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    </section>
+  <% } %>
+
+  <!-- Section: Albums -->
+  <% if (albums && albums.length) { %>
+    <section class="search-section tab-content" data-tab-content="albums" style="display: <%= defaultTab === 'albums' ? 'block' : 'none' %>;">
+      <div class="vertical-list">
+        <% albums.forEach(album => { %>
+          <a href="/album/<%= album.release_id %>" class="list-item" style="text-decoration: none; color: inherit;">
+
+            <div class="item-image" style="background-image: url('<%= album.coverUrl %>');"></div>
+            <div class="item-text">
+              <div class="title"><%= album.title %></div>
+              <div class="subtitle"><%= album.artistName %></div>
+            </div>
+            <div class="item-icons">
+              <i class="fas fa-heart"></i>
+              <i class="fas fa-ellipsis-h"></i>
+            </div>
+          </a>
+
+        <% }) %>
+      </div>
+    </section>
+  <% } %>
+
+  <!-- Posts remain unchanged -->
+  <% if (posts && posts.length) { %>
+    <section class="search-section tab-content" data-tab-content="posts" style="display: <%= defaultTab === 'posts' ? 'block' : 'none' %>;">
+      <% posts.forEach(post => { %>
+        <div class="post-cardA clickable-post" data-post-id="<%= post.post_id %>" style="cursor: pointer;">
+          <div class="post-headerA">
+            <img class="post-pfpA" src="<%= post.authorPfpUrl %>" alt="pfp" />
+            <div class="post-usernameA"><%= post.username %></div>
+          </div>
+          <div class="post-captionA"><%= post.caption %></div>
+          <% if (post.images && post.images.length) { %>
+  <div class="post-imagesA">
+    <% post.images.forEach(img => { %>
+      <img class="post-imgA" src="<%= img %>" alt="post image" />
+    <% }) %>
+  </div>
+<% } %>
+
+
+
+          <div class="post-actionsA">
+            <button class="post-like-btn" data-post-id="<%= post.post_id %>" title="Like">
+    <i class="fa-heart <%= post.isLiked ? 'fa-solid' : 'fa-regular' %>"></i>
+    <span><%= post.likeCount %></span>
+  </button>
+
+  <button class="post-comment-btn" title="Comment">
+  <i class="fa-regular fa-comment"></i>
+  <span><%= post.commentCount %></span>
+</button>
+
+
+  <button class="post-share-btn" title="Share">
+    <i class="fa-regular fa-share-from-square"></i>
+  </button>
+          </div>
+        </div>
+      <% }) %>
+    </section>
+  <% } %>
+
+  <% } %>
+
+</main>

@@ -244,6 +244,7 @@ function bindAllPageEvents() {
   bindProfilePostClickEvents();
   bindEllipsisToggles();
   bindArtistTabNavigation();
+  bindSearchTabButtons();
 
   if (typeof bindSongClickHandlers === 'function') {
     bindSongClickHandlers();

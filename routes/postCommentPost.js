@@ -43,10 +43,14 @@ const { rows } = await pool.query(
   [acode]
 );
     const displayName = rows[0]?.display_name || 'You';
-    if (rows[0]?.pfp_url) {
+
+if (rows[0]?.pfp_url) {
   const filename = rows[0].pfp_url.split('/').pop();
   presignedPfpUrl = await generatePresignedUrl(`pfp/${filename}`);
+} else {
+  presignedPfpUrl = '/drawables/banner_default.png';
 }
+
 
     // Send response with required data
     res.json({

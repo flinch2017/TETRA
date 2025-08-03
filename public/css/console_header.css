@@ -165,11 +165,12 @@ header {
   border: none;
   color: #ccc;
   font-size: 1.25rem;
-  margin-right: 1rem;
+  margin-right: 0.5rem; /* was 1rem */
   cursor: pointer;
 }
 
-.mobile-search-overlay {
+
+.mobile-search-overlayY {
   display: none;
   position: fixed;
   top: 60px;
@@ -182,15 +183,15 @@ header {
   box-sizing: border-box;
 }
 
-.mobile-search-overlay.active {
+.mobile-search-overlayY.active {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.mobile-search-overlay input {
+.mobile-search-overlayY input {
   width: 100%;
-  max-width: 90%;
+  max-width: 100%;
   padding: 0.6rem 1rem;
   font-size: 1rem;
   border-radius: 40px;
