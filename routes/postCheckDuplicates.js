@@ -17,7 +17,7 @@ const uploadCanvasToS3 = require('../utils/uploadCanvasToS3');
 const compCheck = require('../middleware/compCheck.js');
 const upload = require('../middleware/multer-setup.js');
 
-router.post('/check-duplicates', async (req, res) => {
+router.post('/check-duplicates', compCheck, async (req, res) => {
   const { isrcs, upc } = req.body;
 
   try {

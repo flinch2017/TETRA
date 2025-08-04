@@ -18,7 +18,7 @@ const uploadCanvasToS3 = require('../utils/uploadCanvasToS3');
 const compCheck = require('../middleware/compCheck.js');
 const upload = require('../middleware/multer-setup.js');
 
-router.post('/delete-track', async (req, res) => {
+router.post('/delete-track', compCheck, async (req, res) => {
   try {
     const { key } = req.body;
     if (!key) return res.status(400).json({ error: 'Missing S3 key' });

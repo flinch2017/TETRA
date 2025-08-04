@@ -18,7 +18,7 @@ const uploadCanvasToS3 = require('../utils/uploadCanvasToS3');
 const compCheck = require('../middleware/compCheck.js');
 const upload = require('../middleware/multer-setup.js');
 
-router.post('/submit-release', upload.any(), async (req, res) => {
+router.post('/submit-release', compCheck, upload.any(), async (req, res) => {
   try {
     const {
       release_id, release_title, genre, explicit,

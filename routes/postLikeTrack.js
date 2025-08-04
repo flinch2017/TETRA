@@ -17,7 +17,7 @@ const uploadCanvasToS3 = require('../utils/uploadCanvasToS3.js');
 const compCheck = require('../middleware/compCheck.js');
 const { v4: uuidv4 } = require('uuid');
 
-router.post('/api/like-track', async (req, res) => {
+router.post('/api/like-track', compCheck, async (req, res) => {
   const { track_id, liked } = req.body;
   const acode = req.session.user.acode;
 

@@ -20,7 +20,7 @@ const generatePostId = require('../middleware/generatePostId.js');
 const upload = require('../middleware/multer-setup.js');
 
 
-router.post('/create-post', upload.fields([
+router.post('/create-post', compCheck, upload.fields([
   { name: 'images', maxCount: 10 },
   { name: 'videos', maxCount: 5 }
 ]), async (req, res) => {

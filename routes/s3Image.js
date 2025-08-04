@@ -3,9 +3,10 @@ const router = express.Router();
 const s3 = require('../utils/s3Client');
 const { GetObjectCommand } = require('@aws-sdk/client-s3');
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
+const compCheck = require('../middleware/compCheck');
 
 // Route for /drawables/:filename
-router.get('/drawables/:filename', async (req, res) => {
+router.get('/drawables/:filename', compCheck, async (req, res) => {
   const { filename } = req.params;
 
   try {

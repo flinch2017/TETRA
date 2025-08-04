@@ -21,7 +21,7 @@ const path = require('path');
 const expressLayouts = require('express-ejs-layouts');
 
 
-router.get('/create-post', async (req, res) => {
+router.get('/create-post', compCheck, async (req, res) => {
   try {
     const userResult = await pool.query(
       'SELECT pfp_url, acode FROM users WHERE acode = $1',

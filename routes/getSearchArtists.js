@@ -17,7 +17,7 @@ const uploadCanvasToS3 = require('../utils/uploadCanvasToS3');
 const compCheck = require('../middleware/compCheck.js');
 
 // GET /search-artists?q=...
-router.get('/search-artists', async (req, res) => {
+router.get('/search-artists', compCheck, async (req, res) => {
   try {
     const q = req.query.q;
     const currentUserAcode = req.session.user?.acode;

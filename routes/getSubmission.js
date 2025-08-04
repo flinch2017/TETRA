@@ -17,7 +17,7 @@ const uploadCanvasToS3 = require('../utils/uploadCanvasToS3');
 const compCheck = require('../middleware/compCheck.js');
 
 
-router.get('/submission', async (req, res) => { 
+router.get('/submission', compCheck, async (req, res) => { 
   try {
     const userResult = await pool.query(
       'SELECT pfp_url, acode FROM users WHERE acode = $1',

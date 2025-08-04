@@ -18,7 +18,7 @@ const uploadCanvasToS3 = require('../utils/uploadCanvasToS3');
 const compCheck = require('../middleware/compCheck.js');
 const upload = require('../middleware/multer-setup.js');
 
-router.post('/upload-track', upload.single('track'), async (req, res) => {
+router.post('/upload-track', compCheck, upload.single('track'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ success: false, message: 'No track uploaded' });
 

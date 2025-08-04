@@ -3,6 +3,7 @@ const pool = require('../utils/db');
 const router = express.Router();
 const getHeaderPfpUrl = require('../middleware/getHeaderPfpUrl.js');
 const generatePresignedUrl = require('../utils/s3Presign');
+const compCheck = require('../middleware/compCheck.js');
 
 const S3_BASE = 'https://tetrametropolis.s3.us-east-1.amazonaws.com/';
 
@@ -16,7 +17,7 @@ function toS3Key(url) {
   return isFullUrl(url) ? null : url;
 }
 
-router.get('/search', async (req, res) => {
+router.get('/search', compCheck, async (req, res) => {
   const loggedInUser = req.session.user;
   const query = req.query.q?.trim();
 

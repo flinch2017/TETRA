@@ -16,10 +16,11 @@ const uploadTrackToS3 = require('../utils/uploadTrackToS3');
 const deleteFromS3 = require('../utils/s3Delete');
 const uploadArtworkToS3 = require('../utils/uploadArtworkToS3');
 const uploadCanvasToS3 = require('../utils/uploadCanvasToS3');
+const compCheck = require('../middleware/compCheck.js');
 const app = express();
 
 
-router.get('/media/:type/:filename', async (req, res) => {
+router.get('/media/:type/:filename', compCheck, async (req, res) => {
   const { type, filename } = req.params;
 
   // 1. Check if user is logged in and has an allowed plan

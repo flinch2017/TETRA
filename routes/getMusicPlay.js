@@ -16,7 +16,7 @@ const uploadArtworkToS3 = require('../utils/uploadArtworkToS3');
 const uploadCanvasToS3 = require('../utils/uploadCanvasToS3');
 const compCheck = require('../middleware/compCheck.js');
 
-router.get('/api/song-info/:id', async (req, res) => {
+router.get('/api/song-info/:id', compCheck, async (req, res) => {
   const songId = req.params.id;
   const viewer_acode = req.session?.user?.acode;
 

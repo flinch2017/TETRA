@@ -49,6 +49,8 @@ app.use(
   })
 );
 
+
+
 // Helper to check if username or email already exists
 async function userExists(username, email) {
   const result = await pool.query(
@@ -148,6 +150,22 @@ const sslOptions = {
   cert: fs.readFileSync(path.join(__dirname, 'certs', 'localhost.pem')),
 };
 
+// Catch-all unknown route handler (place before HTTPS server start)
+app.use((req, res, next) => {
+  const referer = req.get('Referer');
+
+  if (referer) {
+    return res.redirect(referer); // 🔁 Back to previous page
+  } else if (req.session?.user) {
+    return res.redirect('/dashboard'); // 🔐 If logged in, go to dashboard
+  } else {
+    return res.redirect('/login'); // 🔑 Not logged in? Go to login
+  }
+});
+
+
+// HTTPS server startup
 https.createServer(sslOptions, app).listen(PORT, () => {
   console.log(`HTTPS Server running at https://localhost:${PORT}`);
 });
+

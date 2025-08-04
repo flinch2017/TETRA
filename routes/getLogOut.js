@@ -16,7 +16,7 @@ const uploadArtworkToS3 = require('../utils/uploadArtworkToS3');
 const uploadCanvasToS3 = require('../utils/uploadCanvasToS3');
 const compCheck = require('../middleware/compCheck.js');
 
-router.get('/logout', (req, res) => {
+router.get('/logout', compCheck, (req, res) => {
   req.session.destroy(err => {
     if (err) {
       console.error('Logout error:', err);

@@ -18,7 +18,7 @@ const compCheck = require('../middleware/compCheck.js');
 const { v4: uuidv4 } = require('uuid');
 const geoip = require('geoip-lite');
 
-router.post('/api/log-stream', async (req, res) => {
+router.post('/api/log-stream', compCheck, async (req, res) => {
   const { track_id } = req.body;
   const user = req.session.user;
 
