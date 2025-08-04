@@ -1,11 +1,35 @@
+<button id="loadMoreBtn" type="button" style="
+  position: fixed;
+  top: 80px; /* adjust this if you have a site header */
+  left: 50%;
+  transform: translateX(-50%);
+  background: #222;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 25px;
+  font-weight: bold;
+  font-size: 1rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  display: none;
+  z-index: 9999;
+  cursor: pointer;
+">
+  Refresh page
+</button>
+
+
 <main class="newsfeed">
+  
   <% if (posts.length === 0) { %>
-    <div style="text-align: center; margin-top: 3rem; color: rgba(255, 255, 255, 0.6); font-size: 1.1rem;">
-      🚫 No posts yet. Stay tuned!
-    </div>
+     <div class="no-posts-wrapper">
+    <div class="no-posts-icon">📭</div>
+    <div class="no-posts-text">No posts yet. Stay tuned!</div>
+  </div>
   <% } else { %>
     <% posts.forEach(post => { %>
-      <div class="post" data-href="/post?postId=<%= post.post_id %>" style="cursor: pointer;">
+      <div class="post" data-href="/post?postId=<%= post.post_id %>" style="cursor: pointer;" data-post-id="<%= post.post_id %>">
+
         
         <div class="post-header">
           <div class="post-user-info">
@@ -56,7 +80,8 @@
           <video controls src="/media/video/<%= filename %>" width="100%"></video>
         <% }) %>
 
-        <div class="timestamp">Posted <%= post.timeAgo %></div>
+        <div class="timestamp">Posted <%= post.displayTime %></div>
+
 
         <div class="post-actions">
   <button class="post-like-btn" data-post-id="<%= post.post_id %>" title="Like">
@@ -75,75 +100,18 @@
   </button>
 </div>
 
+
+
       </div>
+
     <% }) %>
   <% } %>
 </main>
 
 
-<div id="lightboxModal" class="lightbox-modal hidden">
-  <div class="lightbox-content">
-    <span class="lightbox-close">&times;</span>
-    <img id="lightboxImg" src="" alt="Expanded Image" />
-    <button class="lightbox-prev">&#10094;</button>
-    <button class="lightbox-next">&#10095;</button>
-  </div>
-</div>
 
 
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const modal = document.getElementById("lightboxModal");
-    const modalImg = document.getElementById("lightboxImg");
-    const closeBtn = document.querySelector(".lightbox-close");
-    const prevBtn = document.querySelector(".lightbox-prev");
-    const nextBtn = document.querySelector(".lightbox-next");
 
-    let images = [];
-    let currentIndex = 0;
 
-    document.body.addEventListener("click", (e) => {
-      const clickedImg = e.target.closest(".collage-image");
-      if (!clickedImg) return;
 
-      const postEl = clickedImg.closest(".post");
-      const postImages = postEl.querySelectorAll(".collage-image");
-      images = Array.from(postImages).map(img => img.src);
-      currentIndex = parseInt(clickedImg.dataset.mediaIndex);
 
-      openModal();
-    });
-
-    function openModal() {
-      modal.classList.remove("hidden");
-      updateModalImage();
-    }
-
-    function updateModalImage() {
-      modalImg.src = images[currentIndex];
-    }
-
-    function closeModal() {
-      modal.classList.add("hidden");
-    }
-
-    closeBtn.addEventListener("click", closeModal);
-
-    nextBtn.addEventListener("click", () => {
-      currentIndex = (currentIndex + 1) % images.length;
-      updateModalImage();
-    });
-
-    prevBtn.addEventListener("click", () => {
-      currentIndex = (currentIndex - 1 + images.length) % images.length;
-      updateModalImage();
-    });
-
-    window.addEventListener("keydown", (e) => {
-      if (modal.classList.contains("hidden")) return;
-      if (e.key === "Escape") closeModal();
-      else if (e.key === "ArrowRight") nextBtn.click();
-      else if (e.key === "ArrowLeft") prevBtn.click();
-    });
-  });
-</script>

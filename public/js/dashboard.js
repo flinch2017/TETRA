@@ -122,3 +122,59 @@ function bindPostClickEvents() {
     });
   });
 }
+
+
+
+
+
+function showLoadMoreWhenBottomReached() {
+  const btn = document.getElementById('loadMoreBtn');
+  if (!btn) return; // <-- 👈 Exit early if not on dashboard
+
+  window.addEventListener('scroll', () => {
+    const scrollTop = window.scrollY;
+    const viewportHeight = window.innerHeight;
+    const totalHeight = document.body.scrollHeight;
+
+    if (scrollTop + viewportHeight >= totalHeight - 100) {
+      btn.style.display = 'block';
+    }
+  });
+
+  btn.addEventListener('click', async () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(async () => {
+      const seenPostIds = new Set();
+      document.querySelectorAll('.post').forEach(post => {
+        const postId = post.dataset.postId;
+        if (postId) seenPostIds.add(postId);
+      });
+
+      try {
+        await Promise.all([...seenPostIds].map(postId => {
+          return fetch(`/api/posts/${postId}/seen`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refreshed: true })
+          });
+        }));
+      } catch (err) {
+        console.error('⚠️ Failed to mark posts as refreshed:', err);
+      }
+
+      // 🧨 Problematic reload
+      window.location.reload();
+    }, 350);
+  });
+}
+
+function forceShowLoadMoreIfNoPosts() {
+  const posts = document.querySelectorAll('.post');
+  const btn = document.getElementById('loadMoreBtn');
+  if (btn && posts.length === 0) {
+    btn.style.display = 'block';
+  }
+}
+
+
+

@@ -35,29 +35,31 @@
   </div>
 </div>
 
-<% if (isOwnProfile && (!artist.account_mode || artist.account_mode === 'regular')) { %>
-  <div class="setup-artist-container">
-    <a href="/edit-profile?acode=<%= artist.acode %>" class="setup-artist-btn">Setup Artist Profile</a>
-  </div>
-<% } %>
-
-<% if (artist.account_mode && artist.account_mode === 'artist') { %>
-
+<!-- Nav Tabs -->
 <div class="artist-nav-tabs">
-  <button class="artist-tab active" data-tab="songs">
-    <i class="fas fa-music"></i><span>Songs</span>
-  </button>
-  <button class="artist-tab" data-tab="posts">
-    <i class="fas fa-pen"></i><span>Posts</span>
-  </button>
-  <button class="artist-tab" data-tab="store">
-    <i class="fas fa-store"></i><span>Store</span>
-  </button>
+  <% if (artist.account_mode === 'artist') { %>
+    <button class="artist-tab active" data-tab="songs">
+      <i class="fas fa-music"></i><span>Songs</span>
+    </button>
+    <button class="artist-tab" data-tab="posts">
+      <i class="fas fa-pen"></i><span>Posts</span>
+    </button>
+    <button class="artist-tab" data-tab="store">
+      <i class="fas fa-store"></i><span>Store</span>
+    </button>
+  <% } else { %>
+    <button class="artist-tab active" data-tab="posts">
+      <i class="fas fa-pen"></i><span>Posts</span>
+    </button>
+  <% } %>
 </div>
 
 <main class="artist-profile">
+
   <!-- Songs Tab -->
+  <% if (artist.account_mode === 'artist') { %>
   <div id="songsTabContent" class="tab-content">
+    <!-- Songs Section -->
     <div class="section">
       <h2>Popular Songs</h2>
       <% if (artist.songs && artist.songs.length > 0) { %>
@@ -90,6 +92,7 @@
       <% } %>
     </div>
 
+    <!-- Albums Section -->
     <div class="section">
       <h2>Latest Albums</h2>
       <% if (artist.releases && artist.releases.length > 0) { %>
@@ -118,6 +121,7 @@
       <% } %>
     </div>
 
+    <!-- Bio -->
     <div class="section">
       <h2>About</h2>
       <% if (artist.bio) { %>
@@ -127,70 +131,62 @@
       <% } %>
     </div>
   </div>
+  <% } %>
 
-  <!-- Posts Tab -->
-  <div id="postsTabContent" class="tab-content" style="display: none;">
+  <!-- Posts Tab (Always present) -->
+  <div id="postsTabContent" class="tab-content" style="<%= artist.account_mode === 'artist' ? 'display: none;' : '' %>">
     <div class="section">
       <h2>Posts</h2>
       <% if (posts && posts.length > 0) { %>
-  <% posts.forEach(post => { 
-     const previewImages = post.images?.slice(0, 4) || [];
-     const hiddenCount = post.images?.length > 4 ? post.images.length - 4 : 0;
-%>
-  <div class="postz clickable-post" data-post-id="<%= post.post_id %>" style="cursor: pointer;">
-    <div class="post-headerz">
-      <img src="<%= post.posterPfpUrl %>" class="post-pfpz" />
-      <div class="post-user-infoz">
-        <div class="post-usernamez"><%= post.displayName %></div>
-        <div class="post-timez"><%= post.timeAgo %></div>
-      </div>
-    </div>
-
-    <div class="post-contentz">
-      <p><%= post.caption %></p>
-
-      <% if (previewImages.length > 0) { %>
-        <div class="post-collagez collage-<%= previewImages.length %>z">
-          <% previewImages.forEach((img, index) => { %>
-            <div class="collage-image-wrapperz">
-              <img src="<%= img %>" class="collage-imagez" alt="Post Image" />
-              <% if (index === 3 && hiddenCount > 0) { %>
-                <div class="more-overlayz">+<%= hiddenCount %></div>
-              <% } %>
+        <% posts.forEach(post => { 
+          const previewImages = post.images?.slice(0, 4) || [];
+          const hiddenCount = post.images?.length > 4 ? post.images.length - 4 : 0;
+        %>
+        <div class="postz clickable-post" data-post-id="<%= post.post_id %>">
+          <div class="post-headerz">
+            <img src="<%= post.posterPfpUrl %>" class="post-pfpz" />
+            <div class="post-user-infoz">
+              <div class="post-usernamez"><%= post.displayName %></div>
+              <div class="post-timez"><%= post.timeAgo %></div>
             </div>
-          <% }) %>
+          </div>
+
+          <div class="post-contentz">
+            <p><%= post.caption %></p>
+
+            <% if (previewImages.length > 0) { %>
+              <div class="post-collagez collage-<%= previewImages.length %>z">
+                <% previewImages.forEach((img, index) => { %>
+                  <div class="collage-image-wrapperz">
+                    <img src="<%= img %>" class="collage-imagez" alt="Post Image" />
+                    <% if (index === 3 && hiddenCount > 0) { %>
+                      <div class="more-overlayz">+<%= hiddenCount %></div>
+                    <% } %>
+                  </div>
+                <% }) %>
+              </div>
+            <% } %>
+          </div>
+
+          <div class="post-actionsz">
+            <button class="post-like-btn" data-post-id="<%= post.post_id %>">
+              <i class="fa-heart <%= post.isLiked ? 'fa-solid' : 'fa-regular' %>"></i>
+              <span><%= post.likeCount %></span>
+            </button>
+
+            <button class="post-comment-btn"><i class="fa-regular fa-comment"></i> <span><%= post.commentCount %></span></button>
+            <button class="post-share-btn"><i class="fa-regular fa-share-from-square"></i></button>
+          </div>
         </div>
+        <% }) %>
+      <% } else { %>
+        <p>No posts available.</p>
       <% } %>
-    </div>
-
-    <div class="post-actionsz">
-      <button class="post-like-btn" data-post-id="<%= post.post_id %>" title="Like">
-    <i class="fa-heart <%= post.isLiked ? 'fa-solid' : 'fa-regular' %>"></i>
-    <span><%= post.likeCount %></span>
-  </button>
-
-  <button class="post-comment-btn" title="Comment">
-  <i class="fa-regular fa-comment"></i>
-  <span><%= post.commentCount %></span>
-</button>
-
-
-  <button class="post-share-btn" title="Share">
-    <i class="fa-regular fa-share-from-square"></i>
-  </button>
-    </div>
-  </div>
-<% }) %>
-
-
-<% } else { %>
-  <p>No posts available.</p>
-<% } %>
-
     </div>
   </div>
 
   <!-- Store Tab -->
+  <% if (artist.account_mode === 'artist') { %>
   <div id="storeTabContent" class="tab-content" style="display: none;">
     <div class="section">
       <h2>Store</h2>
@@ -203,5 +199,6 @@
       <% } %>
     </div>
   </div>
+  <% } %>
+
 </main>
-<% } %>

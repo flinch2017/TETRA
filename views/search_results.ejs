@@ -6,12 +6,15 @@ if (artists && artists.length) defaultTab = 'artists';
 else if (songs && songs.length) defaultTab = 'songs';
 else if (albums && albums.length) defaultTab = 'albums';
 else if (posts && posts.length) defaultTab = 'posts';
+else if (users && users.length) defaultTab = 'users';
 %>
 
 <% const isEmpty = (!artists || artists.length === 0) &&
-                  (!songs || songs.length === 0) &&
-                  (!albums || albums.length === 0) &&
-                  (!posts || posts.length === 0); %>
+                (!songs || songs.length === 0) &&
+                (!albums || albums.length === 0) &&
+                (!posts || posts.length === 0) &&
+                (!users || users.length === 0); // ✅ Add this
+ %>
 
 
 <% if (isEmpty) { %>
@@ -35,6 +38,10 @@ else if (posts && posts.length) defaultTab = 'posts';
   <% if (posts && posts.length) { %>
     <button class="tab-button <%= defaultTab === 'posts' ? 'active' : '' %>" data-tab="posts">Posts</button>
   <% } %>
+  <% if (users && users.length) { %>
+  <button class="tab-button <%= defaultTab === 'users' ? 'active' : '' %>" data-tab="users">Users</button>
+<% } %>
+
 </div>
 
 
@@ -44,14 +51,15 @@ else if (posts && posts.length) defaultTab = 'posts';
 
       <div class="vertical-list">
         <% artists.forEach(artist => { %>
-          <div class="list-item">
-            <a href="/profile?acode=<%= artist.acode %>" class="item-image" style="background-image: url('<%= artist.pfp_url %>');"></a>
-            <div class="item-text"><%= artist.display_name %></div>
-            <div class="item-icons">
-              <i class="fas fa-heart"></i>
-              <i class="fas fa-ellipsis-h"></i>
-            </div>
-          </div>
+          <a href="/profile?acode=<%= artist.acode %>" class="list-item list-link">
+  <div class="item-image" style="background-image: url('<%= artist.pfp_url %>');"></div>
+  <div class="item-text"><%= artist.display_name %></div>
+  <div class="item-icons">
+    <i class="fas fa-heart"></i>
+    <i class="fas fa-ellipsis-h"></i>
+  </div>
+</a>
+
         <% }) %>
       </div>
     </section>
@@ -141,6 +149,25 @@ else if (posts && posts.length) defaultTab = 'posts';
       <% }) %>
     </section>
   <% } %>
+
+  <% if (users && users.length) { %>
+  <section class="search-section tab-content" data-tab-content="users" style="display: <%= defaultTab === 'users' ? 'block' : 'none' %>;">
+    <div class="vertical-list">
+      <% users.forEach(user => { %>
+        <a href="/profile?acode=<%= user.acode %>" class="list-item list-link">
+          <div class="item-image" style="background-image: url('<%= user.pfp_url %>');"></div>
+          <div class="item-text"><%= user.display_name %></div>
+          <div class="item-icons">
+            <i class="fas fa-user"></i>
+            <i class="fas fa-ellipsis-h"></i>
+          </div>
+        </a>
+      <% }) %>
+    </div>
+  </section>
+<% } %>
+
+
 
   <% } %>
 

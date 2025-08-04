@@ -39,7 +39,8 @@
   <div class="profile-container" id="profileDropdown">
     <div class="profile-pic" style="background-image: url('<%= pfpUrl %>');"></div>
     <div class="dropdown">
-      <a href="/profile?acode=<%= userAcode %>">See Profile</a>
+      <a href="/profile?acode=<%= userAcode %>" class="ajax-link">See Profile</a>
+
       <a href="/logout" id="logoutLink">Logout</a>
     </div>
   </div>
@@ -68,31 +69,3 @@
   });
 </script>
 
-
-<script>
-  const desktopSearchForm = document.querySelector('.header-search');
-  const mobileSearchForm = document.getElementById('mobileSearchForm');
-
-  // Handles search submission with AJAX
-  function handleSearchSubmit(form) {
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const query = form.querySelector('input[name="q"]').value;
-      if (query.trim()) {
-        const url = `/search?q=${encodeURIComponent(query)}`;
-        // If you're using AJAX page loading
-        if (window.loadPageViaAjax) {
-          loadPageViaAjax(url); // your global AJAX page loader
-        } else {
-          // fallback to normal navigation
-          window.location.href = url;
-        }
-        // Optional: close mobile overlay
-        mobileSearchOverlay.classList.remove('active');
-      }
-    });
-  }
-
-  handleSearchSubmit(desktopSearchForm);
-  handleSearchSubmit(mobileSearchForm);
-</script>

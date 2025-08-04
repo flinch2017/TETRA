@@ -163,16 +163,7 @@ function bindLikeButtons() {
   });
 }
 
-function showFloatingMessage(message, type = 'success') {
-  const msgBox = document.getElementById('floatingMessage');
-  msgBox.textContent = message;
-  msgBox.className = `floating-message show ${type}`;
 
-  // Show then hide after 3 seconds
-  setTimeout(() => {
-    msgBox.classList.remove('show');
-  }, 3000);
-}
 
 
 function bindEllipsisToggles() {
@@ -227,6 +218,64 @@ function handleLogout(href) {
 }
 
 
+function showFloatingMessage(message, type = 'success') {
+  const msgEl = document.getElementById('floatingMessage');
+  if (!msgEl) return;
+
+  msgEl.textContent = message;
+  msgEl.className = `floating-message show ${type}`;
+
+  // Scroll to the very top of the page smoothly
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+
+
+function bindSearchFormSubmission() {
+  document.body.addEventListener('submit', async function (e) {
+    const form = e.target.closest('.header-search, #mobileSearchForm');
+    if (!form) return;
+
+    e.preventDefault();
+
+    const queryInput = form.querySelector('input[name="q"]');
+    if (!queryInput) return;
+
+    const query = queryInput.value.trim();
+    if (!query) return;
+
+    const url = `/search?q=${encodeURIComponent(query)}`;
+
+    try {
+      const res = await fetch(url, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      });
+
+      if (!res.ok) throw new Error('Search fetch failed');
+
+      const html = await res.text();
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      const newContent = doc.querySelector('#appContent');
+
+      if (newContent) {
+        document.querySelector('#appContent').innerHTML = newContent.innerHTML;
+        window.history.pushState({}, '', url);
+        window.scrollTo(0, 0);
+        bindAllPageEvents();
+      } else {
+        window.location.href = url; // fallback
+      }
+    } catch (err) {
+      console.error('AJAX search failed:', err);
+      window.location.href = url;
+    }
+
+    const overlay = document.getElementById('mobileSearchOverlay');
+    if (overlay) overlay.classList.remove('active');
+  });
+}
+
 
 
 
@@ -245,6 +294,9 @@ function bindAllPageEvents() {
   bindEllipsisToggles();
   bindArtistTabNavigation();
   bindSearchTabButtons();
+  bindSearchFormSubmission();
+  forceShowLoadMoreIfNoPosts(); // 👈 Add this line
+  showLoadMoreWhenBottomReached();
 
   if (typeof bindSongClickHandlers === 'function') {
     bindSongClickHandlers();

@@ -79,16 +79,19 @@
   <div class="comment-itemX">
     <div class="comment-headerX">
       <% if (comment.pfp_url) { %>
-        <img src="<%= comment.pfp_url %>" alt="pfp" class="comment-pfp" />
+        <a href="/profile?acode=<%= comment.acode %>">
+          <img src="<%= comment.pfp_url %>" alt="pfp" class="comment-pfp" />
+        </a>
       <% } %>
       <div class="comment-metaX">
-        <span class="comment-usernameX"><%= comment.username %></span>
+        <a href="/profile?acode=<%= comment.acode %>" class="comment-usernameX"><%= comment.username %></a>
         <span class="comment-timeX">• <%= comment.timeAgo %></span>
       </div>
     </div>
     <p class="comment-textX"><%= comment.content %></p>
   </div>
 <% }) %>
+
 
   <% } %>
 </div>

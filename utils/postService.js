@@ -71,9 +71,11 @@ async function getPostById(postId, viewerAcode) {
   let authorPfpUrl = null;
 
   if (author.pfp_url) {
-    const filename = path.basename(author.pfp_url);
-    authorPfpUrl = await generatePresignedUrl(`pfp/${filename}`);
-  }
+  const filename = path.basename(author.pfp_url);
+  authorPfpUrl = await generatePresignedUrl(`pfp/${filename}`);
+} else {
+  authorPfpUrl = await generatePresignedUrl('drawables/banner_default.png');
+}
 
   // ❤️ Like count + viewer liked or not
   const likeResult = await pool.query(
@@ -89,8 +91,10 @@ async function getPostById(postId, viewerAcode) {
   // 💬 Fetch comments
   const commentResult = await pool.query(
     `SELECT c.content, c.commented_at,
-            COALESCE(u.artist_name, u.username) AS display_name,
-            u.pfp_url
+       COALESCE(u.artist_name, u.username) AS display_name,
+       u.pfp_url,
+       u.acode
+
      FROM comments c
      JOIN users u ON u.acode = c.acode
      WHERE c.post_id = $1
@@ -111,11 +115,13 @@ if (c.pfp_url) {
 
 
     return {
-      username: c.display_name,
-      content: c.content,
-      pfp_url: presignedPfp,
-      timeAgo: moment(c.commented_at).fromNow()
-    };
+  username: c.display_name,
+  content: c.content,
+  pfp_url: presignedPfp,
+  timeAgo: moment(c.commented_at).fromNow(),
+  acode: c.acode
+};
+
   }));
 
   // 🔢 Total comment count

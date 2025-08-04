@@ -30,11 +30,11 @@ router.get('/edit-profile', compCheck, async (req, res) => {
     // Decrypt the acode from query
     const decryptedAcode = decrypt(acode);
 
-    // Fetch only the needed fields from users table
     const result = await pool.query(
-      'SELECT artist_name, main_genre, bio, pfp_url, acode FROM users WHERE acode = $1',
-      [decryptedAcode]
-    );
+  'SELECT artist_name, main_genre, bio, username, pfp_url, acode, account_mode FROM users WHERE acode = $1',
+  [decryptedAcode]
+);
+
 
     if (result.rowCount === 0) {
       return res.status(404).send('User not found.');
@@ -58,15 +58,19 @@ router.get('/edit-profile', compCheck, async (req, res) => {
     const userAcode = req.session.user.acode;
 
     res.render('edit-profile', {
-      user: {
-        artistName: user.artist_name,
-        genre: user.main_genre,
-        bio: user.bio,
-        acode: encryptedAcode
-      },
-      pfpUrl: presignedPfpUrl,
-      userAcode // now available to your EJS as <%= userAcode %>
-    });
+  user: {
+    artistName: user.artist_name,
+    genre: user.main_genre,
+    bio: user.bio,
+    username: user.username,
+    acode: encryptedAcode,
+    accountMode: user.account_mode // <-- include this
+  },
+  pfpUrl: presignedPfpUrl,
+  userAcode
+});
+
+
 
   } catch (err) {
     console.error('Error loading edit profile:', err);

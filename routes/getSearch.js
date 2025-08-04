@@ -36,29 +36,40 @@ router.get('/search', async (req, res) => {
     const headerPfpUrl = await getHeaderPfpUrl(loggedInUser.id);
     const likeQuery = `%${query}%`;
 
-    const [artistRes, trackRes, albumRes] = await Promise.all([
-      pool.query(
-        `SELECT id, acode, pfp_url, COALESCE(artist_name, username) AS display_name
-         FROM users
-         WHERE artist_name ILIKE $1 OR username ILIKE $1
-         LIMIT 20`,
-        [likeQuery]
-      ),
-      pool.query(
-        `SELECT track_id, track_title, primary_artist, features, release_id
-         FROM tracks
-         WHERE track_title ILIKE $1
-         LIMIT 20`,
-        [likeQuery]
-      ),
-      pool.query(
-        `SELECT release_id, release_title, artwork_url, acode
-         FROM albums
-         WHERE release_title ILIKE $1
-         LIMIT 20`,
-        [likeQuery]
-      )
-    ]);
+    const [artistRes, trackRes, albumRes, userRes] = await Promise.all([
+  pool.query(
+  `SELECT id, acode, pfp_url, COALESCE(artist_name, username) AS display_name
+   FROM users
+   WHERE (artist_name ILIKE $1 OR username ILIKE $1)
+     AND account_mode = 'artist'
+   LIMIT 20`,
+  [likeQuery]
+),
+  pool.query(
+    `SELECT track_id, track_title, primary_artist, features, release_id
+     FROM tracks
+     WHERE track_title ILIKE $1
+     LIMIT 20`,
+    [likeQuery]
+  ),
+  pool.query(
+    `SELECT release_id, release_title, artwork_url, acode
+     FROM albums
+     WHERE release_title ILIKE $1
+     LIMIT 20`,
+    [likeQuery]
+  ),
+  pool.query(
+  `SELECT acode, username AS display_name, pfp_url
+   FROM users
+   WHERE account_mode = 'regular'
+     AND (username ILIKE $1 OR artist_name ILIKE $1)
+   LIMIT 20`,
+  [likeQuery]
+)
+
+]);
+
 
     const artistAcodes = artistRes.rows.map(a => a.acode);
     const artistLikePatterns = artistAcodes.map(code => `%${code}%`);
@@ -207,6 +218,7 @@ const userLikedSet = new Set(userLikesRes.rows.map(r => r.post_id));
       };
     }));
 
+
     const artistRows = await Promise.all(artistRes.rows.map(async artist => {
       const key = toS3Key(artist.pfp_url);
       const signedPfp = key
@@ -217,6 +229,19 @@ const userLikedSet = new Set(userLikesRes.rows.map(r => r.post_id));
         pfp_url: signedPfp
       };
     }));
+
+
+    const userRows = await Promise.all(userRes.rows.map(async user => {
+  const key = toS3Key(user.pfp_url);
+  const signedPfp = key
+    ? await generatePresignedUrl(key)
+    : isFullUrl(user.pfp_url) ? user.pfp_url : await generatePresignedUrl('drawables/banner_default.png');
+  return {
+    ...user,
+    pfp_url: signedPfp
+  };
+}));
+
 
     const postRows = await Promise.all(relevantPostRes.rows.map(async post => {
 
@@ -251,7 +276,7 @@ const likedByUser = userLikedSet.has(post.post_id);
       const pfpKey = toS3Key(post.authorpfpurl);
       const signedPfp = pfpKey
         ? await generatePresignedUrl(pfpKey)
-        : isFullUrl(post.authorpfpurl) ? post.authorpfpurl : await generatePresignedUrl('drawables/pfp_default.png');
+        : isFullUrl(post.authorpfpurl) ? post.authorpfpurl : await generatePresignedUrl('drawables/banner_default.png');
 
       return {
   ...post,
@@ -271,14 +296,16 @@ const likedByUser = userLikedSet.has(post.post_id);
     }));
 
     res.render('search_results', {
-      pfpUrl: headerPfpUrl,
-      userAcode: loggedInUser.acode,
-      artists: artistRows,
-      songs: trackRows,
-      albums: albumRows,
-      posts: postRows,
-      query
-    });
+  pfpUrl: headerPfpUrl,
+  userAcode: loggedInUser.acode,
+  artists: artistRows,
+  songs: trackRows,
+  albums: albumRows,
+  posts: postRows,
+  users: userRows, // ✅ Add this
+  query
+});
+
 
   } catch (err) {
     console.error('Search error:', err);

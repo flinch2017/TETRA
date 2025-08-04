@@ -25,6 +25,14 @@
   .editProf label {
     font-size: 0.95rem;
     margin-bottom: 0.3rem;
+    color: white;
+  }
+
+  .editProf h100 {
+    font-size: 0.95rem;
+    margin-top: 3rem;
+    color: white;
+    font-weight: bold;
   }
 
   .editProf input[type="text"],
@@ -138,17 +146,16 @@ select {
 
 
 .editProf .floating-message {
-  position: fixed;
-  top: 20px;
-  right: 20px;
   background: #333;
   color: #fff;
   padding: 12px 20px;
   border-radius: 8px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  z-index: 9999;
+  margin: 0 auto 1.2rem;
+  max-width: 500px;
+  text-align: center;
   opacity: 0;
-  transform: translateY(-20px);
+  transform: translateY(-10px);
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
 

@@ -43,92 +43,108 @@ router.get('/dashboard', compCheck, async (req, res) => {
       presignedPfpUrl = await generatePresignedUrl('drawables/banner_default.png');
     }
 
-    // Fetch posts including poster's artist_name, username, acode, and pfp_url
     const postsResult = await pool.query(
   `SELECT p.*, u.username, u.artist_name, u.acode, u.pfp_url
-   FROM posts p
-   JOIN users u ON u.acode = p.acode
-   WHERE p.acode = $1
-      OR p.acode IN (
-        SELECT following_acode
-        FROM follows
-        WHERE follower_acode = $1
-      )
-   ORDER BY p.date DESC`,
+FROM posts p
+JOIN users u ON u.acode = p.acode
+WHERE (p.acode = $1
+   OR p.acode IN (
+     SELECT following_acode
+     FROM follows
+     WHERE follower_acode = $1
+   ))
+  AND p.post_id NOT IN (
+    SELECT post_id
+    FROM post_seen
+    WHERE acode = $1
+      AND refreshed = 'true'
+  )
+  AND p.date >= NOW() - INTERVAL '3 months'
+ORDER BY p.date DESC
+LIMIT 30;`,
   [userRow.acode]
 );
 
 
+
+
+
+
     const posts = await Promise.all(postsResult.rows.map(async post => {
-  const images = post.image || [];
-  const tracks = post.track || [];
-  const videos = post.video || [];
+      const images = post.image || [];
+      const tracks = post.track || [];
+      const videos = post.video || [];
 
-  const presignedImages = await Promise.all(images.map(async img => {
-    const filename = path.basename(img);
-    return await generatePresignedUrl(`images/${filename}`);
-  }));
+      const presignedImages = await Promise.all(images.map(async img => {
+        const filename = path.basename(img);
+        return await generatePresignedUrl(`images/${filename}`);
+      }));
 
-  const presignedTracks = await Promise.all(tracks.map(async track => {
-    const filename = path.basename(track);
-    return await generatePresignedUrl(`audio/${filename}`);
-  }));
+      const presignedTracks = await Promise.all(tracks.map(async track => {
+        const filename = path.basename(track);
+        return await generatePresignedUrl(`audio/${filename}`);
+      }));
 
-  const presignedVideos = await Promise.all(videos.map(async video => {
-    const filename = path.basename(video);
-    return await generatePresignedUrl(`videos/${filename}`);
-  }));
+      const presignedVideos = await Promise.all(videos.map(async video => {
+        const filename = path.basename(video);
+        return await generatePresignedUrl(`videos/${filename}`);
+      }));
 
-  // Get like count for this post
-  const likeCountResult = await pool.query(
-    'SELECT COUNT(*) FROM post_likes WHERE post_id = $1',
-    [post.post_id]
-  );
-  const likeCount = parseInt(likeCountResult.rows[0].count, 10);
+      // Get like count for this post
+      const likeCountResult = await pool.query(
+        'SELECT COUNT(*) FROM post_likes WHERE post_id = $1',
+        [post.post_id]
+      );
+      const likeCount = parseInt(likeCountResult.rows[0].count, 10);
 
-  // Check if current user liked this post
-  const isLikedResult = await pool.query(
-    'SELECT 1 FROM post_likes WHERE post_id = $1 AND acode = $2',
-    [post.post_id, userRow.acode]
-  );
-  const isLiked = isLikedResult.rowCount > 0;
+      // Check if current user liked this post
+      const isLikedResult = await pool.query(
+        'SELECT 1 FROM post_likes WHERE post_id = $1 AND acode = $2',
+        [post.post_id, userRow.acode]
+      );
+      const isLiked = isLikedResult.rowCount > 0;
 
-  // Get comment count for this post
-const commentCountResult = await pool.query(
-  'SELECT COUNT(*) FROM comments WHERE post_id = $1',
-  [post.post_id]
-);
-const commentCount = parseInt(commentCountResult.rows[0].count, 10);
+      // Get comment count for this post
+      const commentCountResult = await pool.query(
+        'SELECT COUNT(*) FROM comments WHERE post_id = $1',
+        [post.post_id]
+      );
+      const commentCount = parseInt(commentCountResult.rows[0].count, 10);
 
+      // Poster PFP
+      const presignedPosterPfpUrl = post.pfp_url
+        ? await generatePresignedUrl(`pfp/${path.basename(post.pfp_url)}`)
+        : await generatePresignedUrl('drawables/banner_default.png');
 
-  // Poster PFP
-  const presignedPosterPfpUrl = post.pfp_url
-    ? await generatePresignedUrl(`pfp/${path.basename(post.pfp_url)}`)
-    : await generatePresignedUrl('drawables/banner_default.png');
+      // Time display
+      const now = moment();
+      const postDate = moment(post.date);
+      const daysAgo = now.diff(postDate, 'days');
 
-  return {
-  post_id: post.post_id,
-  acode: post.acode,
-  caption: post.caption,
-  images: presignedImages,
-  tracks: presignedTracks,
-  videos: presignedVideos,
-  timeAgo: moment(post.date).fromNow(),
-  displayName: post.artist_name?.trim() || post.username,
-  posterPfpUrl: presignedPosterPfpUrl,
-  likeCount,
-  isLiked,
-  commentCount // ← new field
-};
+      const displayTime = daysAgo > 7
+        ? postDate.format('MMMM D, YYYY') // e.g., August 4, 2025
+        : postDate.fromNow();
 
-}));
+      return {
+        post_id: post.post_id,
+        acode: post.acode,
+        caption: post.caption,
+        images: presignedImages,
+        tracks: presignedTracks,
+        videos: presignedVideos,
+        displayTime, // use in EJS
+        displayName: post.artist_name?.trim() || post.username,
+        posterPfpUrl: presignedPosterPfpUrl,
+        likeCount,
+        isLiked,
+        commentCount
+      };
+    }));
 
-
-    
-const isAjax = req.xhr || req.headers['x-requested-with'] === 'XMLHttpRequest';
+    const isAjax = req.xhr || req.headers['x-requested-with'] === 'XMLHttpRequest';
 
     res.render('dashboard', {
-      layout: isAjax ? false : 'layout', // skip full layout for AJAX
+      layout: isAjax ? false : 'layout',
       user: req.session.user,
       userAcode: userRow.acode,
       pfpUrl: presignedPfpUrl,
@@ -140,5 +156,48 @@ const isAjax = req.xhr || req.headers['x-requested-with'] === 'XMLHttpRequest';
     res.status(500).send('Something went wrong.');
   }
 });
+
+
+
+router.post('/api/posts/:postId/seen', async (req, res) => {
+  const { postId } = req.params;
+  const { refreshed } = req.body || {};
+  const userAcode = req.session?.user?.acode;
+  if (!userAcode) return res.status(401).json({ success: false });
+
+  try {
+    const existing = await pool.query(`
+      SELECT refreshed FROM post_seen
+      WHERE post_id = $1 AND acode = $2
+      LIMIT 1
+    `, [postId, userAcode]);
+
+    if (existing.rowCount === 0) {
+      // Not seen yet → insert with current refreshed flag
+      await pool.query(`
+        INSERT INTO post_seen (post_id, acode, seen_status, refreshed)
+        VALUES ($1, $2, TRUE, $3)
+      `, [postId, userAcode, refreshed === true]);
+    } else if (refreshed && existing.rows[0].refreshed === false) {
+      // Seen already, but needs to be updated as refreshed
+      await pool.query(`
+        UPDATE post_seen
+        SET refreshed = TRUE
+        WHERE post_id = $1 AND acode = $2
+      `, [postId, userAcode]);
+    }
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Mark seen error:', err);
+    res.status(500).json({ success: false });
+  }
+});
+
+
+
+
+
+
 
 module.exports = router;

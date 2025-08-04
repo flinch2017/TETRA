@@ -1,70 +1,65 @@
-
-
 <div class="editProf">
-  <h1>Edit Artist Profile</h1>
-  
+  <h1>Edit <%= user.accountMode === 'regular' ? 'Profile' : 'Artist Profile' %></h1>
+  <div id="floatingMessage" class="floating-message hidden"></div>
 
   <form id="editArtistForm" enctype="multipart/form-data">
     <input type="hidden" name="acode" value="<%= user.acode %>">
+
+    <!-- Username (Always Editable) -->
     <div>
-      <label for="artistName">Artist Name</label>
-      <input type="text" id="artistName" name="artistName" value="<%= user.artistName || '' %>" required>
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username" value="<%= user.username || '' %>" required>
     </div>
 
-    <div>
-  <label for="genre">Main Genre</label>
-  <select id="genre" name="genre" required>
-    <option value="">Select genre</option>
-    <option value="Pop" <%= user.genre === 'Pop' ? 'selected' : '' %>>Pop</option>
-    <option value="Rock" <%= user.genre === 'Rock' ? 'selected' : '' %>>Rock</option>
-    <option value="Hip-hop" <%= user.genre === 'Hip-hop' ? 'selected' : '' %>>Hip-hop</option>
-    <option value="R&B" <%= user.genre === 'R&B' ? 'selected' : '' %>>R&B</option>
-    <option value="Electronic" <%= user.genre === 'Electronic' ? 'selected' : '' %>>Electronic</option>
-    <option value="Dance" <%= user.genre === 'Dance' ? 'selected' : '' %>>Dance</option>
-    <option value="Indie" <%= user.genre === 'Indie' ? 'selected' : '' %>>Indie</option>
-    <option value="Alternative" <%= user.genre === 'Alternative' ? 'selected' : '' %>>Alternative</option>
-    <option value="Jazz" <%= user.genre === 'Jazz' ? 'selected' : '' %>>Jazz</option>
-    <option value="Blues" <%= user.genre === 'Blues' ? 'selected' : '' %>>Blues</option>
-    <option value="Classical" <%= user.genre === 'Classical' ? 'selected' : '' %>>Classical</option>
-    <option value="Reggae" <%= user.genre === 'Reggae' ? 'selected' : '' %>>Reggae</option>
-    <option value="Country" <%= user.genre === 'Country' ? 'selected' : '' %>>Country</option>
-    <option value="Folk" <%= user.genre === 'Folk' ? 'selected' : '' %>>Folk</option>
-    <option value="Latin" <%= user.genre === 'Latin' ? 'selected' : '' %>>Latin</option>
-    <option value="Metal" <%= user.genre === 'Metal' ? 'selected' : '' %>>Metal</option>
-    <option value="Soul" <%= user.genre === 'Soul' ? 'selected' : '' %>>Soul</option>
-    <option value="Soundtrack" <%= user.genre === 'Soundtrack' ? 'selected' : '' %>>Soundtrack</option>
-    <option value="World" <%= user.genre === 'World' ? 'selected' : '' %>>World</option>
-    
-  </select>
-</div>
+    <% if (user.accountMode !== 'regular') { %>
+      <!-- Artist-only Fields -->
+      <div>
+        <label for="artistName">Artist Name</label>
+        <input type="text" id="artistName" name="artistName" value="<%= user.artistName || '' %>" required>
+      </div>
 
+      <div>
+        <label for="genre">Main Genre</label>
+        <select id="genre" name="genre" required>
+          <option value="">Select genre</option>
+          <option value="Pop" <%= user.genre === 'Pop' ? 'selected' : '' %>>Pop</option>
+          <!-- other genres here... -->
+          <option value="World" <%= user.genre === 'World' ? 'selected' : '' %>>World</option>
+        </select>
+      </div>
 
-    <div>
-      <label for="bio">About</label>
-      <textarea id="bio" name="bio" rows="4" placeholder="Tell us about yourself..."><%= user.bio || '' %></textarea>
-    </div>
-
-    <div class="banner-upload">
-  <label for="banner" class="banner-box">
-    <% if (pfpUrl) { %>
-      <img id="bannerPreview" src="<%= pfpUrl %>" alt="Profile Banner">
-    <% } else { %>
-      <div class="plus-icon">+</div>
-      <img id="bannerPreview" style="display: none;" />
+      <div>
+        <label for="bio">About</label>
+        <textarea id="bio" name="bio" rows="4" placeholder="Tell us about yourself..."><%= user.bio || '' %></textarea>
+      </div>
     <% } %>
-  </label>
-  <input type="file" id="banner" name="banner" accept="image/*" style="display: none;">
-</div>
 
-
-
+    <!-- Banner Upload (Always Editable) -->
+    <div class="banner-upload">
+      <h100>Profile Banner</h100>
+      <label for="banner" class="banner-box">
+        
+        <% if (pfpUrl) { %>
+          <img id="bannerPreview" src="<%= pfpUrl %>" alt="Profile Banner">
+        <% } else { %>
+          <div class="plus-icon">+</div>
+          <img id="bannerPreview" style="display: none;" />
+        <% } %>
+      </label>
+      <input type="file" id="banner" name="banner" accept="image/*" style="display: none;">
+    </div>
 
     <button type="submit">Save Changes</button>
-    <div id="floatingMessage" class="floating-message hidden"></div>
   </form>
 </div>
 
-
-
-
-
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const accountMode = "<%= user.accountMode %>";
+    if (accountMode === 'regular') {
+      document.getElementById('artistName')?.setAttribute('disabled', true);
+      document.getElementById('genre')?.setAttribute('disabled', true);
+      document.getElementById('bio')?.setAttribute('disabled', true);
+    }
+  });
+</script>

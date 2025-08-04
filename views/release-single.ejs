@@ -1,6 +1,7 @@
 
 
-  <main class="releaseform">
+  <main class="releaseform" data-release-id="<%= releaseId %>" data-current-user="<%= currentUser %>">
+
   <h2>Single Release</h2>
   
   <form id="releaseForm">
@@ -195,10 +196,8 @@
 
 
 <script>
-  const releaseId = "<%= releaseId %>";
-const currentUser = "<%= currentUser %>";
-
+  window.releaseIdx = "<%= releaseId %>";
+  window.currentUserx = "<%= currentUser %>";
 </script>
 
 
-<script src="/js/releaseform.js"></script>

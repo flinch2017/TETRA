@@ -69,6 +69,19 @@ cron.schedule('*/3 * * * *', async () => {
   }
 });
 
+cron.schedule('0 0 * * *', async () => {
+  try {
+    const result = await pool.query(
+      `DELETE FROM post_seen WHERE seen_at < NOW() - INTERVAL '4 months'`
+    );
+    if (result.rowCount > 0) {
+      console.log(`🧹 Deleted ${result.rowCount} old post_seen entries (older than 4 months)`);
+    }
+  } catch (err) {
+    console.error('Error deleting old post_seen entries:', err);
+  }
+});
+
 
 app.use(helmet({
   contentSecurityPolicy: {
