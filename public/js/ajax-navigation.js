@@ -297,6 +297,7 @@ function bindAllPageEvents() {
   bindSearchFormSubmission();
   forceShowLoadMoreIfNoPosts(); // 👈 Add this line
   showLoadMoreWhenBottomReached();
+  bindReleaseTypeFilter();
 
   if (typeof bindSongClickHandlers === 'function') {
     bindSongClickHandlers();

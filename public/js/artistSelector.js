@@ -1,6 +1,4 @@
-// artistSelector.js
-
-export function createArtistSelector({ type, currentUser, onUnknownArtist }) {
+export function createArtistSelector({ type, currentUser, onUnknownArtist, getOtherSelectedAcodes }) {
   const container = document.createElement('div');
   container.className = `${type}-artist-container`;
 
@@ -62,34 +60,37 @@ export function createArtistSelector({ type, currentUser, onUnknownArtist }) {
     dropdown.className = 'artist-dropdown';
 
     let hasResult = false;
+    const otherSelected = getOtherSelectedAcodes ? getOtherSelectedAcodes() : [];
+
     list.forEach(user => {
       const isSelf = user.acode === currentUser;
-      const inPrimary = selectedMap.has(user.acode);
-      if (type === 'featured' && isSelf) return;
+      const alreadySelectedHere = selectedMap.has(user.acode);
+      const alreadySelectedOther = otherSelected.includes(user.acode);
 
-      if (!inPrimary) {
-        hasResult = true;
-        const item = document.createElement('div');
-        item.className = 'artist-item';
-        const img = document.createElement('img');
-        img.src = user.pfp_url;
-        img.alt = user.artist_name;
-        img.className = 'artist-avatar';
+      // Skip if: self in featured, or already selected in either field
+      if ((type === 'featured' && isSelf) || alreadySelectedHere || alreadySelectedOther) return;
 
-        const name = document.createElement('span');
-        name.textContent = user.artist_name;
+      hasResult = true;
+      const item = document.createElement('div');
+      item.className = 'artist-item';
+      const img = document.createElement('img');
+      img.src = user.pfp_url;
+      img.alt = user.artist_name;
+      img.className = 'artist-avatar';
 
-        item.appendChild(img);
-        item.appendChild(name);
-        item.onclick = () => {
-          selectedMap.set(user.acode, user.artist_name);
-          renderSelected();
-          input.value = '';
-          dropdown.remove();
-        };
+      const name = document.createElement('span');
+      name.textContent = user.artist_name;
 
-        dropdown.appendChild(item);
-      }
+      item.appendChild(img);
+      item.appendChild(name);
+      item.onclick = () => {
+        selectedMap.set(user.acode, user.artist_name);
+        renderSelected();
+        input.value = '';
+        dropdown.remove();
+      };
+
+      dropdown.appendChild(item);
     });
 
     if (!hasResult) {
@@ -114,5 +115,5 @@ export function createArtistSelector({ type, currentUser, onUnknownArtist }) {
 
   renderSelected();
 
-  return container;
+  return { container, selectedMap };
 }

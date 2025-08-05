@@ -93,33 +93,50 @@
     </div>
 
     <!-- Albums Section -->
-    <div class="section">
-      <h2>Latest Albums</h2>
-      <% if (artist.releases && artist.releases.length > 0) { %>
-        <div class="releases-grid">
-          <% artist.releases.forEach(release => { %>
-            <a href="/album/<%= release.id %>" class="release-card-link">
-              <div class="release-card">
-                <img class="release-cover" src="<%= release.coverUrl %>" alt="<%= release.title %>">
-                <div class="release-details">
-                  <div class="release-title-with-badge">
-                    <span class="release-title"><%= release.title %></span>
-                    <% if (release.explicit === 'Yes') { %>
-                      <span class="explicit-e-badge">E</span>
-                    <% } %>
-                  </div>
-                  <% if (release.releasedOn) { %>
-                    <div class="release-meta">Released on <%= release.releasedOn %></div>
-                  <% } %>
-                </div>
+<div class="section">
+  <div class="albums-header-row">
+    <h2 class="section-heading">Latest Albums</h2>
+
+    <!-- Desktop button (shows only on desktop) -->
+    <a href="/artist/<%= artist.acode %>/discography" class="see-discography-btn desktop-only">
+      See Full Discography
+    </a>
+  </div>
+
+  <% if (artist.releases && artist.releases.length > 0) { %>
+    <div class="releases-grid">
+      <% artist.releases.forEach(release => { %>
+        <a href="/album/<%= release.id %>" class="release-card-link">
+          <div class="release-card">
+            <img class="release-cover" src="<%= release.coverUrl %>" alt="<%= release.title %>">
+            <div class="release-details">
+              <div class="release-title-with-badge">
+                <span class="release-title"><%= release.title %></span>
+                <% if (release.explicit === 'Yes') { %>
+                  <span class="explicit-e-badge">E</span>
+                <% } %>
               </div>
-            </a>
-          <% }) %>
-        </div>
-      <% } else { %>
-        <p style="color: rgba(255,255,255,0.6); font-size:0.95rem;">No available albums</p>
-      <% } %>
+              <% if (release.releasedOn) { %>
+                <div class="release-meta">Released on <%= release.releasedOn %></div>
+              <% } %>
+            </div>
+          </div>
+        </a>
+      <% }) %>
     </div>
+
+    <!-- Mobile button (only shown on small screens) -->
+    <div class="mobile-only see-discography-mobile-wrapper">
+      <a href="/artist/<%= artist.acode %>/discography" class="see-discography-btn">
+        See Full Discography
+      </a>
+    </div>
+
+  <% } else { %>
+    <p style="color: rgba(255,255,255,0.6); font-size:0.95rem;">No available albums</p>
+  <% } %>
+</div>
+
 
     <!-- Bio -->
     <div class="section">

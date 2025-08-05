@@ -1,0 +1,147 @@
+.discography-page {
+  padding: 2rem 1rem;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.discography-title {
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  font-weight: bold;
+  color: #fff;
+}
+
+/* Tabs */
+.release-type-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.release-type-btn {
+  background: #333;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background 0.2s ease;
+}
+
+.release-type-btn:hover {
+  background: #444;
+}
+
+.release-type-btn.active {
+  background: #fff;
+  color: #000;
+  font-weight: bold;
+}
+
+/* List */
+.release-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.release-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #333;
+}
+
+.release-item a {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  width: 100%;
+}
+
+.release-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Thumbnail */
+.release-thumbnail {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+/* Text Details */
+.release-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+.release-title-line {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: bold;
+  font-size: 1rem;
+  color: #fff;
+  flex-wrap: wrap;
+}
+
+.release-artists {
+  font-size: 0.85rem;
+  color: #aaa;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.release-type {
+  font-size: 0.75rem;
+  color: #888;
+  font-style: italic;
+}
+
+.release-meta {
+  font-size: 0.75rem;
+  color: #aaa;
+}
+
+/* Explicit Badge */
+.explicit-e-badge {
+  background-color: red;
+  color: white;
+  font-size: 0.6rem;
+  padding: 0.15rem 0.35rem;
+  border-radius: 3px;
+  text-transform: uppercase;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+.clean-badge {
+  background-color: #3498db;
+  color: white;
+  font-size: 0.6rem;
+  padding: 0.15rem 0.35rem;
+  border-radius: 3px;
+  text-transform: uppercase;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+/* No Releases */
+.no-releases-message {
+  text-align: center;
+  color: #777;
+  font-size: 1rem;
+  margin-top: 2rem;
+}
+
+

@@ -1,3 +1,5 @@
+//trackCardBuilder.js
+
 import { generateUniqueCode } from './idGenerator.js';
 import { uploadTrack } from './trackUploader.js';
 import { createArtistSelector } from './artistSelector.js';
@@ -10,9 +12,20 @@ export function createTrackCard({
   currentUser,
   showArtistAlert,
   tracklistContainer,
-  trackOrderInput
+  trackOrderInput,
+  onTrackRemove
 }) {
   const trackId = `${releaseId}-${generateUniqueCode(8)}`;
+
+  const submitButton = document.querySelector('#releaseForm button[type="submit"]');
+
+  function disableSubmit(disabled) {
+    if (submitButton) {
+      submitButton.disabled = disabled;
+      submitButton.style.opacity = disabled ? '0.5' : '1';
+    }
+  }
+
 
   const card = document.createElement('div');
   card.className = 'track-card';
@@ -54,6 +67,10 @@ export function createTrackCard({
   const uploadBar = document.createElement('div');
   uploadBar.className = 'upload-progress';
   preview.appendChild(uploadBar);
+  const statusText = document.createElement('div');
+  statusText.className = 'upload-status-text';
+  preview.appendChild(statusText);
+
   card.appendChild(preview);
 
   const audio = document.createElement('audio');
@@ -80,6 +97,8 @@ export function createTrackCard({
     releaseId,
     trackId,
     uploadBar,
+    statusTextEl: statusText,
+    disableSubmitButton: disableSubmit,
     onSuccess: (s3Key) => {
       card.dataset.s3Key = s3Key;
     },
@@ -87,6 +106,7 @@ export function createTrackCard({
       uploadBar.style.backgroundColor = 'red';
     }
   });
+
 
   // Fields
   const fields = document.createElement('div');
@@ -103,19 +123,26 @@ export function createTrackCard({
   trackTitleField.placeholder = 'Track Title*';
   fields.appendChild(trackTitleField);
 
+  let primaryMap, featuredMap;
+
   const primarySelector = createArtistSelector({
     type: 'primary',
     currentUser,
-    onUnknownArtist: showArtistAlert
+    onUnknownArtist: showArtistAlert,
+    getOtherSelectedAcodes: () => Array.from(featuredMap?.keys() || [])
   });
-  fields.appendChild(primarySelector);
+  primaryMap = primarySelector.selectedMap;
+  fields.appendChild(primarySelector.container);
 
   const featuredSelector = createArtistSelector({
     type: 'featured',
     currentUser,
-    onUnknownArtist: showArtistAlert
+    onUnknownArtist: showArtistAlert,
+    getOtherSelectedAcodes: () => Array.from(primaryMap?.keys() || [])
   });
-  fields.appendChild(featuredSelector);
+  featuredMap = featuredSelector.selectedMap;
+  fields.appendChild(featuredSelector.container);
+
 
   const genreSelect = document.createElement('select');
   genreSelect.name = 'genre';
@@ -214,6 +241,7 @@ export function createTrackCard({
     tracklistContainer.removeChild(card);
     tracklistContainer.removeChild(input);
     updateTrackOrder(tracklistContainer, trackOrderInput);
+    if (onTrackRemove) onTrackRemove();
   });
 
   card.appendChild(fields);

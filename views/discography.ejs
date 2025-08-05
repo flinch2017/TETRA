@@ -1,0 +1,50 @@
+<main class="discography-page">
+
+  <section class="discography-section">
+    <h2 class="discography-title">Discography</h2>
+
+    <div class="release-type-tabs">
+      <button class="release-type-btn active" data-filter="all">All</button>
+      <button class="release-type-btn" data-filter="Album">Albums</button>
+      <button class="release-type-btn" data-filter="EP">EPs</button>
+      <button class="release-type-btn" data-filter="Single">Singles</button>
+    </div>
+
+    <% if (artist.releases && artist.releases.length > 0) { %>
+      <ul class="release-list">
+        <% artist.releases.forEach(release => { %>
+          <li class="release-item" data-type="<%= release.releaseType %>">
+            <a href="/album/<%= release.release_id %>">
+              <div class="release-info">
+                <img class="release-thumbnail" src="<%= release.coverUrl %>" alt="<%= release.release_title %>">
+                <div class="release-text">
+                  <div class="release-title-line">
+                    <span class="release-title"><%= release.title %></span>
+                    <% if (release.explicit === 'Yes') { %>
+                      <span class="explicit-e-badge">E</span>
+                    <% } else if (release.explicit === 'Clean Version') { %>
+                      <span class="clean-badge">Clean</span>
+                    <% } %>
+                  </div>
+                  <% if (release.artists?.length > 0) { %>
+                    <div class="release-artists"><%= release.artists.join(', ') %></div>
+                  <% } %>
+                  <% if (release.releaseType) { %>
+                    <div class="release-type"><%= release.releaseType %></div>
+                  <% } %>
+                  <% if (release.releasedOn) { %>
+                    <div class="release-meta">Released on <%= release.releasedOn %></div>
+                  <% } %>
+                </div>
+              </div>
+            </a>
+          </li>
+        <% }) %>
+      </ul>
+    <% } else { %>
+      <p class="no-releases-message">No albums released yet.</p>
+    <% } %>
+  </section>
+</main>
+
+

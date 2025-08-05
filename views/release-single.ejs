@@ -1,100 +1,76 @@
+<main class="releaseform" data-release-id="<%= releaseId %>" data-current-user="<%= currentUser %>">
 
-
-  <main class="releaseform" data-release-id="<%= releaseId %>" data-current-user="<%= currentUser %>">
-
-  <h2>Single Release</h2>
-  
   <form id="releaseForm">
 
-    <div id="releaseWarnings" style="
-  display: none; 
-  background-color: #fff3cd; 
-  color: #856404; 
-  border: 1px solid #ffeeba; 
-  padding: 10px; 
-  margin-bottom: 15px; 
-  border-radius: 4px;
-  font-size: 0.95rem;
-"></div>
 
+    <div id="releaseWarnings" class="warning-box hidden"></div>
 
-    <!-- 🌱 Phase 1: Basic & core info -->
-    <h3>Phase 1: Basic Info</h3>
+    <h3>Basic Info</h3>
 
-    <div class="form-group" style="display:none;">
+    <div class="form-group hidden">
       <label>Release ID*</label>
-      <input type="text" name="release_id" value="<%= releaseId %>
-">
+      <input type="text" name="release_id" value="<%= releaseId %>">
     </div>
-
-    <div class="form-group" style="display:none;">
-      <label>Release Type*</label>
-      <input type="text" name="release_type" value="Single">
-    </div>
+    
 
     <div class="form-group">
-  <label>Artwork (PNG)*</label>
-  <small style="display:block; color:#666; font-size:0.9em; margin-bottom:0.4rem;">
-    Please ensure your artwork complies with our community guidelines. Non-compliant content may result in removal of your release and suspension of your account. 
-    <a href="/community-guidelines" style="color:#007aff; text-decoration:none; margin-left:4px;">See community guidelines</a>
-  </small>
-  <div class="artwork-upload" id="artworkUpload">
-    <span class="plus-icon">+</span>
-    <img id="artworkPreview" src="" alt="Artwork Preview" style="display:none;" />
-    <input type="file" name="art_url" id="artworkInput" accept="image/png" hidden>
-  </div>
-</div>
-
-
-
-
-
+      <label>Artwork (PNG)*</label>
+      <small class="form-note">
+        Please ensure your artwork complies with our community guidelines. Non-compliant content may result in removal of your release and suspension of your account.
+        <a href="/community-guidelines" class="guideline-link">See community guidelines</a>
+      </small>
+      <div class="artwork-upload" id="artworkUpload">
+        <span class="plus-icon">+</span>
+        <img id="artworkPreview" src="" alt="Artwork Preview" class="hidden" />
+        <input type="file" name="art_url" id="artworkInput" accept="image/png" hidden>
+      </div>
+    </div>
 
     <div class="form-group">
       <label>Release Title*</label>
       <input type="text" name="release_title" required>
     </div>
 
-    <div class="form-group" style="display:none;">
-  <label>Released by*</label>
-  <input type="text" name="acode" value="<%= currentUser %>" required>
-</div>
+    <div class="form-group hidden">
+      <label>Released by*</label>
+      <input type="text" name="acode" value="<%= currentUser %>" required>
+    </div>
 
-    <h3>Phase 2: Upload Tracks</h3>
+
+    <h3>Upload Tracks</h3>
     <div class="form-group">
-  <label>Tracklist*</label>
-  <div id="tracklistContainer" class="tracklist-container">
-    <!-- tracks will appear here -->
+    <label>
+      Tracklist* 
+      <span id="releaseTypeDisplay" class="release-type-display">(0 tracks)</span>
+    </label>
+    <div id="tracklistContainer" class="tracklist-container">
+      <!-- tracks will appear here -->
+    </div>
+    <div class="add-track" id="addTrackBtn">
+      <i class="fas fa-plus"></i>
+    </div>
   </div>
-  <div class="add-track" id="addTrackBtn">
-    <i class="fas fa-plus"></i>
-  </div>
-</div>
 
 
 
+    <h3>Creators & Rights</h3>
+    <div class="form-group">
+      <label>Copyright Holder*</label>
+      <input type="text" name="copyright" required>
+    </div>
 
-    <!-- ✏️ Phase 2: Creators & Rights -->
-<h3>Phase 3: Creators & Rights</h3>
-<div class="form-group">
-  <label>Copyright Holder*</label>
-  <input type="text" name="copyright" required>
-</div>
+    <div class="form-group">
+      <label>Phonograph*</label>
+      <input type="text" name="phonograph" required>
+    </div>
 
-<div class="form-group">
-  <label>Phonograph*</label>
-  <input type="text" name="phonograph" required>
-</div>
-
-
-<div class="form-group">
-  <label>Record Label (Optional)</label>
-  <input type="text" name="record_label">
-</div>
+    <div class="form-group">
+      <label>Record Label (Optional)</label>
+      <input type="text" name="record_label">
+    </div>
 
 
-    <!-- ⚙️ Phase 3: Technical & release details -->
-    <h3>Phase 4: Technical & Release Details</h3>
+    <h3>Technical & Release Details</h3>
 
     <div class="form-group">
       <label>UPC/EAN (If available)</label>
@@ -107,97 +83,66 @@
     </div>
 
     <div class="form-group">
-  <label>Canvas (Optional)</label>
-  <div class="canvas-upload" id="canvasUpload">
-    <span class="plus-icon">+</span>
-    <video id="canvasPreview" style="display:none;" muted loop></video>
-    <input type="file" name="canvas_url" id="canvasInput" accept="video/mp4" hidden>
-  </div>
-  <small style="color:#666; font-size:0.9em;">
-    Upload an MP4 video (vertical 9:16) lasting between 3–8 seconds.
-  </small>
-</div>
-
-
+      <label>Canvas (Optional)</label>
+      <div class="canvas-upload" id="canvasUpload">
+        <span class="plus-icon">+</span>
+        <video id="canvasPreview" class="hidden" muted loop></video>
+        <input type="file" name="canvas_url" id="canvasInput" accept="video/mp4" hidden>
+      </div>
+      <small class="form-note">Upload an MP4 video (vertical 9:16) lasting between 3–8 seconds.</small>
+    </div>
 
     <div class="form-group">
       <label>Release Date*</label>
       <input type="date" name="release_date" required>
     </div>
+
     <div class="form-group">
       <label>Release Time*</label>
       <input type="time" name="release_time" required>
     </div>
+
     <div class="form-group">
       <label>Timezone*</label>
-      <select name="release_zone" style="color: black;" required>
-  <option value="" disabled selected hidden>Select Timezone</option>
-  <option value="UTC">UTC</option>
-  <option value="Etc/GMT+12">GMT-12:00 (International Date Line West)</option>
-  <option value="Pacific/Honolulu">GMT-10:00 (Hawaii)</option>
-  <option value="America/Anchorage">GMT-09:00 (Alaska)</option>
-  <option value="America/Los_Angeles">GMT-08:00 (Pacific Time - US & Canada)</option>
-  <option value="America/Denver">GMT-07:00 (Mountain Time - US & Canada)</option>
-  <option value="America/Chicago">GMT-06:00 (Central Time - US & Canada)</option>
-  <option value="America/New_York">GMT-05:00 (Eastern Time - US & Canada)</option>
-  <option value="America/Sao_Paulo">GMT-03:00 (Brasilia)</option>
-  <option value="Atlantic/Azores">GMT-01:00 (Azores)</option>
-  <option value="Europe/London">GMT+00:00 (London)</option>
-  <option value="Europe/Berlin">GMT+01:00 (Berlin, Rome, Paris)</option>
-  <option value="Europe/Athens">GMT+02:00 (Athens, Bucharest)</option>
-  <option value="Europe/Moscow">GMT+03:00 (Moscow, St. Petersburg)</option>
-  <option value="Asia/Dubai">GMT+04:00 (Abu Dhabi, Dubai)</option>
-  <option value="Asia/Karachi">GMT+05:00 (Islamabad, Karachi)</option>
-  <option value="Asia/Dhaka">GMT+06:00 (Dhaka)</option>
-  <option value="Asia/Bangkok">GMT+07:00 (Bangkok, Jakarta)</option>
-  <option value="Asia/Shanghai">GMT+08:00 (Beijing, Hong Kong, Singapore)</option>
-  <option value="Asia/Tokyo">GMT+09:00 (Tokyo, Seoul)</option>
-  <option value="Australia/Sydney">GMT+10:00 (Sydney, Melbourne)</option>
-  <option value="Pacific/Auckland">GMT+12:00 (Auckland, Wellington)</option>
-  <option value="Asia/Manila">GMT+08:00 (Manila)</option>
-</select>
-
+      <select name="release_zone" class="timezone-select" required>
+        <option value="" disabled selected hidden>Select Timezone</option>
+        <option value="UTC">UTC</option>
+        <option value="Etc/GMT+12">GMT-12:00 (International Date Line West)</option>
+        <option value="Pacific/Honolulu">GMT-10:00 (Hawaii)</option>
+        <option value="America/Anchorage">GMT-09:00 (Alaska)</option>
+        <option value="America/Los_Angeles">GMT-08:00 (Pacific Time - US & Canada)</option>
+        <option value="America/Denver">GMT-07:00 (Mountain Time - US & Canada)</option>
+        <option value="America/Chicago">GMT-06:00 (Central Time - US & Canada)</option>
+        <option value="America/New_York">GMT-05:00 (Eastern Time - US & Canada)</option>
+        <option value="America/Sao_Paulo">GMT-03:00 (Brasilia)</option>
+        <option value="Atlantic/Azores">GMT-01:00 (Azores)</option>
+        <option value="Europe/London">GMT+00:00 (London)</option>
+        <option value="Europe/Berlin">GMT+01:00 (Berlin, Rome, Paris)</option>
+        <option value="Europe/Athens">GMT+02:00 (Athens, Bucharest)</option>
+        <option value="Europe/Moscow">GMT+03:00 (Moscow, St. Petersburg)</option>
+        <option value="Asia/Dubai">GMT+04:00 (Abu Dhabi, Dubai)</option>
+        <option value="Asia/Karachi">GMT+05:00 (Islamabad, Karachi)</option>
+        <option value="Asia/Dhaka">GMT+06:00 (Dhaka)</option>
+        <option value="Asia/Bangkok">GMT+07:00 (Bangkok, Jakarta)</option>
+        <option value="Asia/Shanghai">GMT+08:00 (Beijing, Hong Kong, Singapore)</option>
+        <option value="Asia/Tokyo">GMT+09:00 (Tokyo, Seoul)</option>
+        <option value="Australia/Sydney">GMT+10:00 (Sydney, Melbourne)</option>
+        <option value="Pacific/Auckland">GMT+12:00 (Auckland, Wellington)</option>
+        <option value="Asia/Manila">GMT+08:00 (Manila)</option>
+      </select>
     </div>
-  
 
     <button type="submit" class="submit-btn">Add Release</button>
 
-<div id="uploadProgressContainer" style="
-  display: none;
-  margin-top: 10px;
-  background-color: #e9ecef;
-  border-radius: 999px;
-  overflow: hidden;
-  height: 22px;
-  box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
-">
-  <div id="uploadProgressBar" style="
-    width: 0%;
-    height: 100%;
-    background: linear-gradient(90deg, #4facfe, #00f2fe);
-    text-align: center;
-    color: white;
-    font-weight: 500;
-    font-size: 0.85rem;
-    line-height: 22px;
-    white-space: nowrap;
-    transition: width 0.3s ease;
-  ">0%</div>
-</div>
 
+    <div id="uploadProgressContainer" class="upload-progress hidden">
+      <div id="uploadProgressBar" class="progress-bar">0%</div>
+    </div>
 
   </form>
 </main>
 
-<!-- Alert container -->
-<div id="artistAlert" class="artist-alert" style="display:none;">
+
+<div id="artistAlert" class="artist-alert hidden">
   ⚠ Please select an artist from the dropdown list only.
 </div>
-
-
-<script>
-  window.releaseIdx = "<%= releaseId %>";
-  window.currentUserx = "<%= currentUser %>";
-</script>
-
-

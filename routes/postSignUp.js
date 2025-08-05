@@ -14,6 +14,7 @@ const uploadTrackToS3 = require('../utils/uploadTrackToS3');
 const deleteFromS3 = require('../utils/s3Delete');
 const uploadArtworkToS3 = require('../utils/uploadArtworkToS3');
 const uploadCanvasToS3 = require('../utils/uploadCanvasToS3');
+const paidCheck = require('../middleware/paidCheck.js');
 
 
 let environment = new paypal.core.SandboxEnvironment(
@@ -226,8 +227,10 @@ await pool.query(
   }
 });
 
+
+
 // GET route for pricing page
-router.get('/pricing', (req, res) => {
+router.get('/pricing', paidCheck, (req, res) => {
   res.render('pricing', {
     userAcode: null,
     pfpUrl: null,

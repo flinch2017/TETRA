@@ -571,3 +571,67 @@ body {
   justify-content: center;
   border-radius: 4px;
 }
+
+
+/* Layout for heading + button on desktop */
+.albums-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.section-heading {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.see-discography-btn {
+  display: inline-block;
+  padding: 0.35rem 0.75rem; /* smaller padding */
+  font-size: 0.75rem;       /* smaller text */
+  font-weight: 500;
+  background-color: #2196f3;
+  color: white;
+  text-decoration: none;
+  border-radius: 999px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 0 8px rgba(33, 150, 243, 0.4); /* slightly smaller shadow */
+}
+
+
+.see-discography-btn:hover {
+  background-color: #1a7fc1;
+  transform: translateY(-1px);
+}
+
+/* Hide mobile version by default */
+.mobile-only {
+  display: none;
+}
+
+.see-discography-mobile-wrapper {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+/* Mobile styles */
+@media screen and (max-width: 600px) {
+  .albums-header-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  /* Hide desktop button, show mobile one */
+  .desktop-only {
+    display: none;
+  }
+
+  .mobile-only {
+    display: block;
+  }
+
+  .see-discography-btn {
+    margin: 0 auto;
+  }
+}

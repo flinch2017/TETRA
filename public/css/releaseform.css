@@ -16,6 +16,13 @@ body {
   box-shadow: 0 4px 20px rgba(0,0,0,0.4);
 }
 
+.releaseform input,
+.releaseform select,
+.releaseform textarea {
+  box-sizing: border-box;
+}
+
+
 .releaseform h2 {
   text-align: center;
   margin-bottom: 1.5rem;
@@ -31,8 +38,8 @@ body {
   color: rgba(255,255,255,0.9);
 }
 
-.form-group input,
-.form-group select {
+.releaseform .form-group input,
+.releaseform .form-group select {
   width: 100%;
   padding: 0.5rem;
   border: none;
@@ -41,13 +48,13 @@ body {
   color: white;
 }
 
-.form-group input:focus,
-.form-group select:focus {
+.releaseform .form-group input:focus,
+.releaseform .form-group select:focus {
   outline: none;
   background: rgba(255,255,255,0.2);
 }
 
-.submit-btn {
+.releaseform .submit-btn {
   display: block;
   width: 100%;
   padding: 0.75rem;
@@ -61,7 +68,7 @@ body {
   transition: background-color 0.2s ease;
 }
 
-.submit-btn:hover {
+.releaseform .submit-btn:hover {
   background-color: #0056b3;
 }
 
@@ -89,7 +96,7 @@ body {
   margin-top: 0.5rem;
 }
 
-.add-track {
+.releaseform .add-track {
   background-color: #007aff;
   color: white;
   padding: 0.6rem;
@@ -105,11 +112,11 @@ body {
   transition: background-color 0.3s;
 }
 
-.add-track:hover {
+.releaseform .add-track:hover {
   background-color: #005fc1;
 }
 
-.track-card {
+.releaseform .track-card {
   background-color: #1c2a5a;
   border-radius: 8px;
   padding: 0.6rem;
@@ -119,35 +126,35 @@ body {
 }
 
 
-.track-header {
+.releaseform .track-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.track-filename {
+.releaseform .track-filename {
   font-size: 0.9rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.track-remove {
+.releaseform .track-remove {
   color: rgba(255,255,255,0.8);
   cursor: pointer;
 }
 
-.track-remove:hover {
+.releaseform .track-remove:hover {
   color: #ff4c4c;
 }
 
-.track-fields {
+.releaseform .track-fields {
   width: 100%;
   box-sizing: border-box;
   margin-top: 0.6rem;
 }
 
-.track-fields input {
+.releaseform .track-fields input {
   display: block;
   width: 100%;
   box-sizing: border-box;
@@ -161,19 +168,19 @@ body {
 }
 
 
-.track-fields input::placeholder {
+.releaseform .track-fields input::placeholder {
   color: rgba(255,255,255,0.7);
 }
 
 
-.track-audio {
+.releaseform .track-audio {
   width: 100%;
   margin-top: 0.4rem;
   border-radius: 4px;
 }
 
 
-.track-fields select {
+.releaseform .track-fields select {
   display: block;
   width: 100%;
   box-sizing: border-box;
@@ -186,18 +193,18 @@ body {
   color: white;
 }
 
-.track-fields select option {
+.releaseform .track-fields select option {
   color: black; /* keep dropdown list readable */
 }
 
-.audio-preview {
+.releaseform .audio-preview {
   display: flex;
   flex-direction: column;
   align-items: center;
   margin-top: 0.6rem;
 }
 
-.progress-circle {
+.releaseform .progress-circle {
   width: 60px;
   height: 60px;
   border-radius: 50%;
@@ -207,13 +214,13 @@ body {
   justify-content: center;
 }
 
-.play-btn {
+.releaseform .play-btn {
   color: white;
   font-size: 1.2rem;
   cursor: pointer;
 }
 
-.upload-progress {
+.releaseform .upload-progress {
   width: 100%;
   height: 4px;
   background-color: rgba(255,255,255,0.1);
@@ -223,7 +230,7 @@ body {
   position: relative;
 }
 
-.upload-progress::before {
+.releaseform .upload-progress::before {
   content: '';
   position: absolute;
   top: 0; left: 0;
@@ -234,11 +241,11 @@ body {
 }
 
 
-select[name="timezone"] {
+.releaseform select[name="timezone"] {
   color: black;
 }
 
-.artwork-upload {
+.releaseform .artwork-upload {
   width: 200px;
   height: 200px;
   border: 2px dashed #ccc;
@@ -252,12 +259,12 @@ select[name="timezone"] {
   background-color: #f9f9f9;
 }
 
-.plus-icon {
+.releaseform .plus-icon {
   font-size: 3rem;
   color: #aaa;
 }
 
-.artwork-upload img {
+.releaseform .artwork-upload img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -266,25 +273,25 @@ select[name="timezone"] {
 
 
 
-.drag-container {
+.releaseform .drag-container {
   display: flex;
   align-items: center;
   gap: 0.5rem; /* space between lines and number */
   margin-bottom: 0.5rem; /* optional: space below the container */
 }
 
-.drag-handle {
+.releaseform .drag-handle {
   cursor: grab;
   font-size: 1.2rem; /* adjust as needed */
   user-select: none;
 }
 
-.track-number {
+.releaseform .track-number {
   font-weight: bold;
   color: #ffffff; /* adjust color */
 }
 
-.canvas-upload {
+.releaseform .canvas-upload {
   position: relative;
   width: 200px;       /* adjust size as needed */
   height: 355px;      /* keeps roughly 9:16 */
@@ -297,19 +304,19 @@ select[name="timezone"] {
   overflow: hidden;
 }
 
-.canvas-upload .plus-icon {
+.releaseform .canvas-upload .plus-icon {
   font-size: 3rem;
   color: #ccc;
   z-index: 1;
 }
 
-.canvas-upload video {
+.releaseform .canvas-upload video {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.artist-alert {
+.releaseform .artist-alert {
   background-color: #ffcc00;
   color: #333;
   padding: 8px 12px;
@@ -357,4 +364,72 @@ select[name="timezone"] {
   color: #888;
   text-align: center;
   font-size: 0.85rem;
+}
+
+
+.hidden {
+  display: none;
+}
+
+.releaseform .warning-box {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeeba;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 4px;
+  font-size: 0.95rem;
+}
+
+.releaseform .form-note {
+  display: block;
+  color: #666;
+  font-size: 0.9em;
+  margin-bottom: 0.4rem;
+}
+
+.guideline-link {
+  color: #007aff;
+  text-decoration: none;
+  margin-left: 4px;
+}
+
+.releaseform .upload-progress {
+  margin-top: 10px;
+  background-color: #e9ecef;
+  border-radius: 999px;
+  overflow: hidden;
+  height: 22px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.releaseform .progress-bar {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, #4facfe, #00f2fe);
+  text-align: center;
+  color: white;
+  font-weight: 500;
+  font-size: 0.85rem;
+  line-height: 22px;
+  white-space: nowrap;
+  transition: width 0.3s ease;
+}
+
+.releaseform .timezone-select,
+.releaseform .timezone-select option {
+  color: black;
+}
+
+.upload-status-text {
+  font-size: 0.85rem;
+  color: yellow;
+  margin-top: 4px;
+}
+
+.release-type-display {
+  font-weight: normal;
+  margin-left: 0.5rem;
+  color: #ccc;
+  font-size: 0.9em;
 }

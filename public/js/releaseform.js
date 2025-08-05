@@ -1,4 +1,3 @@
-// releaseform.js
 import { createTrackCard } from './trackCardBuilder.js';
 import { initializeSortable, updateTrackOrder } from './trackOrderManager.js';
 import { setupUnloadHandler } from './uploadManager.js';
@@ -8,7 +7,6 @@ import { setupFormSubmission } from './formSubmitHandler.js';
 
 let formState = { submitted: false };
 setupFormSubmission(formState);
-
 
 document.addEventListener('DOMContentLoaded', () => {
   const addTrackBtn = document.getElementById('addTrackBtn');
@@ -23,12 +21,35 @@ document.addEventListener('DOMContentLoaded', () => {
   trackOrderInput.name = 'track_order';
   tracklistContainer.appendChild(trackOrderInput);
 
-  addTrackBtn.addEventListener('click', () => {
-    if (tracklistContainer.querySelectorAll('.track-card').length >= 3) {
-      alert('You can only upload up to 3 tracks.');
-      return;
+  const releaseTypeInput = document.createElement('input');
+  releaseTypeInput.type = 'hidden';
+  releaseTypeInput.name = 'release_type';
+  tracklistContainer.appendChild(releaseTypeInput);
+
+  function updateReleaseType(trackCount) {
+    const displayEl = document.getElementById('releaseTypeDisplay');
+    let type = 'Single';
+
+    if (trackCount <= 3) {
+      type = 'Single';
+    } else if (trackCount <= 7) {
+      type = 'EP';
+    } else {
+      type = 'Album';
     }
 
+    releaseTypeInput.value = type;
+
+    if (displayEl) {
+      const label = trackCount === 0 
+        ? '(0 tracks)' 
+        : `(${trackCount} track${trackCount > 1 ? 's' : ''} • ${type})`;
+      displayEl.textContent = label;
+    }
+  }
+
+
+  addTrackBtn.addEventListener('click', () => {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'audio/mpeg';
@@ -44,12 +65,16 @@ document.addEventListener('DOMContentLoaded', () => {
         currentUser,
         showArtistAlert,
         tracklistContainer,
-        trackOrderInput
+        trackOrderInput,
+        onTrackRemove: () => {
+          updateReleaseType(tracklistContainer.querySelectorAll('.track-card').length);
+        }
       });
 
       tracklistContainer.appendChild(hiddenInput);
       tracklistContainer.appendChild(card);
       updateTrackOrder(tracklistContainer, trackOrderInput);
+      updateReleaseType(tracklistContainer.querySelectorAll('.track-card').length);
     });
 
     tracklistContainer.appendChild(input);
@@ -67,4 +92,5 @@ document.addEventListener('DOMContentLoaded', () => {
   setupArtworkUpload();
   initializeSortable(tracklistContainer, trackOrderInput);
   setupUnloadHandler(() => formState.submitted);
+  updateReleaseType(tracklistContainer.querySelectorAll('.track-card').length);
 });
