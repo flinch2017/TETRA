@@ -1,6 +1,6 @@
 // server.js
 require('dotenv').config();
-const https = require('https');
+const http = require('http');
 const fs = require('fs');
 const express = require('express');
 const session = require('express-session');
@@ -164,8 +164,7 @@ app.use((req, res, next) => {
 });
 
 
-// HTTPS server startup
-https.createServer(sslOptions, app).listen(PORT, () => {
-  console.log(`HTTPS Server running at https://localhost:${PORT}`);
-});
 
+http.createServer(app).listen(PORT, () => {
+  console.log(`HTTP Server running at http://localhost:${PORT}`);
+});
