@@ -18,6 +18,7 @@ const dotenv = require('dotenv');
 const pool = require('./utils/db'); // adjust path if needed
 const s3ImageRoute = require('./routes/s3Image');
 const expressLayouts = require('express-ejs-layouts');
+const paymentRoutes = require('./routes/postPayment');
 dotenv.config();
 
 const app = express();
@@ -142,7 +143,7 @@ app.use(helmet({
 }));
 
 // Routes
-app.use('/', postRoutes, s3ImageRoute);
+app.use('/', postRoutes, s3ImageRoute, paymentRoutes);
 
 
 const sslOptions = {
