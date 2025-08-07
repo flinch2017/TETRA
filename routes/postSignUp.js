@@ -18,12 +18,12 @@ const paidCheck = require('../middleware/paidCheck.js');
 const paymentRoutes = require('./postPayment');
 
 
-// let environment = new paypal.core.SandboxEnvironment(
-//   "AZ3vwRr1sqKm0Fm3jQAP8nkMmkCjaYvGxuSYRBaNvfRNOGSdqAJ_xUXKkn8go9a8eS7oegV6lSFkYorj",
-//   "ECDyl6qPiT5vgCFu0VlDHPZWNTj_4aivacNjo02gNjT63dzvTHeomI6r5IO6v07dExweU1pX6V3gNucb"
-// );
+let environment = new paypal.core.SandboxEnvironment(
+  "AZ3vwRr1sqKm0Fm3jQAP8nkMmkCjaYvGxuSYRBaNvfRNOGSdqAJ_xUXKkn8go9a8eS7oegV6lSFkYorj",
+  "ECDyl6qPiT5vgCFu0VlDHPZWNTj_4aivacNjo02gNjT63dzvTHeomI6r5IO6v07dExweU1pX6V3gNucb"
+);
 
-// const client = new paypal.core.PayPalHttpClient(environment);
+const client = new paypal.core.PayPalHttpClient(environment);
 
 
 router.get('/auth', (req, res) => {
