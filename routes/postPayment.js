@@ -1,13 +1,15 @@
+// routes/postPayment.js
 const express = require('express');
+const pool = require('../utils/db'); // adjust path if needed
 const router = express.Router();
 const fetch = require('node-fetch');
-const pool = require('../utils/db'); // adjust path if needed
 require('dotenv').config();
 
 const CLIENT = process.env.PAYPAL_CLIENT_ID;
 const SECRET = process.env.PAYPAL_CLIENT_SECRET;
-const BASE_URL = 'https://api-m.paypal.com'; // Use sandbox URL for testing
+const BASE_URL = 'https://api-m.paypal.com'; // use https://api-m.sandbox.paypal.com for sandbox
 
+// Get access token
 async function getAccessToken() {
   const response = await fetch(`${BASE_URL}/v1/oauth2/token`, {
     method: 'POST',
@@ -22,6 +24,7 @@ async function getAccessToken() {
   return data.access_token;
 }
 
+// Capture subscription details
 router.post('/capture-subscription', async (req, res) => {
   const { subscriptionID } = req.body;
 
@@ -84,5 +87,6 @@ router.post('/capture-subscription', async (req, res) => {
     return res.status(500).json({ success: false });
   }
 });
+
 
 module.exports = router;
