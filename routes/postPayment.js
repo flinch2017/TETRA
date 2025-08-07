@@ -1,4 +1,4 @@
-// routes/payments.js
+// routes/postPayment.js
 const express = require('express');
 const router = express.Router();
 const fetch = require('node-fetch');
@@ -6,7 +6,7 @@ require('dotenv').config();
 
 const CLIENT = process.env.PAYPAL_CLIENT_ID;
 const SECRET = process.env.PAYPAL_CLIENT_SECRET;
-const BASE_URL = 'https://api-m.sandbox.paypal.com'; // use https://api-m.sandbox.paypal.com for sandbox
+const BASE_URL = 'https://api-m.paypal.com'; // use https://api-m.sandbox.paypal.com for sandbox
 
 // Get access token
 async function getAccessToken() {
