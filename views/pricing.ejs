@@ -92,22 +92,29 @@
         });
       },
       onApprove: function(data, actions) {
-        // Send subscriptionID to server
-        fetch('/pricing/capture-subscription', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ subscriptionID: data.subscriptionID })
-        })
-        .then(res => res.json())
-        .then(resData => {
-          if (resData.success) {
-            alert('Subscription successful!');
-            // Optionally redirect or update DB/session
-          }
-        });
-      }
+  // Send subscriptionID to server
+  fetch('/pricing/capture-subscription', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ subscriptionID: data.subscriptionID })
+  })
+  .then(res => res.json())
+  .then(resData => {
+    if (resData.success) {
+      alert('Subscription successful!');
+      window.location.href = '/dashboard'; // Redirect to dashboard
+    } else {
+      alert('Subscription failed. Please try again.');
+    }
+  })
+  .catch(err => {
+    console.error('Error processing subscription:', err);
+    alert('Something went wrong. Please contact support.');
+  });
+}
+
     }).render(`#paypal-button-container-${plan}`);
   });
 </script>
