@@ -1,12 +1,13 @@
 // routes/postPayment.js
 const express = require('express');
+const pool = require('../utils/db'); // adjust path if needed
 const router = express.Router();
 const fetch = require('node-fetch');
 require('dotenv').config();
 
-const CLIENT = process.env.PAYPAL_CLIENT_ID;
-const SECRET = process.env.PAYPAL_CLIENT_SECRET;
-const BASE_URL = 'https://api-m.paypal.com'; // use https://api-m.sandbox.paypal.com for sandbox
+const CLIENT = process.env.SANBOX_CLIENT_ID;
+const SECRET = process.env.SANDBOX_CLIENT_SECRET;
+const BASE_URL = 'https://api-m.sandbox.paypal.com'; // use https://api-m.sandbox.paypal.com for sandbox
 
 // Get access token
 async function getAccessToken() {
@@ -37,8 +38,48 @@ router.post('/capture-subscription', async (req, res) => {
     });
 
     const data = await response.json();
-    // Save details to DB if needed here
-    console.log('Subscription Data:', data);
+
+    const {
+      id: paypalSubId,
+      plan_id,
+      status,
+      billing_info,
+      subscriber
+    } = data;
+
+    const nextBillingTime = billing_info?.next_billing_time;
+    const payerEmail = subscriber?.email_address;
+    const acode = req.session.user?.acode;
+
+    // Determine plan type (based on known plan IDs)
+    let planType = null;
+    if (plan_id === 'P-0KJ123456ABCDEF01SANDBOX') planType = 'basic';
+    else if (plan_id === 'P-1LM234567XYZGHI02SANDBOX') planType = 'mid';
+    else if (plan_id === 'P-2NM345678UVWJKL03SANDBOX') planType = 'pro';
+
+    if (!planType) {
+      return res.status(400).json({ success: false, message: 'Unknown plan ID' });
+    }
+
+    // Save subscription data
+    await pool.query(
+      `INSERT INTO subscriptions (acode, subscription_id, plan_name, status, next_billing_time, payer_email)
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      [
+        acode,
+        paypalSubId,
+        planType,
+        status,
+        nextBillingTime ? new Date(nextBillingTime) : null,
+        payerEmail
+      ]
+    );
+
+    // Update user's plan and account_mode
+    await pool.query(
+      `UPDATE users SET plan = $1, account_mode = 'artist' WHERE acode = $2`,
+      [planType, acode]
+    );
 
     return res.status(200).json({ success: true, data });
   } catch (err) {
@@ -46,5 +87,6 @@ router.post('/capture-subscription', async (req, res) => {
     return res.status(500).json({ success: false });
   }
 });
+
 
 module.exports = router;

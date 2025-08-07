@@ -69,13 +69,13 @@
 </div>
 
 
-<script src="https://www.paypal.com/sdk/js?client-id=AaUJTwwM0DRXv4YVeXZS6DUyTCoU4BadZNDxj3HgyqebbAyniacivYvaquHUFnBsasycWDxwrNXldHG-&vault=true&intent=subscription"></script>
+<script src="https://www.paypal.com/sdk/js?client-id=AcIAKpwvSCs9G682ZO2017hXgpnp25fyxmHhd5RUSPLLRcONWH9OOZidDo86DR7Mbs4k2Mo5oAkHa2lu&vault=true&intent=subscription"></script>
 
 <script>
   const plans = {
-    basic: 'P-8V563971VF056944ENCJB6QQ', // Replace with actual PayPal Plan ID
-    mid: 'P-865905246F849110ENCJB53I',
-    pro: 'P-4BJ93315WB274131JNCJBXUQ'
+    basic: 'P-0KJ123456ABCDEF01SANDBOX',
+    mid: 'P-1LM234567XYZGHI02SANDBOX',
+    pro: 'P-2NM345678UVWJKL03SANDBOX'
   };
 
   ['basic', 'mid', 'pro'].forEach(plan => {
@@ -86,13 +86,12 @@
         shape: 'pill',
         label: 'subscribe'
       },
-      createSubscription: function(data, actions) {
+      createSubscription: function (data, actions) {
         return actions.subscription.create({
           plan_id: plans[plan]
         });
       },
-      onApprove: function(data, actions) {
-        // Send subscriptionID to server
+      onApprove: function (data, actions) {
         fetch('/pricing/capture-subscription', {
           method: 'POST',
           headers: {
@@ -103,9 +102,15 @@
         .then(res => res.json())
         .then(resData => {
           if (resData.success) {
-            alert('Subscription successful!');
-            // Optionally redirect or update DB/session
+            // Redirect to dashboard
+            window.location.href = '/dashboard';
+          } else {
+            alert('Subscription failed. Please try again.');
           }
+        })
+        .catch(err => {
+          console.error(err);
+          alert('Something went wrong. Please try again.');
         });
       }
     }).render(`#paypal-button-container-${plan}`);
