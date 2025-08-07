@@ -71,11 +71,9 @@
 
 <script src="https://www.paypal.com/sdk/js?client-id=AaUJTwwM0DRXv4YVeXZS6DUyTCoU4BadZNDxj3HgyqebbAyniacivYvaquHUFnBsasycWDxwrNXldHG-&vault=true&intent=subscription"></script>
 
-
-
 <script>
   const plans = {
-    basic: 'P-8V563971VF056944ENCJB6QQ',
+    basic: 'P-8V563971VF056944ENCJB6QQ', // Replace with actual PayPal Plan ID
     mid: 'P-865905246F849110ENCJB53I',
     pro: 'P-4BJ93315WB274131JNCJBXUQ'
   };
@@ -94,29 +92,22 @@
         });
       },
       onApprove: function(data, actions) {
-  // Send subscriptionID to server
-  fetch('/pricing/capture-subscription', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ subscriptionID: data.subscriptionID })
-  })
-  .then(res => res.json())
-  .then(resData => {
-    if (resData.success) {
-      alert('Subscription successful!');
-      window.location.href = '/dashboard'; // Redirect to dashboard
-    } else {
-      alert('Subscription failed. Please try again.');
-    }
-  })
-  .catch(err => {
-    console.error('Error processing subscription:', err);
-    alert('Something went wrong. Please contact support.');
-  });
-}
-
+        // Send subscriptionID to server
+        fetch('/pricing/capture-subscription', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ subscriptionID: data.subscriptionID })
+        })
+        .then(res => res.json())
+        .then(resData => {
+          if (resData.success) {
+            alert('Subscription successful!');
+            // Optionally redirect or update DB/session
+          }
+        });
+      }
     }).render(`#paypal-button-container-${plan}`);
   });
 </script>
