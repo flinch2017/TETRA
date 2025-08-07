@@ -93,7 +93,7 @@
       },
       onApprove: function(data, actions) {
         // Send subscriptionID to server
-        fetch('/payments/capture-subscription', {
+        fetch('/pricing/capture-subscription', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
