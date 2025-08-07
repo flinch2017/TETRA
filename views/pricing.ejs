@@ -21,7 +21,9 @@
         <li>Release 3 Singles and 1 EP</li>
         <li>48 hours release verification support</li>
       </ul>
-      <div id="paypal-button-container-P-8V563971VF056944ENCJB6QQ"></div>
+
+      <div id="paypal-button-container-basic"></div>
+    
 
     </div>
 
@@ -37,8 +39,9 @@
         <li>Socialize/Post to feed</li>
         <li>Tetra Radio/Playlisting Request</li>
       </ul>
-      <div id="paypal-button-container-P-865905246F849110ENCJB53I"></div>
 
+      <div id="paypal-button-container-mid"></div>
+    
     </div>
 
     <!-- A-Lister -->
@@ -57,8 +60,54 @@
         <li>Merch Support</li>
       </ul>
 
-      <div id="paypal-button-container-P-4BJ93315WB274131JNCJBXUQ"></div>
+      <div id="paypal-button-container-pro"></div>
+
+     
 
     </div>
   </div>
 </div>
+
+
+<script src="https://www.paypal.com/sdk/js?client-id=AcIAKpwvSCs9G682ZO2017hXgpnp25fyxmHhd5RUSPLLRcONWH9OOZidDo86DR7Mbs4k2Mo5oAkHa2lu&vault=true&intent=subscription"></script>
+
+<script>
+  const plans = {
+    basic: 'P-8V563971VF056944ENCJB6QQ', // Replace with actual PayPal Plan ID
+    mid: 'P-865905246F849110ENCJB53I',
+    pro: 'P-4BJ93315WB274131JNCJBXUQ'
+  };
+
+  ['basic', 'mid', 'pro'].forEach(plan => {
+    paypal.Buttons({
+      style: {
+        layout: 'vertical',
+        color: 'blue',
+        shape: 'pill',
+        label: 'subscribe'
+      },
+      createSubscription: function(data, actions) {
+        return actions.subscription.create({
+          plan_id: plans[plan]
+        });
+      },
+      onApprove: function(data, actions) {
+        // Send subscriptionID to server
+        fetch('/payments/capture-subscription', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ subscriptionID: data.subscriptionID })
+        })
+        .then(res => res.json())
+        .then(resData => {
+          if (resData.success) {
+            alert('Subscription successful!');
+            // Optionally redirect or update DB/session
+          }
+        });
+      }
+    }).render(`#paypal-button-container-${plan}`);
+  });
+</script>
