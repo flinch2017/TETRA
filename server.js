@@ -101,7 +101,9 @@ app.use(helmet({
         "https://js.stripe.com",
         "https://www.paypal.com",
         "https://www.sandbox.paypal.com",
-        "https://cdn.jsdelivr.net"      // ✅ add this line
+        "https://cdn.jsdelivr.net",
+        "https://www.google.com",      // <-- Add this
+        "https://www.gstatic.com"      // <-- Add this
       ],
       styleSrc: [
         "'self'",
@@ -111,7 +113,7 @@ app.use(helmet({
       ],
       fontSrc: [
         "'self'",
-        "https://cdn.jsdelivr.net",   
+        "https://cdn.jsdelivr.net",
         "https://cdnjs.cloudflare.com"
       ],
       imgSrc: [
@@ -125,7 +127,6 @@ app.use(helmet({
         "https://s3.amazonaws.com",
         "http://192.168.1.7:3000"
       ],
-
       frameSrc: [
         "'self'",
         "https://js.stripe.com",
@@ -146,6 +147,7 @@ app.use(helmet({
     }
   }
 }));
+
 
 // Routes
 app.use('/', postRoutes, s3ImageRoute);
