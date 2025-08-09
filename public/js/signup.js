@@ -1,3 +1,27 @@
+function renderRecaptcha() {
+  if (typeof grecaptcha !== 'undefined') {
+    const container = document.querySelector('.g-recaptcha');
+    if (container) {
+      // Clear previous widget if any
+      container.innerHTML = '';
+
+      // Render the widget again
+      grecaptcha.render(container, {
+        sitekey: '6LeS058rAAAAAPtasBchk895HK0PspPMlUAcC1zq',
+      });
+    }
+  }
+}
+
+function renderRecaptchaWhenReady() {
+  if (typeof grecaptcha !== 'undefined') {
+    renderRecaptcha();
+  } else {
+    // Retry after 100ms if grecaptcha not yet loaded
+    setTimeout(renderRecaptchaWhenReady, 100);
+  }
+}
+
 function bindSignupForm() {
   const form = document.getElementById('signupForm');
   const errorMessage = document.getElementById('errorMessage');
@@ -7,7 +31,7 @@ function bindSignupForm() {
   // Remove any existing listeners to avoid duplicates
   form.removeEventListener('submit', signupFormSubmitHandler);
 
-  // Define the submit handler separately for easy add/remove
+  // Define submit handler separately so we can remove it
   function signupFormSubmitHandler(e) {
     errorMessage.style.display = 'none';
     const password = form.password.value;
@@ -28,4 +52,7 @@ function bindSignupForm() {
   }
 
   form.addEventListener('submit', signupFormSubmitHandler);
+
+  // Render reCAPTCHA widget after signup form is bound
+  renderRecaptchaWhenReady();
 }
