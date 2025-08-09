@@ -8,20 +8,26 @@
 
     <h1>Create your account</h1>
     <form id="signupForm" method="POST" action="/signup">
-      <label for="username">Username</label>
-      <input type="text" id="username" name="username" placeholder="Your username" required minlength="3" maxlength="30" />
+  <label for="username">Username</label>
+  <input type="text" id="username" name="username" placeholder="Your username" required minlength="3" maxlength="30" />
 
-      <label for="email">Email</label>
-      <input type="email" id="email" name="email" placeholder="you@example.com" required />
+  <label for="email">Email</label>
+  <input type="email" id="email" name="email" placeholder="you@example.com" required />
 
-      <label for="password">Password</label>
-      <input type="password" id="password" name="password" placeholder="At least 8 characters" required minlength="8" />
+  <label for="password">Password</label>
+  <input type="password" id="password" name="password" placeholder="At least 8 characters" required minlength="8" />
 
-      <label for="confirmPassword">Confirm Password</label>
-      <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Re-enter your password" required minlength="8" />
+  <label for="confirmPassword">Confirm Password</label>
+  <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Re-enter your password" required minlength="8" />
 
-      <button type="submit" class="btn">Sign Up</button>
-    </form>
+  <!-- reCAPTCHA -->
+  <div class="g-recaptcha" data-sitekey="6LeS058rAAAAAPtasBchk895HK0PspPMlUAcC1zq"></div>
+
+  <button type="submit" class="btn">Sign Up</button>
+</form>
+
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
     <p class="login-link">
       Already have an account? <a href="/login">Log in</a>
     </p>
@@ -34,13 +40,22 @@
     const errorMessage = document.getElementById('errorMessage');
 
     form.addEventListener('submit', (e) => {
-      errorMessage.style.display = 'none';
-      const password = form.password.value;
-      const confirmPassword = form.confirmPassword.value;
-      if (password !== confirmPassword) {
-        e.preventDefault();
-        errorMessage.textContent = 'Passwords do not match!';
-        errorMessage.style.display = 'block';
-      }
-    });
+  errorMessage.style.display = 'none';
+  const password = form.password.value;
+  const confirmPassword = form.confirmPassword.value;
+
+  if (password !== confirmPassword) {
+    e.preventDefault();
+    errorMessage.textContent = 'Passwords do not match!';
+    errorMessage.style.display = 'block';
+    return;
+  }
+
+  if (grecaptcha.getResponse().length === 0) {
+    e.preventDefault();
+    errorMessage.textContent = 'Please complete the CAPTCHA.';
+    errorMessage.style.display = 'block';
+  }
+});
+
   </script>

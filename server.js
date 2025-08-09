@@ -29,6 +29,12 @@ app.use(helmet());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use((req, res, next) => {
+  res.locals.userAcode = req.user ? req.user.acode : null;
+  next();
+});
+
+
 
 // EJS setup
 app.use(expressLayouts);
