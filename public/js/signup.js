@@ -1,10 +1,16 @@
 function renderRecaptcha() {
-  if (typeof grecaptcha !== 'undefined' && document.getElementById('recaptcha-container')) {
+  const container = document.getElementById('recaptcha-container');
+  if (!container) return;
+
+  if (typeof grecaptcha !== 'undefined') {
+    container.innerHTML = ''; // clear previous widget if any
     grecaptcha.render('recaptcha-container', {
       sitekey: '6LeS058rAAAAAPtasBchk895HK0PspPMlUAcC1zq'
     });
   }
 }
+
+
 
 
 function bindSignupForm() {
