@@ -298,6 +298,7 @@ function bindAllPageEvents() {
   forceShowLoadMoreIfNoPosts(); // 👈 Add this line
   showLoadMoreWhenBottomReached();
   bindReleaseTypeFilter();
+  bindSignupForm();
 
   if (typeof bindSongClickHandlers === 'function') {
     bindSongClickHandlers();
