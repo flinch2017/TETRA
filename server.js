@@ -103,7 +103,9 @@ app.use(helmet({
         "https://www.sandbox.paypal.com",
         "https://cdn.jsdelivr.net",
         "https://www.google.com",      // <-- Add this
-        "https://www.gstatic.com"      // <-- Add this
+        "https://www.gstatic.com",      // <-- Add this
+        "https://pagead2.googlesyndication.com",  // <--- add this
+        "https://ep2.adtrafficquality.google"  // Add this line
       ],
       styleSrc: [
         "'self'",
@@ -125,19 +127,26 @@ app.use(helmet({
         "https://tetrametropolis.s3.us-east-1.amazonaws.com",
         "https://tetrametropolis.s3.amazonaws.com",
         "https://s3.amazonaws.com",
-        "http://192.168.1.7:3000"
+        "http://192.168.1.7:3000",
+        "https://pagead2.googlesyndication.com", // <--- add this line
+        "https://ep1.adtrafficquality.google"  // add this line
       ],
       frameSrc: [
         "'self'",
         "https://js.stripe.com",
         "https://www.paypal.com",
-        "https://www.sandbox.paypal.com"
+        "https://www.sandbox.paypal.com",
+        "https://googleads.g.doubleclick.net",  // Add this line
+        "https://ep2.adtrafficquality.google",   // Add this line
+        "https://www.google.com",   // Add this line
+        "https://ep2.adtrafficquality.google"   // add this line
       ],
       connectSrc: [
         "'self'",
         "https://api.stripe.com",
         "https://www.paypal.com",
-        "https://www.sandbox.paypal.com"
+        "https://www.sandbox.paypal.com",
+        "https://ep1.adtrafficquality.google"  // add this line
       ],
       mediaSrc: [
         "'self'",
