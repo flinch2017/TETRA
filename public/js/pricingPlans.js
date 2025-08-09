@@ -1,46 +1,46 @@
-
-  paypal.Buttons({
+['basic', 'mid', 'pro'].forEach(plan => {
+  const containerId = `paypal-button-container-${plan}`;
+  if (document.getElementById(containerId)) {
+    paypal.Buttons({
       style: {
-          shape: 'rect',
-          color: 'gold',
-          layout: 'vertical',
-          label: 'subscribe'
+        layout: 'vertical',
+        color: 'blue',
+        shape: 'pill',
+        label: 'pay' // will show “Pay with Debit or Credit Card”
       },
-      createSubscription: function(data, actions) {
-        return actions.subscription.create({ plan_id: 'P-8V563971VF056944ENCJB6QQ' });
-      },
-      onApprove: function(data, actions) {
-        alert(data.subscriptionID);
-      }
-  }).render('#paypal-button-container-P-8V563971VF056944ENCJB6QQ');
+      commit: true,
 
-  paypal.Buttons({
-      style: {
-          shape: 'rect',
-          color: 'gold',
-          layout: 'vertical',
-          label: 'subscribe'
+      createOrder: async function (data, actions) {
+        try {
+          const res = await fetch(`/create-paypal-order?plan=${plan}`, {
+            method: 'POST'
+          });
+          const order = await res.json();
+          if (!order.id) throw new Error("Invalid order response");
+          return order.id;
+        } catch (error) {
+          console.error('Create order failed:', error);
+          alert('Failed to create PayPal order. Please try again.');
+        }
       },
-      createSubscription: function(data, actions) {
-        return actions.subscription.create({ plan_id: 'P-865905246F849110ENCJB53I' });
-      },
-      onApprove: function(data, actions) {
-        alert(data.subscriptionID);
-      }
-  }).render('#paypal-button-container-P-865905246F849110ENCJB53I');
 
-  paypal.Buttons({
-      style: {
-          shape: 'rect',
-          color: 'gold',
-          layout: 'vertical',
-          label: 'subscribe'
+      onApprove: async function (data, actions) {
+        try {
+          const res = await fetch(`/capture-paypal-order?orderID=${data.orderID}&plan=${plan}`, {
+            method: 'POST'
+          });
+          const result = await res.json();
+          window.location.href = '/dashboard';
+        } catch (error) {
+          console.error('Capture failed:', error);
+          alert('Failed to complete PayPal payment. Please try again.');
+        }
       },
-      createSubscription: function(data, actions) {
-        return actions.subscription.create({ plan_id: 'P-4BJ93315WB274131JNCJBXUQ' });
-      },
-      onApprove: function(data, actions) {
-        alert(data.subscriptionID);
-      }
-  }).render('#paypal-button-container-P-4BJ93315WB274131JNCJBXUQ');
 
+      onError: function (err) {
+        console.error('PayPal error', err);
+        alert('There was a problem processing your card payment. Please try again.');
+      }
+    }).render(`#${containerId}`);
+  }
+});
