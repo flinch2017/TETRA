@@ -299,6 +299,7 @@ function bindAllPageEvents() {
   showLoadMoreWhenBottomReached();
   bindReleaseTypeFilter();
   bindSignupForm();
+  renderRecaptcha();
 
   if (typeof bindSongClickHandlers === 'function') {
     bindSongClickHandlers();
