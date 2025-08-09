@@ -1,13 +1,18 @@
+function renderRecaptcha() {
+  if (typeof grecaptcha !== 'undefined' && document.getElementById('recaptcha-container')) {
+    grecaptcha.render('recaptcha-container', {
+      sitekey: '6LeS058rAAAAAPtasBchk895HK0PspPMlUAcC1zq'
+    });
+  }
+}
+
+
 function bindSignupForm() {
   const form = document.getElementById('signupForm');
   const errorMessage = document.getElementById('errorMessage');
 
-  if (!form || !errorMessage) return; // no signup form on this page
+  if (!form || !errorMessage) return;
 
-  // Remove any existing listeners to avoid duplicates
-  form.removeEventListener('submit', signupFormSubmitHandler);
-
-  // Define the submit handler separately for easy add/remove
   function signupFormSubmitHandler(e) {
     errorMessage.style.display = 'none';
     const password = form.password.value;
@@ -27,5 +32,9 @@ function bindSignupForm() {
     }
   }
 
+  form.removeEventListener('submit', signupFormSubmitHandler);
   form.addEventListener('submit', signupFormSubmitHandler);
+
+  renderRecaptcha();
 }
+
