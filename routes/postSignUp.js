@@ -19,8 +19,8 @@ const paymentRoutes = require('./postPayment');
 
 
 let environment = new paypal.core.SandboxEnvironment(
-  "AZ3vwRr1sqKm0Fm3jQAP8nkMmkCjaYvGxuSYRBaNvfRNOGSdqAJ_xUXKkn8go9a8eS7oegV6lSFkYorj",
-  "ECDyl6qPiT5vgCFu0VlDHPZWNTj_4aivacNjo02gNjT63dzvTHeomI6r5IO6v07dExweU1pX6V3gNucb"
+  "AcIAKpwvSCs9G682ZO2017hXgpnp25fyxmHhd5RUSPLLRcONWH9OOZidDo86DR7Mbs4k2Mo5oAkHa2lu",
+  "EB06p_eTqcc_faRqPdZKnnz36mOKrDVcVf9yelHL_5IIJLFwNwg7sI6Uh02PTF4BBvX9ASZbZjQ34WMf"
 );
 
 const client = new paypal.core.PayPalHttpClient(environment);
@@ -231,7 +231,7 @@ await pool.query(
 
 
 // GET route for pricing page
-router.get('/pricing', paymentRoutes, paidCheck, (req, res) => {
+router.get('/pricing', paidCheck, (req, res) => {
   res.render('pricing', {
     userAcode: null,
     pfpUrl: null,
@@ -251,11 +251,11 @@ router.post('/create-paypal-order', async (req, res) => {
     return res.status(400).json({ error: 'Invalid plan type' });
   }
 
-  // Define prices in USD
+  // Define prices in PHP
   const prices = {
-    basic: "5.00",
-    mid: "10.00",
-    pro: "25.00"
+    basic: "280.00", // Example PHP equivalent of $5
+    mid: "560.00",   // Example PHP equivalent of $10
+    pro: "1400.00"   // Example PHP equivalent of $25
   };
 
   try {
@@ -265,7 +265,7 @@ router.post('/create-paypal-order', async (req, res) => {
       intent: 'CAPTURE',
       purchase_units: [{
         amount: {
-          currency_code: 'USD',       // 💵 Use USD for these values
+          currency_code: 'PHP', // 🇵🇭 Philippine Peso
           value: prices[plan]
         }
       }]
@@ -279,6 +279,7 @@ router.post('/create-paypal-order', async (req, res) => {
     res.status(500).json({ error: 'Failed to create PayPal order' });
   }
 });
+
 
 
 
