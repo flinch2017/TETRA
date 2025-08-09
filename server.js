@@ -146,7 +146,9 @@ app.use(helmet({
         "https://api.stripe.com",
         "https://www.paypal.com",
         "https://www.sandbox.paypal.com",
-        "https://ep1.adtrafficquality.google"  // add this line
+        "https://ep1.adtrafficquality.google",  // add this line
+        "https://pagead2.googlesyndication.com",  // ADD THIS LINE
+        "https://www.google.com"   // <-- Add this line
       ],
       mediaSrc: [
         "'self'",
