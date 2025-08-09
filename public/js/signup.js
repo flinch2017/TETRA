@@ -3,13 +3,15 @@ function renderRecaptcha() {
   if (!container) return;
 
   if (typeof grecaptcha !== 'undefined') {
-    container.innerHTML = ''; // clear previous widget if any
-    grecaptcha.render('recaptcha-container', {
+    // Clear previous widget if any
+    container.innerHTML = '';
+
+    // Render new widget
+    grecaptcha.render(container, {
       sitekey: '6LeS058rAAAAAPtasBchk895HK0PspPMlUAcC1zq'
     });
   }
 }
-
 
 
 
