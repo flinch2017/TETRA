@@ -3,8 +3,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const link = e.target.closest('a');
     if (!link || link.target === '_blank' || link.hasAttribute('download')) return;
 
-    if (link.classList.contains('no-ajax')) return;  // SKIP AJAX for links with this class
-
     const href = link.getAttribute('href');
     if (!href || href.startsWith('http') || href.startsWith('#')) return;
 
@@ -283,7 +281,6 @@ function bindSearchFormSubmission() {
 
 
 
-
 function bindAllPageEvents() {
   bindSongClickEvents();
   initFollowButton();
@@ -302,7 +299,6 @@ function bindAllPageEvents() {
   forceShowLoadMoreIfNoPosts(); // 👈 Add this line
   showLoadMoreWhenBottomReached();
   bindReleaseTypeFilter();
-  bindSignupForm();
 
   if (typeof bindSongClickHandlers === 'function') {
     bindSongClickHandlers();
