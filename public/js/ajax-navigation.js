@@ -3,6 +3,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const link = e.target.closest('a');
     if (!link || link.target === '_blank' || link.hasAttribute('download')) return;
 
+    if (link.classList.contains('no-ajax')) return;  // SKIP AJAX for links with this class
+
     const href = link.getAttribute('href');
     if (!href || href.startsWith('http') || href.startsWith('#')) return;
 
