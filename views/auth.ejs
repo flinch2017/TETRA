@@ -116,51 +116,63 @@
         padding: 2rem 1.5rem;
       }
     }
+
+    .resend-link.disabled {
+  pointer-events: none;
+  color: gray;
+  opacity: 0.85;
+}
+
+/* small spinner used inside the resend button/text */
+.spinner-mini {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255,255,255,0.25);
+  border-top-color: white;
+  border-radius: 50%;
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 8px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* keep message fade pleasant */
+.error-message {
+  transition: opacity 0.35s ease;
+}
+
   </style>
 </head>
 <body>
   <div class="otp-container">
     <h1>Verify Your Email</h1>
-    <div class="error-message" id="errorMessage" style="<%= error ? 'display: block;' : 'display: none;' %>">
-  <%= error || '' %>
-</div>
+    <div class="error-message" id="errorMessage" style="display:none;"></div>
     <p>Please enter the 6-digit code sent to your email address.</p>
-    <form id="otpForm" method="POST" action="/verify-otp?email=<%= email %>">
+    <form id="otpForm" data-email="<%- email %>">
+  <label for="otp">OTP Code</label>
+  <input
+    type="text"
+    id="otp"
+    name="otp"
+    maxlength="6"
+    minlength="6"
+    placeholder="Enter the code"
+    pattern="\d{6}"
+    required
+    autocomplete="off"
+    inputmode="numeric"
+  />
+  <button type="submit" class="btn">Verify</button>
+</form>
+<p class="resend-link" id="resendOtp">Didn't receive the code? Resend</p>
+<div class="error-message" id="errorMessage" style="display:none;"></div>
 
-      <label for="otp">OTP Code</label>
-      <input
-        type="text"
-        id="otp"
-        name="otp"
-        maxlength="6"
-        minlength="6"
-        placeholder="Enter the code"
-        pattern="\d{6}"
-        required
-        autocomplete="off"
-        inputmode="numeric"
-      />
-      <button type="submit" class="btn">Verify</button>
-    </form>
-    <p class="resend-link" id="resendOtp">Didn't receive the code? Resend</p>
   </div>
 
-  <script>
-    const resendLink = document.getElementById('resendOtp');
-    resendLink.addEventListener('click', () => {
-      alert('A new OTP has been sent to your email.');
-      // You can replace this alert with actual AJAX call to resend OTP
-    });
-
-    // Optional: Add client-side validation for OTP input on submit
-    const otpForm = document.getElementById('otpForm');
-    otpForm.addEventListener('submit', e => {
-      const otp = otpForm.otp.value.trim();
-      if (!/^\d{6}$/.test(otp)) {
-        e.preventDefault();
-        alert('Please enter a valid 6-digit OTP code.');
-      }
-    });
-  </script>
+  <script src="/js/otp.js"></script>
 </body>
 </html>

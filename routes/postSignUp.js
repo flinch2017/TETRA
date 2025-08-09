@@ -16,6 +16,8 @@ const uploadArtworkToS3 = require('../utils/uploadArtworkToS3');
 const uploadCanvasToS3 = require('../utils/uploadCanvasToS3');
 const paidCheck = require('../middleware/paidCheck.js');
 const paymentRoutes = require('./postPayment');
+const fetch = require('node-fetch');
+require('dotenv').config();
 
 
 let environment = new paypal.core.SandboxEnvironment(
@@ -40,22 +42,41 @@ router.get('/auth', (req, res) => {
 
 
 
+
+
 router.post('/signup', async (req, res) => {
   try {
-    const { username, email, password, confirmPassword } = req.body;
+    const { username, email, password, confirmPassword, 'g-recaptcha-response': captcha } = req.body;
 
-    // Basic validation
+    // 1️⃣ Check CAPTCHA presence
+    if (!captcha) {
+      return res.render('signup', { error: 'Please complete the CAPTCHA.' });
+    }
+
+    // 2️⃣ Verify CAPTCHA with Google
+    const captchaVerify = await fetch(`https://www.google.com/recaptcha/api/siteverify`, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        secret: process.env.RECAPTCHA_SECRET_KEY, // From Google reCAPTCHA
+        response: captcha
+      })
+    });
+
+    const captchaData = await captchaVerify.json();
+    if (!captchaData.success) {
+      return res.render('signup', { error: 'CAPTCHA verification failed. Please try again.' });
+    }
+
+    // 3️⃣ Basic validation
     if (!username || !email || !password || !confirmPassword) {
       return res.render('signup', { error: 'All fields are required.' });
     }
 
-    // Username validation: lowercase letters, numbers, or allowed symbols, no spaces
-    // Adjust the allowed symbols as needed. Here I allow underscore, hyphen, and dot:
     const usernameRegex = /^[a-z0-9._-]+$/;
     if (!usernameRegex.test(username)) {
       return res.render('signup', {
-        error:
-          'Username can only contain lowercase letters, numbers, and symbols (._-), and no spaces.'
+        error: 'Username can only contain lowercase letters, numbers, and symbols (._-), and no spaces.'
       });
     }
 
@@ -66,9 +87,8 @@ router.post('/signup', async (req, res) => {
       return res.render('signup', { error: 'Password must be at least 8 characters.' });
     }
 
-    // Check if username exists
+    // 4️⃣ Check if username/email exist
     const usernameCheck = await pool.query('SELECT 1 FROM users WHERE username = $1', [username]);
-    // Check if email exists
     const emailCheck = await pool.query('SELECT 1 FROM users WHERE email = $1', [email]);
 
     if (usernameCheck.rowCount > 0 && emailCheck.rowCount > 0) {
@@ -79,31 +99,30 @@ router.post('/signup', async (req, res) => {
       return res.render('signup', { error: 'Email is already taken.' });
     }
 
-    // Hash password securely
+    // 5️⃣ Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Generate 6-digit OTP
+    // 6️⃣ Generate OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-    // Insert new user into DB along with OTP and expiration (e.g., 10 min)
+    // 7️⃣ Insert into DB
     await pool.query(
       `INSERT INTO users (username, email, password, otp, otp_expires, verified)
        VALUES ($1, $2, $3, $4, NOW() + INTERVAL '10 minutes', false)`,
       [username, email, hashedPassword, otp]
     );
 
-    // Setup Nodemailer transporter (use your SMTP credentials)
+    // 8️⃣ Send OTP email
     let transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",   // your SMTP host
-      port: 587,
-      secure: false,                  // your SMTP port
+      host: process.env.SMTP_HOST,
+      port: process.env.SMTP_PORT,
+      secure: false,
       auth: {
-        user: "thedossiercreatives@gmail.com",  // your SMTP username
-        pass: "riso kltz lhbk jyvv"      // your SMTP password
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS
       }
     });
 
-    // Send OTP email
     await transporter.sendMail({
       from: '"TETRA" <no-reply@tetra.com>',
       to: email,
@@ -112,7 +131,7 @@ router.post('/signup', async (req, res) => {
       html: `<p>Your verification code is: <b>${otp}</b></p>`
     });
 
-    // Redirect to OTP verification page
+    // 9️⃣ Redirect to OTP page
     res.redirect(`/auth?email=${encodeURIComponent(email)}`);
 
   } catch (error) {
@@ -120,6 +139,7 @@ router.post('/signup', async (req, res) => {
     res.render('signup', { error: 'Internal Server Error. Please try again later.' });
   }
 });
+
 
 
 router.get('/test-email', async (req, res) => {
@@ -154,10 +174,7 @@ router.post('/verify-otp', async (req, res) => {
   const { otp } = req.body;
 
   if (!otp) {
-    return res.render('auth', {
-      error: 'Please enter the OTP.',
-      email
-    });
+    return res.status(400).json({ success: false, error: 'Please enter the OTP.' });
   }
 
   try {
@@ -167,23 +184,17 @@ router.post('/verify-otp', async (req, res) => {
     );
 
     if (result.rowCount === 0) {
-      return res.render('auth', {
-        error: 'User not found.',
-        email
-      });
+      return res.status(404).json({ success: false, error: 'User not found.' });
     }
 
     const user = result.rows[0];
 
     // Check if OTP matches and is not expired
     if (user.otp !== otp || new Date(user.otp_expires) < new Date()) {
-      return res.render('auth', {
-        error: 'Invalid or expired OTP. Please try again.',
-        email
-      });
+      return res.status(400).json({ success: false, error: 'Invalid or expired OTP. Please try again.' });
     }
 
-    // Generate 20-character acode: YYYYMMDD-XXXXXXXX
+    // Generate unique acode: YYYYMMDD-XXXXXXXX
     const generateUniqueAcode = async () => {
       const date = new Date();
       const yyyy = date.getFullYear().toString();
@@ -201,14 +212,13 @@ router.post('/verify-otp', async (req, res) => {
 
     const acode = await generateUniqueAcode();
 
-    // Mark user as verified, set account_mode to 'regular', and save acode
-await pool.query(
-  `UPDATE users 
-   SET verified = true, otp = NULL, otp_expires = NULL, acode = $1, account_mode = 'regular'
-   WHERE email = $2`,
-  [acode, email]
-);
-
+    // Mark user as verified
+    await pool.query(
+      `UPDATE users 
+       SET verified = true, otp = NULL, otp_expires = NULL, acode = $1, account_mode = 'regular'
+       WHERE email = $2`,
+      [acode, email]
+    );
 
     // Create session
     req.session.user = {
@@ -217,16 +227,71 @@ await pool.query(
       email: user.email
     };
 
-    res.redirect('/pricing');
+    // Respond with success + redirect target
+    res.json({ success: true, redirect: '/pricing' });
 
   } catch (err) {
     console.error('OTP verification error:', err);
-    res.render('auth', {
-      error: 'Something went wrong. Please try again later.',
-      email
-    });
+    res.status(500).json({ success: false, error: 'Something went wrong. Please try again later.' });
   }
 });
+
+
+router.post('/resend-otp', async (req, res) => {
+  const { email } = req.query;
+
+  if (!email) {
+    return res.status(400).json({ success: false, error: 'Email is required.' });
+  }
+
+  try {
+    // Check if user exists
+    const userResult = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
+    if (userResult.rowCount === 0) {
+      return res.status(404).json({ success: false, error: 'User not found.' });
+    }
+
+    // Generate new 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Update user record with new OTP + expiration (10 min)
+    await pool.query(
+      `UPDATE users
+       SET otp = $1,
+           otp_expires = NOW() + INTERVAL '10 minutes'
+       WHERE email = $2`,
+      [otp, email]
+    );
+
+    // Reuse the same Nodemailer setup from signup
+    let transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: process.env.SMTP_PORT,
+      secure: false,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS
+      }
+    });
+
+    // Send OTP email (same format as signup)
+    await transporter.sendMail({
+      from: '"TETRA" <no-reply@tetra.com>',
+      to: email,
+      subject: "Verify your email - OTP code",
+      text: `Your verification code is: ${otp}`,
+      html: `<p>Your verification code is: <b>${otp}</b></p>`
+    });
+
+    res.json({ success: true });
+
+  } catch (err) {
+    console.error('Resend OTP error:', err);
+    res.status(500).json({ success: false, error: 'Internal Server Error' });
+  }
+});
+
+
 
 
 
