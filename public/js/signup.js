@@ -1,25 +1,14 @@
-function renderRecaptcha() {
-  if (typeof grecaptcha !== 'undefined') {
-    const container = document.querySelector('.g-recaptcha');
-    if (container) {
-      // Clear previous widget if any
-      container.innerHTML = '';
+function renderRecaptchaWidget() {
+  const container = document.querySelector('.g-recaptcha');
+  if (!container) return;
 
-      // Render the widget again
-      grecaptcha.render(container, {
-        sitekey: '6LeS058rAAAAAPtasBchk895HK0PspPMlUAcC1zq',
-      });
-    }
-  }
-}
+  // If we already rendered a widget here, reset container first
+  container.innerHTML = '';
 
-function renderRecaptchaWhenReady() {
-  if (typeof grecaptcha !== 'undefined') {
-    renderRecaptcha();
-  } else {
-    // Retry after 100ms if grecaptcha not yet loaded
-    setTimeout(renderRecaptchaWhenReady, 100);
-  }
+  // Render the widget explicitly and save widgetId
+  window.recaptchaWidgets.signup = grecaptcha.render(container, {
+    sitekey: '6LeS058rAAAAAPtasBchk895HK0PspPMlUAcC1zq',
+  });
 }
 
 function bindSignupForm() {
@@ -28,10 +17,8 @@ function bindSignupForm() {
 
   if (!form || !errorMessage) return; // no signup form on this page
 
-  // Remove any existing listeners to avoid duplicates
   form.removeEventListener('submit', signupFormSubmitHandler);
 
-  // Define submit handler separately so we can remove it
   function signupFormSubmitHandler(e) {
     errorMessage.style.display = 'none';
     const password = form.password.value;
@@ -44,7 +31,7 @@ function bindSignupForm() {
       return;
     }
 
-    if (typeof grecaptcha !== 'undefined' && grecaptcha.getResponse().length === 0) {
+    if (!grecaptcha || grecaptcha.getResponse(window.recaptchaWidgets.signup).length === 0) {
       e.preventDefault();
       errorMessage.textContent = 'Please complete the CAPTCHA.';
       errorMessage.style.display = 'block';
@@ -53,6 +40,10 @@ function bindSignupForm() {
 
   form.addEventListener('submit', signupFormSubmitHandler);
 
-  // Render reCAPTCHA widget after signup form is bound
-  renderRecaptchaWhenReady();
+  if (typeof grecaptcha !== 'undefined') {
+    renderRecaptchaWidget();
+  } else {
+    // Wait for recaptcha to load
+    document.addEventListener('recaptchaLoaded', renderRecaptchaWidget, { once: true });
+  }
 }
