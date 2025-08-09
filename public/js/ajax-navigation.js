@@ -276,12 +276,7 @@ function bindSearchFormSubmission() {
   });
 }
 
-window.recaptchaWidgets = {};
 
-window.onRecaptchaLoad = function() {
-  // Called when recaptcha API finished loading
-  document.dispatchEvent(new Event('recaptchaLoaded'));
-};
 
 
 
