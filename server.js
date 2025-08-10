@@ -102,10 +102,10 @@ app.use(helmet({
         "https://www.paypal.com",
         "https://www.sandbox.paypal.com",
         "https://cdn.jsdelivr.net",
-        "https://www.google.com",      // <-- Add this
-        "https://www.gstatic.com",      // <-- Add this
-        "https://pagead2.googlesyndication.com",  // <--- add this
-        "https://ep2.adtrafficquality.google"  // Add this line
+        "https://www.google.com",
+        "https://www.gstatic.com",
+        "https://pagead2.googlesyndication.com",
+        "https://ep2.adtrafficquality.google"
       ],
       styleSrc: [
         "'self'",
@@ -128,27 +128,28 @@ app.use(helmet({
         "https://tetrametropolis.s3.amazonaws.com",
         "https://s3.amazonaws.com",
         "http://192.168.1.7:3000",
-        "https://pagead2.googlesyndication.com", // <--- add this line
-        "https://ep1.adtrafficquality.google"  // add this line
+        "https://pagead2.googlesyndication.com",
+        "https://ep1.adtrafficquality.google"
       ],
       frameSrc: [
         "'self'",
         "https://js.stripe.com",
         "https://www.paypal.com",
         "https://www.sandbox.paypal.com",
-        "https://googleads.g.doubleclick.net",  // Add this line
-        "https://ep2.adtrafficquality.google",   // Add this line
-        "https://www.google.com",   // Add this line
-        "https://ep2.adtrafficquality.google"   // add this line
+        "https://googleads.g.doubleclick.net",
+        "https://ep2.adtrafficquality.google",
+        "https://www.google.com",
+        "https://ep2.adtrafficquality.google"
       ],
       connectSrc: [
         "'self'",
         "https://api.stripe.com",
         "https://www.paypal.com",
         "https://www.sandbox.paypal.com",
-        "https://ep1.adtrafficquality.google",  // add this line
-        "https://pagead2.googlesyndication.com",  // ADD THIS LINE
-        "https://www.google.com"   // <-- Add this line
+        "https://ep1.adtrafficquality.google",
+        "https://pagead2.googlesyndication.com",
+        "https://www.google.com",
+        "https://csi.gstatic.com"   // <--- Added this line
       ],
       mediaSrc: [
         "'self'",
@@ -158,6 +159,7 @@ app.use(helmet({
     }
   }
 }));
+
 
 
 // Routes
