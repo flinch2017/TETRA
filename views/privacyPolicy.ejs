@@ -5,23 +5,95 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title><%= siteName %> — Privacy Policy</title>
   <style>
-    body{font-family:Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;line-height:1.6;color:#111;background:#f9fafb;padding:32px}
-    .container{max-width:900px;margin:0 auto;background:#fff;padding:28px;border-radius:12px;box-shadow:0 8px 24px rgba(16,24,40,0.06)}
-    h1,h2{color:#0f172a}
-    p,li{color:#334155}
-    pre{background:#0f172a;color:#fff;padding:12px;border-radius:8px;overflow:auto}
-    .muted{color:#64748b;font-size:0.95em}
-    footer{margin-top:28px;font-size:0.9em;color:#475569}
-    a{color:#0ea5a4}
+    :root {
+      --primary: #0ea5a4; /* teal accent */
+      --text-dark: #0f172a;
+      --text-muted: #64748b;
+      --bg-light: #f9fafb;
+      --bg-white: #ffffff;
+      --border-color: #e2e8f0;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.7;
+      color: var(--text-dark);
+      background: var(--bg-light);
+      padding: 32px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--bg-white);
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(15, 23, 42, 0.08);
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 4px;
+      color: var(--text-dark);
+    }
+
+    h2 {
+      font-size: 1.25rem;
+      margin-top: 32px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid var(--border-color);
+      color: var(--text-dark);
+    }
+
+    p, li {
+      font-size: 1rem;
+      color: var(--text-muted);
+    }
+
+    ul {
+      padding-left: 20px;
+      margin: 12px 0;
+    }
+
+    a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .muted {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+    }
+
+    .privacy-header {
+      border-bottom: 2px solid var(--border-color);
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+    }
+
+    footer {
+      margin-top: 32px;
+      padding-top: 16px;
+      border-top: 2px solid var(--border-color);
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    strong {
+      color: var(--text-dark);
+    }
   </style>
 </head>
 <body>
   <main class="container">
-    <header>
+    <div class="privacy-header">
       <h1>Privacy Policy</h1>
       <p class="muted">Effective date: <strong><%= effectiveDate %></strong></p>
       <p class="muted">Last updated: <%= lastUpdated || effectiveDate %></p>
-    </header>
+    </div>
 
     <section>
       <p>This Privacy Policy explains how <strong><%= siteName %></strong> ("we", "us", or "our") collects, uses, discloses, and protects information when you use our music streaming and sharing service available at <a href="<%= siteUrl %>"><%= siteUrl %></a> (the "Service").</p>
@@ -77,7 +149,7 @@
 
     <footer>
       <p>If you have questions or requests regarding this Privacy Policy, contact us at <a href="mailto:<%= supportEmail %>"><%= supportEmail %></a> or visit <a href="<%= siteUrl %>"><%= siteUrl %></a>.</p>
-      <p class="muted">© <%= new Date().getFullYear() %> <%= siteName %>. All rights reserved.</p>
+      <p>© <%= new Date().getFullYear() %> <%= siteName %>. All rights reserved.</p>
     </footer>
   </main>
 </body>

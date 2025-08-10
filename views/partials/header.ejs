@@ -18,6 +18,21 @@
 
 <header>
   <div class="logoPlus">
-    <a href="/" style="color: #007aff; text-decoration: none;">TETRA</a>
-  </div>
+  <a href="#" class="go-back" style="color: #007aff; text-decoration: none;">TETRA</a>
+</div>
+</div>
+
+<script>
+document.addEventListener('click', function (e) {
+  const link = e.target.closest('.go-back');
+  if (!link) return;
+  e.preventDefault();
+  if (document.referrer) {
+    history.back();
+  } else {
+    window.location.href = '/'; // fallback
+  }
+});
+</script>
+
 </header>

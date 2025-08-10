@@ -21,7 +21,7 @@ const expressLayouts = require('express-ejs-layouts');
 
 
 
-router.get('/privacy-policy', async (req, res) => {
+router.get('/terms-conditions', async (req, res) => {
   let userAcode = req.session.user?.acode || null;
   let pfpUrl = null;
   let showHeader = true;
@@ -52,12 +52,11 @@ router.get('/privacy-policy', async (req, res) => {
     showMusicBar = false;
   }
 
-  res.render('privacyPolicy', {
+  res.render('termsConditions', {
     siteName: 'TETRA METROPOLIS',
     siteUrl: 'https://tetrometro.com',
     effectiveDate: 'August 10, 2025',
-    lastUpdated: 'August 10, 2025',
-    supportEmail: 'support@tetrometro.com',
+    supportEmail: 'support@tetrametro.com',
     userAcode,
     pfpUrl,
     showHeader,

@@ -15,7 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
 if (
   href === '/login' ||
   href.startsWith('/submission') ||
-  href === '/signup'
+  href === '/signup' ||
+  href === '/privacy-policy'
 ) return;
 
 
