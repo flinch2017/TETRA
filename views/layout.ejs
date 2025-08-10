@@ -3,64 +3,32 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css" />
-
-
   <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-
-  
-
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6266603042074515"
      crossorigin="anonymous"></script>
-     <script src="https://www.paypal.com/sdk/js?client-id=AcIAKpwvSCs9G682ZO2017hXgpnp25fyxmHhd5RUSPLLRcONWH9OOZidDo86DR7Mbs4k2Mo5oAkHa2lu&currency=PHP"></script>
-  
-
-  
-
-  <link rel="stylesheet" href="/css/profile.css" />
-  <link rel="stylesheet" href="/css/dashboard.css" />
-  <link rel="stylesheet" href="/css/console_header.css" />
-  <link rel="stylesheet" href="/css/music_bar.css" />
-  <link rel="stylesheet" href="/css/posting.css" />
-  <link rel="stylesheet" href="/css/releaseform.css" />
-  <link rel="stylesheet" href="/css/login.css" />
-  <link rel="stylesheet" href="/css/signup.css" />
-  <link rel="stylesheet" href="/css/music.css" />
-  <link rel="stylesheet" href="/css/edit-profile.css" />
-  <link rel="stylesheet" href="/css/album.css" />
-  <link rel="stylesheet" href="/css/postView.css" />
-  <link rel="stylesheet" href="/css/search_results.css" />
-  <link rel="stylesheet" href="/css/discography.css" />
-  <link rel="stylesheet" href="/css/pricing.css" />
+  <script src="https://www.paypal.com/sdk/js?client-id=AcIAKpwvSCs9G682ZO2017hXgpnp25fyxmHhd5RUSPLLRcONWH9OOZidDo86DR7Mbs4k2Mo5oAkHa2lu&currency=PHP"></script>
+  <link rel="stylesheet" href="/css/main.css">
 </head>
 <body data-user-acode="<%= userAcode %>">
-
   <% if (typeof showHeader === 'undefined' || showHeader) { %>
   <div class="fixed-header">
     <%- include('partials/console_header') %>
   </div>
-<% } else { %>
-  <div class="fixed-header">
-    <%- include('partials/header') %>
-  </div>
-<% } %>
-
-
+  <% } else { %>
+    <div class="fixed-header">
+      <%- include('partials/header') %>
+    </div>
+  <% } %>
   <main id="appContent">
     <%- body %>
   </main>
-
   <% if (typeof showMusicBar === 'undefined' || showMusicBar) { %>
     <div class="fixed-bar">
       <%- include('partials/music_bar') %>
     </div>
   <% } %>
-
-
-
-
   <script src="/js/dashboard.js"></script>
   <script src="/js/console_header.js"></script>
   <script src="/js/profile.js"></script>
@@ -72,9 +40,7 @@
   <script src="/js/discography.js"></script>
   <script src="/js/pricingPlans.js"></script>
   <script src="/js/signup.js"></script>
-
   <script type="module" src="/js/releaseform.js"></script>
   <script src="/js/ajax-navigation.js"></script>
-
 </body>
 </html>
