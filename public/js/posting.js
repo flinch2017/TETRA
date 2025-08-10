@@ -80,52 +80,100 @@ function bindPostFormEvents() {
   images.addEventListener('change', () => handleFiles(images.files, 'image'));
   videos.addEventListener('change', () => handleFiles(videos.files, 'video'));
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
+  form.addEventListener('submit', (e) => {
+  e.preventDefault();
 
-    const dataTransferImages = new DataTransfer();
-    const dataTransferVideos = new DataTransfer();
+  const postButton = document.getElementById('postButton');
+  const progressContainer = document.getElementById('uploadProgressContainer');
+  const progressBar = document.getElementById('uploadProgressBar');
+  const progressText = document.getElementById('uploadProgressText');
 
-    selectedFiles.forEach(file => {
-      if (file.type.startsWith('image/')) {
-        dataTransferImages.items.add(file);
-      } else if (file.type.startsWith('video/')) {
-        dataTransferVideos.items.add(file);
-      }
-    });
+  // Prepare files for upload again
+  const dataTransferImages = new DataTransfer();
+  const dataTransferVideos = new DataTransfer();
 
-    document.getElementById('imagesInput').files = dataTransferImages.files;
-    document.getElementById('videosInput').files = dataTransferVideos.files;
-
-    const formData = new FormData(form);
-
-    try {
-      const response = await fetch('/create-post', {
-        method: 'POST',
-        body: formData
-      });
-
-      const result = await response.json();
-
-      if (result.success) {
-        alertMessage.textContent = result.message;
-
-        alertBox.classList.remove('hidden');
-        setTimeout(() => alertBox.classList.add('show'), 10);
-
-        setTimeout(() => {
-          alertBox.classList.remove('show');
-          setTimeout(() => {
-            alertBox.classList.add('hidden');
-            window.location.href = '/dashboard';
-          }, 400);
-        }, 2000);
-
-      } else {
-        alert('Error: ' + result.message);
-      }
-    } catch (error) {
-      alert('Network error');
+  selectedFiles.forEach(file => {
+    if (file.type.startsWith('image/')) {
+      dataTransferImages.items.add(file);
+    } else if (file.type.startsWith('video/')) {
+      dataTransferVideos.items.add(file);
     }
   });
+
+  document.getElementById('imagesInput').files = dataTransferImages.files;
+  document.getElementById('videosInput').files = dataTransferVideos.files;
+
+  const formData = new FormData(form);
+
+  // Hide button, show progress bar
+  postButton.style.display = 'none';
+  progressContainer.classList.add('show');
+
+  const xhr = new XMLHttpRequest();
+
+  xhr.open('POST', '/create-post');
+
+  xhr.upload.addEventListener('progress', (event) => {
+    if (event.lengthComputable) {
+      const percent = Math.round((event.loaded / event.total) * 100);
+      progressBar.style.width = percent + '%';
+      progressText.textContent = percent + '%';
+    }
+  });
+
+  xhr.onload = () => {
+    if (xhr.status >= 200 && xhr.status < 300) {
+      try {
+        const result = JSON.parse(xhr.responseText);
+        if (result.success) {
+          alertMessage.textContent = result.message;
+
+          alertBox.classList.remove('hidden');
+          setTimeout(() => alertBox.classList.add('show'), 10);
+
+          setTimeout(() => {
+            alertBox.classList.remove('show');
+            setTimeout(() => {
+              alertBox.classList.add('hidden');
+              window.location.href = '/dashboard';
+            }, 400);
+          }, 2000);
+        } else {
+          alert('Error: ' + result.message);
+          // revert UI
+          postButton.style.display = 'inline-block';
+          progressContainer.classList.remove('show');
+          progressBar.style.width = '0%';
+          progressText.textContent = '0%';
+        }
+      } catch (e) {
+        alert('Invalid server response');
+        // revert UI
+        postButton.style.display = 'inline-block';
+        progressContainer.classList.remove('show');
+        progressBar.style.width = '0%';
+        progressText.textContent = '0%';
+      }
+    } else {
+      alert('Server error: ' + xhr.status);
+      // revert UI
+      postButton.style.display = 'inline-block';
+      progressContainer.classList.remove('show');
+      progressBar.style.width = '0%';
+      progressText.textContent = '0%';
+    }
+  };
+
+  xhr.onerror = () => {
+    alert('Network error during upload');
+    // revert UI
+    postButton.style.display = 'inline-block';
+    progressContainer.classList.remove('show');
+    progressBar.style.width = '0%';
+    progressText.textContent = '0%';
+  };
+
+  xhr.send(formData);
+});
+
 }

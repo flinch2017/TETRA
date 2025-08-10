@@ -1,7 +1,7 @@
 
 <div class="form-container">
   <div id="alertBox" class="alert-box hidden">
-  <span class="checkmark">✔</span>
+  <span class="checkmark"></span>
   <span id="alertMessage"></span>
 </div>
   
@@ -25,8 +25,15 @@
     <input type="file" name="videos" id="videosInput" accept="video/*" multiple hidden />
 
     <div class="button-group">
-      <button type="submit">Post</button>
-    </div>
+  <button type="submit" id="postButton">Post</button>
+
+  <!-- Progress bar container, hidden initially -->
+  <div id="uploadProgressContainer" class="upload-progress-container hidden">
+    <div id="uploadProgressBar" class="upload-progress-bar" style="width: 0%"></div>
+    <span id="uploadProgressText">0%</span>
+  </div>
+</div>
+
   </form>
 
  
