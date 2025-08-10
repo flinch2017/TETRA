@@ -48,71 +48,57 @@ router.post('/signup', async (req, res) => {
   try {
     const { username, email, password, confirmPassword, 'g-recaptcha-response': captcha } = req.body;
 
-    // 1️⃣ Check CAPTCHA presence
-    if (!captcha) {
-      return res.render('signup', { error: 'Please complete the CAPTCHA.' });
-    }
+    const sendError = (msg) => {
+      if (req.xhr) return res.status(400).json({ error: msg });
+      return res.render('signup', { error: msg });
+    };
 
-    // 2️⃣ Verify CAPTCHA with Google
+    if (!captcha) return sendError('Please complete the CAPTCHA.');
+
     const captchaVerify = await fetch(`https://www.google.com/recaptcha/api/siteverify`, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: new URLSearchParams({
-        secret: process.env.RECAPTCHA_SECRET_KEY, // From Google reCAPTCHA
+        secret: process.env.RECAPTCHA_SECRET_KEY,
         response: captcha
       })
     });
 
     const captchaData = await captchaVerify.json();
-    if (!captchaData.success) {
-      return res.render('signup', { error: 'CAPTCHA verification failed. Please try again.' });
-    }
+    if (!captchaData.success) return sendError('CAPTCHA verification failed. Please try again.');
 
-    // 3️⃣ Basic validation
     if (!username || !email || !password || !confirmPassword) {
-      return res.render('signup', { error: 'All fields are required.' });
+      return sendError('All fields are required.');
     }
 
     const usernameRegex = /^[a-z0-9._-]+$/;
     if (!usernameRegex.test(username)) {
-      return res.render('signup', {
-        error: 'Username can only contain lowercase letters, numbers, and symbols (._-), and no spaces.'
-      });
+      return sendError('Username can only contain lowercase letters, numbers, and symbols (._-), and no spaces.');
     }
 
-    if (password !== confirmPassword) {
-      return res.render('signup', { error: 'Passwords do not match.' });
-    }
-    if (password.length < 8) {
-      return res.render('signup', { error: 'Password must be at least 8 characters.' });
-    }
+    if (password !== confirmPassword) return sendError('Passwords do not match.');
+    if (password.length < 8) return sendError('Password must be at least 8 characters.');
 
-    // 4️⃣ Check if username/email exist
     const usernameCheck = await pool.query('SELECT 1 FROM users WHERE username = $1', [username]);
     const emailCheck = await pool.query('SELECT 1 FROM users WHERE email = $1', [email]);
 
     if (usernameCheck.rowCount > 0 && emailCheck.rowCount > 0) {
-      return res.render('signup', { error: 'Both username and email are already taken.' });
+      return sendError('Both username and email are already taken.');
     } else if (usernameCheck.rowCount > 0) {
-      return res.render('signup', { error: 'Username is already taken.' });
+      return sendError('Username is already taken.');
     } else if (emailCheck.rowCount > 0) {
-      return res.render('signup', { error: 'Email is already taken.' });
+      return sendError('Email is already taken.');
     }
 
-    // 5️⃣ Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    // 6️⃣ Generate OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-    // 7️⃣ Insert into DB
     await pool.query(
       `INSERT INTO users (username, email, password, otp, otp_expires, verified)
        VALUES ($1, $2, $3, $4, NOW() + INTERVAL '10 minutes', false)`,
       [username, email, hashedPassword, otp]
     );
 
-    // 8️⃣ Send OTP email
     let transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
       port: process.env.SMTP_PORT,
@@ -127,18 +113,24 @@ router.post('/signup', async (req, res) => {
       from: '"TETRA" <no-reply@tetra.com>',
       to: email,
       subject: "Verify your email - OTP code",
-      text: `Your verification code is: ${otp}`,
       html: `<p>Your verification code is: <b>${otp}</b></p>`
     });
 
-    // 9️⃣ Redirect to OTP page
-    res.redirect(`/auth?email=${encodeURIComponent(email)}`);
+    if (req.xhr) {
+      return res.json({ success: true, redirect: `/auth?email=${encodeURIComponent(email)}` });
+    } else {
+      return res.redirect(`/auth?email=${encodeURIComponent(email)}`);
+    }
 
   } catch (error) {
     console.error('Signup error:', error);
+    if (req.xhr) {
+      return res.status(500).json({ error: 'Internal Server Error. Please try again later.' });
+    }
     res.render('signup', { error: 'Internal Server Error. Please try again later.' });
   }
 });
+
 
 
 
