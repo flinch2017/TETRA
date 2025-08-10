@@ -154,11 +154,6 @@ body {
 
   .song-title {
   font-weight: 500;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 250px;
-  display: inline-block;
 }
 
 
@@ -192,33 +187,36 @@ body {
   }
 
   @media screen and (max-width: 600px) {
-    .artist-name {
-      font-size: 2rem;
-    }
-
-    .section {
-      padding: 1rem;
-    }
-
-    .song-info img {
-      width: 40px;
-      height: 40px;
-    }
-
-    .song-info {
-  max-width: 100%;
-  overflow: hidden;
-}
-
-.song-title {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
-  display: block;
-}
-
+  .artist-name {
+    font-size: 2rem;
   }
+
+  .section {
+    padding: 1rem;
+  }
+
+  .song-info img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .song-info {
+    max-width: 100%;
+    /* if flex container, you might want: */
+    /* flex-shrink: 1; */
+  }
+
+  .song-title {
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;  /* smaller max-width for mobile */
+    display: inline-block;
+    vertical-align: middle;
+  }
+}
+
 
   .artist-rank {
   position: absolute;
