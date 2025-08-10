@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title><%= siteName %> — Privacy Policy</title>
+  <style>
+    body{font-family:Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;line-height:1.6;color:#111;background:#f9fafb;padding:32px}
+    .container{max-width:900px;margin:0 auto;background:#fff;padding:28px;border-radius:12px;box-shadow:0 8px 24px rgba(16,24,40,0.06)}
+    h1,h2{color:#0f172a}
+    p,li{color:#334155}
+    pre{background:#0f172a;color:#fff;padding:12px;border-radius:8px;overflow:auto}
+    .muted{color:#64748b;font-size:0.95em}
+    footer{margin-top:28px;font-size:0.9em;color:#475569}
+    a{color:#0ea5a4}
+  </style>
+</head>
+<body>
+  <main class="container">
+    <header>
+      <h1>Privacy Policy</h1>
+      <p class="muted">Effective date: <strong><%= effectiveDate %></strong></p>
+      <p class="muted">Last updated: <%= lastUpdated || effectiveDate %></p>
+    </header>
+
+    <section>
+      <p>This Privacy Policy explains how <strong><%= siteName %></strong> ("we", "us", or "our") collects, uses, discloses, and protects information when you use our music streaming and sharing service available at <a href="<%= siteUrl %>"><%= siteUrl %></a> (the "Service").</p>
+    </section>
+
+    <h2>1. Information We Collect</h2>
+    <p>We collect information in the following categories:</p>
+    <ul>
+      <li><strong>Information you provide:</strong> account details (name, email, username), profile picture, artist metadata, uploaded content (audio, artwork, descriptions), and messages or comments.</li>
+      <li><strong>Automatically collected information:</strong> usage data (pages visited, streaming activity, interactions), device and technical data (IP address, browser, device identifiers), and cookies or similar tracking technologies.</li>
+      <li><strong>Third-party sources:</strong> social media accounts you link, and payment providers when you make purchases or subscribe.</li>
+    </ul>
+
+    <h2>2. How We Use Your Information</h2>
+    <ul>
+      <li>To provide and operate the Service, including streaming and sharing functionality.</li>
+      <li>To personalize recommendations and improve user experience.</li>
+      <li>To enable social features (follows, likes, comments) and to display public profile and uploaded content.</li>
+      <li>To process payments and manage subscriptions through third-party payment processors.</li>
+      <li>To communicate updates, notifications, and support messages.</li>
+      <li>To detect, prevent, and respond to fraud, abuse, or technical issues.</li>
+    </ul>
+
+    <h2>3. Sharing and Disclosure</h2>
+    <p>We will not sell your personal information. We may share information with:</p>
+    <ul>
+      <li>Service providers (hosting, analytics, payment processors) who perform services on our behalf.</li>
+      <li>Other users: content you publish (profiles, uploaded tracks, public playlists, and comments) will be visible to others depending on your privacy settings.</li>
+      <li>Law enforcement or third parties if required by law or to protect rights and safety.</li>
+      <li>Third parties involved in a business transfer (acquisition, merger, insolvency).</li>
+    </ul>
+
+    <h2>4. Cookies & Tracking</h2>
+    <p>We use cookies and similar technologies to keep you signed in, remember preferences, analyze usage, and serve recommendations. You may control or disable cookies via your browser, but some features may not function properly if cookies are disabled.</p>
+
+    <h2>5. Your Rights</h2>
+    <p>Depending on your jurisdiction (for example under GDPR or CCPA), you may have rights to access, correct, port, or delete your personal data, or to object to certain processing. To exercise these rights, contact us at <a href="mailto:<%= supportEmail %>"><%= supportEmail %></a>. We will verify requests as required by law.</p>
+
+    <h2>6. Data Retention</h2>
+    <p>We retain personal data as long as your account is active and as necessary to provide the Service, comply with legal obligations, prevent abuse, and enforce our agreements. You may request deletion of your account and data; note that some data may remain in backups or logs for a limited time.</p>
+
+    <h2>7. Security</h2>
+    <p>We implement reasonable technical and organizational measures to protect data. However, no system is completely secure; please take care when sharing sensitive information.</p>
+
+    <h2>8. Third-Party Links</h2>
+    <p>Our Service may include links to third-party websites, apps, or services. We are not responsible for the privacy practices of those third parties; review their policies separately.</p>
+
+    <h2>9. Children</h2>
+    <p>Our Service is not directed to children under 13. We do not knowingly collect personal information from children under 13. If you believe we have such data, contact us to request deletion.</p>
+
+    <h2>10. Changes to This Policy</h2>
+    <p>We may update this Privacy Policy from time to time. If we make material changes, we will notify you by posting the new policy and updating the "Last updated" date. Continued use of the Service after changes indicates acceptance.</p>
+
+    <footer>
+      <p>If you have questions or requests regarding this Privacy Policy, contact us at <a href="mailto:<%= supportEmail %>"><%= supportEmail %></a> or visit <a href="<%= siteUrl %>"><%= siteUrl %></a>.</p>
+      <p class="muted">© <%= new Date().getFullYear() %> <%= siteName %>. All rights reserved.</p>
+    </footer>
+  </main>
+</body>
+</html>

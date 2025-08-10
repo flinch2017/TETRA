@@ -51,6 +51,7 @@ const getReleaseView = require('./getReleaseView.js');
 const getPostView = require('./getPostView.js');
 const getSearch = require('./getSearch.js');
 const getDiscography = require('./getDiscography.js');
+const getPrivacyPolicy = require('./getPrivacyPolicy.js');
 
 
 
@@ -80,7 +81,7 @@ router.get('/', (req, res) => {
 
 
 
-router.use('/', getSignUp, getLogIn, getDashboard, getProfile, getCreatePost, getEditProfile, getMedia, getSubmission, getSearchArtists, getMusicPlay, getLogOut, getMusic, getReleaseView, getPostView, getSearch, getDiscography);
+router.use('/', getSignUp, getLogIn, getDashboard, getProfile, getCreatePost, getEditProfile, getMedia, getSubmission, getSearchArtists, getMusicPlay, getLogOut, getMusic, getReleaseView, getPostView, getSearch, getDiscography, getPrivacyPolicy);
 
 router.use('/', postLogIn, postSignUp, postFollowUnfollow, postEditProfile, postUpdateArtist, postCreatePost, postUploadTrack, postDeleteTrack, postCheckDuplicates, postSubmitRelease, postMusicPlay, postLikeTrack, postLikePost, postCommentPost);
 
