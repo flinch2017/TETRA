@@ -153,8 +153,14 @@ body {
   }
 
   .song-title {
-    font-weight: 500;
-  }
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 250px;
+  display: inline-block;
+}
+
 
   .song-actions i {
     margin-left: 1rem;
@@ -198,6 +204,20 @@ body {
       width: 40px;
       height: 40px;
     }
+
+    .song-info {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.song-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  display: block;
+}
+
   }
 
   .artist-rank {
