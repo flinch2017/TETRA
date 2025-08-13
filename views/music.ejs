@@ -1,77 +1,96 @@
 <div class="dashboard-wrapper">
+  <!-- Main Content -->
+  <main class="main-dashboard">
     
-
-
-    <!-- Main Content -->
-    <main class="main-dashboard">
-      <!-- Section 1: Promotional Posts / Releases -->
-      <section class="section promo-section">
-  <h2>New Releases</h2>
-
-  <% if (promotionalPosts.length === 0) { %>
-    <p style="margin-left: 1rem; color: #888;">No available content</p>
-  <% } else { %>
-    <div class="horizontal-scroll">
-      <% promotionalPosts.forEach(release => { %>
-        <a href="/album/<%= release.id %>" class="release-card-link">
-          <div class="card promo-card">
-            <img src="<%= release.coverUrl %>" alt="Promo Cover">
-            <h3><%= release.title %></h3>
-            <p><%= release.artist %></p>
+    <!-- Section 1: Promotional Posts / Releases -->
+    <section class="section promo-section">
+      <h2>New Releases</h2>
+      <% if (promotionalPosts.length === 0) { %>
+        <p style="margin-left: 1rem; color: #888;">No available content</p>
+      <% } else { %>
+        <div class="scroll-wrapperx">
+          <button class="scroll-arrow left" data-scroll="left">&#10094;</button>
+          <div class="horizontal-scroll">
+            <% promotionalPosts.forEach(release => { %>
+              <a href="/album/<%= release.id %>" class="release-card-link">
+                <div class="card promo-card">
+                  <img src="<%= release.coverUrl %>" alt="Promo Cover">
+                  <h3><%= release.title %></h3>
+                  <p><%= release.artist %></p>
+                </div>
+              </a>
+            <% }) %>
           </div>
-        </a>
-      <% }) %>
-    </div>
-  <% } %>
-</section>
-
-
-      <!-- Section 2: Recently Played -->
-      <section class="section recents-section">
-  <h2>Recently Played</h2>
-  <div class="horizontal-scroll">
-    <% recentTracks.forEach(track => { %>
-      <div 
-        class="card track-card clickable-song" 
-        data-song-id="<%= track.track_id %>">
-        <img src="<%= track.coverUrl %>" alt="Cover">
-        <h3><%= track.title %></h3>
-        <p><%= track.artist %></p>
-      </div>
-    <% }) %>
-  </div>
-</section>
-
-
-
-      <!-- Section 3: Playlists -->
-      <section class="section playlists-section">
-        <h2>Discover</h2>
-        <div class="grid-layout">
-          <% playlists.forEach(playlist => { %>
-            <div class="card playlist-card">
-              <img src="<%= playlist.coverUrl %>" alt="Playlist Cover">
-              <h3><%= playlist.name %></h3>
-              <p><%= playlist.track_count %> Tracks</p>
-
-            </div>
-          <% }) %>
+          <button class="scroll-arrow right" data-scroll="right">&#10095;</button>
         </div>
-      </section>
+      <% } %>
+    </section>
 
-      <!-- Section 4: Top Videos -->
-      <section class="section videos-section">
-        <h2>Top Videos</h2>
-        <div class="grid-layout">
-          <% topVideos.forEach(video => { %>
-  <div class="card video-card">
-    <video src="<%= video.videoUrl || '#' %>" poster="<%= video.thumbnail %>" controls></video>
-    <h3><%= video.title %></h3>
-    <p><%= video.artist %></p>
-  </div>
-<% }) %>
-
+    <!-- Section 2: Recently Played -->
+    <section class="section recents-section">
+      <h2>Recently Played</h2>
+      <% if (recentTracks.length === 0) { %>
+        <p style="margin-left: 1rem; color: #888;">No recently played tracks</p>
+      <% } else { %>
+        <div class="scroll-wrapperx">
+          <button class="scroll-arrow left" data-scroll="left">&#10094;</button>
+          <div class="horizontal-scroll">
+            <% recentTracks.forEach(track => { %>
+              <div class="card track-card clickable-song" data-song-id="<%= track.track_id %>">
+                <img src="<%= track.coverUrl %>" alt="Cover">
+                <h3><%= track.title %></h3>
+                <p><%= track.artist %></p>
+              </div>
+            <% }) %>
+          </div>
+          <button class="scroll-arrow right" data-scroll="right">&#10095;</button>
         </div>
-      </section>
-    </main>
-  </div>
+      <% } %>
+    </section>
+
+    <!-- Section 3: Playlists -->
+    <section class="section playlists-section">
+      <h2>Discover</h2>
+      <% if (playlists.length === 0) { %>
+        <p style="margin-left: 1rem; color: #888;">No playlists available</p>
+      <% } else { %>
+        <div class="scroll-wrapperx">
+          <button class="scroll-arrow left" data-scroll="left">&#10094;</button>
+          <div class="horizontal-scroll">
+            <% playlists.forEach(playlist => { %>
+              <div class="card playlist-card">
+                <img src="<%= playlist.coverUrl %>" alt="Playlist Cover">
+                <h3><%= playlist.name %></h3>
+                <p><%= playlist.track_count %> Tracks</p>
+              </div>
+            <% }) %>
+          </div>
+          <button class="scroll-arrow right" data-scroll="right">&#10095;</button>
+        </div>
+      <% } %>
+    </section>
+
+    <!-- Section 4: Top Videos -->
+    <section class="section videos-section">
+      <h2>Top Videos</h2>
+      <% if (topVideos.length === 0) { %>
+        <p style="margin-left: 1rem; color: #888;">No videos available</p>
+      <% } else { %>
+        <div class="scroll-wrapperx">
+          <button class="scroll-arrow left" data-scroll="left">&#10094;</button>
+          <div class="horizontal-scroll">
+            <% topVideos.forEach(video => { %>
+              <div class="card video-card">
+                <video src="<%= video.videoUrl || '#' %>" poster="<%= video.thumbnail %>" controls></video>
+                <h3><%= video.title %></h3>
+                <p><%= video.artist %></p>
+              </div>
+            <% }) %>
+          </div>
+          <button class="scroll-arrow right" data-scroll="right">&#10095;</button>
+        </div>
+      <% } %>
+    </section>
+
+  </main>
+</div>

@@ -183,3 +183,61 @@
   display: block;
 }
 
+/* Scroll Wrapper for Horizontal Sections */
+.scroll-wrapperx {
+  position: relative;
+}
+
+.scroll-wrapperx .horizontal-scroll {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding: 0 2rem; /* space so arrows don't overlap first/last item */
+}
+
+.scroll-wrapperx .horizontal-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.scroll-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  border: none;
+  padding: 0.5rem 0.7rem;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 10;
+  font-size: 1.2rem;
+  transition: background 0.3s, opacity 0.3s;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.scroll-wrapperx:hover .scroll-arrow {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.scroll-arrow.left {
+  left: 0.3rem;
+}
+
+.scroll-arrow.right {
+  right: 0.3rem;
+}
+
+.scroll-arrow:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+/* Always show arrows on mobile (no hover) */
+@media (max-width: 768px) {
+  .scroll-arrow {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
