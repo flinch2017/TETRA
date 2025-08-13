@@ -183,38 +183,30 @@
   display: block;
 }
 
-/* Scroll Wrapper for Horizontal Sections */
 .scroll-wrapperx {
-  position: relative;
-}
-
-.scroll-wrapperx .horizontal-scroll {
-  display: flex;
-  gap: 1rem;
-  overflow-x: auto;
-  scroll-behavior: smooth;
-  padding: 0 2rem; /* space so arrows don't overlap first/last item */
-}
-
-.scroll-wrapperx .horizontal-scroll::-webkit-scrollbar {
-  display: none;
+  position: relative; /* So arrows position relative to this container */
 }
 
 .scroll-arrow {
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 0;
+  bottom: 0;
+  transform: none; /* No vertical centering — let height match container */
   background: rgba(0, 0, 0, 0.6);
   color: white;
   border: none;
-  padding: 0.5rem 0.7rem;
-  border-radius: 50%;
+  width: 40px;
+  border-radius: 8px;
   cursor: pointer;
   z-index: 10;
-  font-size: 1.2rem;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: background 0.3s, opacity 0.3s;
   opacity: 0;
   pointer-events: none;
+  height: 100%; /* Always match horizontal-scroll height */
 }
 
 .scroll-wrapperx:hover .scroll-arrow {
@@ -223,21 +215,23 @@
 }
 
 .scroll-arrow.left {
-  left: 0.3rem;
+  left: 0;
 }
 
 .scroll-arrow.right {
-  right: 0.3rem;
+  right: 0;
 }
 
 .scroll-arrow:hover {
   background: rgba(0, 0, 0, 0.8);
 }
 
-/* Always show arrows on mobile (no hover) */
+/* Always show arrows on mobile */
 @media (max-width: 768px) {
   .scroll-arrow {
     opacity: 1;
     pointer-events: auto;
   }
 }
+
+

@@ -245,7 +245,7 @@ function bindAllPageEvents() {
   bindDropdownToggles();
   bindProfileEvents();
   bindPostActionButtons();
-  bindLikeButtons(); 
+  bindLikeButtons();
   bindFormSubmissions();
   bindSongClickHandlers();
   bindPostClickEvents();
@@ -254,7 +254,7 @@ function bindAllPageEvents() {
   bindArtistTabNavigation();
   bindSearchTabButtons();
   bindSearchFormSubmission();
-  forceShowLoadMoreIfNoPosts(); // 👈 Add this line
+  forceShowLoadMoreIfNoPosts();
   showLoadMoreWhenBottomReached();
   bindReleaseTypeFilter();
 
@@ -266,11 +266,16 @@ function bindAllPageEvents() {
     bindPostViewEvents();
   }
 
-  // ✅ NEW
   if (typeof bindPostFormEvents === 'function') {
     bindPostFormEvents();
   }
+
+  // ✅ Bind Netflix-style scroll arrows for all .scroll-wrapperx
+  bindHorizontalScrollArrows();
 }
+
+
+
 
 
 
