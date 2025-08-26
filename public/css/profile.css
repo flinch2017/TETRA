@@ -81,6 +81,11 @@ body {
   max-width: 1000px;
   margin: 0 auto 20px;
 }
+
+.section:last-of-type {
+  margin-bottom: 80px; /* or more if you want extra spacing */
+}
+
 .section h2 {
   font-size: 1.5rem;
   margin-bottom: 1rem;
