@@ -68,15 +68,19 @@
             <div class="song-info">
               <img src="<%= song.coverUrl %>" alt="Cover">
               <div>
-                <div class="song-title">
-                  <%= song.title %>
-                  <% if (song.explicit === 'Yes') { %>
-                    <span class="explicit-badge">Explicit</span>
-                  <% } else if (song.explicit === 'Clean Version') { %>
-                    <span class="explicit-badge clean">Clean</span>
-                  <% } %>
-                </div>
-                <div class="release-meta"><%= song.streams %> streams</div>
+                <div class="song-title"><%= song.title %></div>
+
+<div class="song-meta-row">
+  <% if (song.explicit === 'Yes') { %>
+    <span class="explicit-badge">E</span>
+  <% } else if (song.explicit === 'Clean Version') { %>
+    <span class="explicit-badge clean">C</span>
+  <% } %>
+
+  <span class="release-meta"><%= song.streams %> streams</span>
+</div>
+
+
               </div>
             </div>
             <div class="song-actions">

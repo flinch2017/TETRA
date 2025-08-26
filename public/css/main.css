@@ -355,17 +355,6 @@ body {
 }
 
 
-.explicit-badge {
-  background-color: #b50000;
-  color: white;
-  font-size: 0.55rem;          /* smaller text */
-  padding: 1px 4px;            /* tighter padding */
-  margin-left: 6px;
-  border-radius: 4px;
-  text-transform: uppercase;
-  font-weight: 600;
-  vertical-align: super;       /* move it slightly upward */
-}
 
 .explicit-badge.clean {
   background-color: #3498db;
@@ -652,6 +641,47 @@ body {
   .see-discography-btn {
     margin: 0 auto;
   }
+}
+
+
+/* --- Fix: align E/C badge with stream count --- */
+.song-meta-row {
+  display: inline-flex;
+  align-items: center;   /* vertically center both items */
+  gap: 8px;
+  margin-top: 2px;
+  line-height: 1;        /* consistent row height */
+}
+
+.song-meta-row .release-meta {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1;        /* match badge */
+}
+
+/* Compact square-ish E/C badge, centered text */
+.explicit-badge,
+.explicit-e-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 16px;          /* keeps badge height consistent */
+  min-width: 16px;       /* lets single-letter center nicely */
+  padding: 0 4px;        /* small horizontal breathing room */
+  font-size: 0.6rem;
+  line-height: 1;        /* exact content height */
+  border-radius: 3px;
+  background-color: #b50000;
+  color: #fff;
+
+  /* override any earlier stray rules */
+  margin-left: 0 !important;
+  vertical-align: baseline !important;
+}
+
+.explicit-badge.clean,
+.explicit-e-badge.clean {
+  background-color: #3498db;
 }
  body {
   margin: 0;

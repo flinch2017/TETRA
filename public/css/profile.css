@@ -1,387 +1,222 @@
+/* === Base === */
 body {
-    margin: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #0a0f2c;
-    color: white;
-  }
-
-  .fixed-header {
-    position: fixed;
-    top: 0; left: 0; width: 100%;
-    z-index: 10000;
-    background-color: #050a1f;
-  }
-
-  .artist-header {
-    position: relative;
-    background-size: cover;
-    background-position: center;
-    height: 300px;
-    display: flex;
-    align-items: flex-end;
-    padding: 2rem;
-    
-    overflow: visible;
-  }
-
-  .overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to top, rgba(10, 15, 44, 0.9), rgba(10, 15, 44, 0));
-    z-index: 1;
-  }
-
- 
-
-  .more-dropdown {
-  position: relative;
-}
-
-.more-dropdown-toggle {
-  cursor: pointer;
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #0a0f2c;
   color: white;
-  font-size: 1.5rem;
 }
 
-.more-dropdown-menu {
-  display: none;
+/* === Fixed Header === */
+.fixed-header {
+  position: fixed;
+  top: 0; left: 0; width: 100%;
+  z-index: 10000;
+  background-color: #050a1f;
+}
+
+/* === Artist Header === */
+.artist-header {
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  height: 300px;
+  display: flex;
+  align-items: flex-end;
+  padding: 2rem;
+}
+
+.overlay {
   position: absolute;
-  top: 120%;
-  left: 0;  /* align directly below the ellipsis icon */
-  background-color: #12193a;
-  border-radius: 6px;
-  overflow: hidden;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-  min-width: 160px;
-  z-index: 999999;
+  inset: 0;
+  background: linear-gradient(to top, rgba(10, 15, 44, 0.9), rgba(10, 15, 44, 0));
+  z-index: 1;
 }
 
+.artist-info {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
 
-.more-dropdown-menu a {
-  display: block;
-  padding: 0.75rem 1rem;
-  color: rgba(255, 255, 255, 0.9);
-  text-decoration: none;
+.artist-name {
+  font-size: 2.5rem;
+  font-weight: bold;
+}
+
+.artist-follow {
+  margin-top: 0.5rem;
   font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
 }
 
-.more-dropdown-menu a:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-
-  .artist-info {
-    position: relative;
-    z-index: 2;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .artist-name {
-    font-size: 2.5rem;
-    font-weight: bold;
-  }
-
-  .artist-follow {
-    margin-top: 0.5rem;
-    font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.7);
-  }
-
-  .header-actions {
+/* === Actions === */
+.header-actions {
   display: flex;
   align-items: center;
-  gap: 1rem;  /* ← increased gap */
+  gap: 1rem;
   margin-top: 1rem;
 }
 
-
-  .follow-btn {
+.follow-btn, .setup-artist-btn {
   padding: 0.5rem 1rem;
   border-radius: 999px;
-  background-color: #007bff; /* vibrant blue */
+  background-color: #007bff;
   color: white;
   border: none;
   cursor: pointer;
   font-size: 0.95rem;
-  box-shadow: 0 0 8px rgba(0, 123, 255, 0.6), 0 0 16px rgba(0, 123, 255, 0.4);
+  box-shadow: 0 0 8px rgba(0,123,255,0.6), 0 0 16px rgba(0,123,255,0.4);
   transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
-
-.follow-btn:hover {
-  box-shadow: 0 0 12px rgba(0, 123, 255, 0.8), 0 0 24px rgba(0, 123, 255, 0.5);
+.follow-btn:hover, .setup-artist-btn:hover {
+  box-shadow: 0 0 12px rgba(0,123,255,0.8), 0 0 24px rgba(0,123,255,0.5);
   transform: translateY(-1px);
 }
 
-
-  .section {
-    padding: 2rem;
-    max-width: 1000px;
-    margin: 0 auto;
-    margin-bottom: 20px;
-  }
-
-  .section h2 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-  }
-
-  .song-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.75rem 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  }
-
-  .song-item.no-border {
-    border: none;
-  }
-
-  .song-info {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-
-  .song-info img {
-    width: 50px;
-    height: 50px;
-    border-radius: 6px;
-    object-fit: cover;
-  }
-
-  .song-title {
-  font-weight: 500;
+/* === Sections === */
+.section {
+  padding: 2rem;
+  max-width: 1000px;
+  margin: 0 auto 20px;
+}
+.section h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
 }
 
+/* === Song List === */
+.song-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+.song-item.no-border { border: none; }
 
-  .song-actions i {
-    margin-left: 1rem;
-    cursor: pointer;
-    color: rgba(255, 255, 255, 0.8);
-  }
+.song-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.song-info img {
+  width: 50px; height: 50px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+.song-title { font-weight: 500; }
 
-  .song-actions i:hover {
-    color: #1db954;
-  }
+.song-actions i {
+  margin-left: 1rem;
+  cursor: pointer;
+  color: rgba(255,255,255,0.8);
+}
+.song-actions i:hover { color: #1db954; }
 
-  .artist-details {
-    font-size: 0.95rem;
-    color: rgba(255, 255, 255, 0.75);
-    line-height: 1.6;
-  }
-
-  .releases-wrapper {
-    display: flex;
-    gap: 2rem;
-    flex-wrap: wrap;
-  }
-
-  
-
-  .release-meta {
-    font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.6);
-  }
-
-  @media screen and (max-width: 600px) {
-  .artist-name {
-    font-size: 2rem;
-  }
-
-  .section {
-    padding: 1rem;
-  }
-
-  .song-info img {
-    width: 40px;
-    height: 40px;
-  }
-
-  .song-info {
-    max-width: 100%;
-    /* if flex container, you might want: */
-    /* flex-shrink: 1; */
-  }
-
-  .song-title {
-    font-weight: 500;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 150px;  /* smaller max-width for mobile */
-    display: inline-block;
-    vertical-align: middle;
-  }
+/* === Explicit / Clean Badges === */
+.song-badges {
+  margin-top: 2px;
+  display: flex;
+  gap: 6px;
 }
 
+.explicit-badge,
+.explicit-e-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  font-size: 0.6rem;
+  font-weight: 600;
+  border-radius: 4px;
+  background-color: #b50000;
+  color: #fff;
+  line-height: 1;
+}
+.explicit-badge.clean,
+.explicit-e-badge.clean { background-color: #3498db; }
 
-  .artist-rank {
+.song-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+}
+.song-meta-row .release-meta {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.6);
+}
+
+/* === Releases Grid === */
+.releases-grid {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.releases-grid::-webkit-scrollbar { display: none; }
+
+.release-card-link {
+  flex: 0 0 180px;
+  text-decoration: none;
+  color: inherit;
+}
+.release-card {
+  position: relative;
+  scroll-snap-align: start;
+  border-radius: 16px;
+  overflow: hidden;
+}
+.release-cover {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 12px;
+}
+.release-details { padding: 10px 8px; }
+.release-title-with-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 5px;
+}
+.release-title {
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+/* === Artist Rank Circle === */
+.artist-rank {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
-  width: 48px;
-  height: 48px;
-  background-color: rgba(18, 25, 58, 0.8);
+  top: 1rem; right: 1rem;
+  width: 48px; height: 48px;
+  background-color: rgba(18,25,58,0.8);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.9);
   font-weight: bold;
-  z-index: 2;
+  color: rgba(255,255,255,0.9);
 }
 
-.artist-profile {
-  padding-bottom: 80px; /* space so content isn't hidden under music bar */
-}
-
-.setup-artist-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 300px;
-  margin-top: 2rem;
-}
-
-.setup-artist-btn {
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-  border-radius: 999px;
-  background-color: #007bff; /* vibrant blue */
-  color: white;
-  border: none;
-  cursor: pointer;
-  text-decoration: none; /* remove underline */
-  box-shadow: 0 0 10px rgba(0, 123, 255, 0.6), 0 0 20px rgba(0, 123, 255, 0.4);
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
-}
-
-.setup-artist-btn:hover {
-  box-shadow: 0 0 15px rgba(0, 123, 255, 0.8), 0 0 30px rgba(0, 123, 255, 0.5);
-  transform: translateY(-2px);
-}
-
-  .releases-grid {
-    display: flex;
-    gap: 20px;
-    overflow-x: auto;
-    padding-bottom: 10px;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-
-  .releases-grid::-webkit-scrollbar {
-    display: none;
-  }
-
-  .release-card-link {
-    flex: 0 0 180px;
-    text-decoration: none;
-    color: inherit;
-  }
-
-  .release-card {
-  position: relative;
-  scroll-snap-align: start;
- 
-  border-radius: 16px;
-  overflow: hidden;
-}
-
-  /* No .release-card:hover at all */
-
-  .release-cover {
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    object-fit: cover;
-    border-radius: 12px;
-   
-  }
-
-  .release-details {
-    padding: 10px 8px;
-    text-align: left;
-  }
-
-  .release-title-with-badge {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-bottom: 5px;
-  }
-
-  .release-title {
-    font-size: 1rem;
-    font-weight: bold;
-    color: white;
-  }
-
-  .explicit-e-badge {
-    background-color: crimson;
-    color: white;
-    font-size: 0.65rem;
-    padding: 2px 5px;
-    border-radius: 4px;
-    font-weight: bold;
-    text-transform: uppercase;
-    line-height: 1;
-  }
-
-  .release-meta {
-    font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.6);
-    margin-bottom: 8px;
-  }
-
-
-
-.clickable-song {
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-
-
-
-.like-track.liked {
-  color: #2196f3; /* blue */
-  text-shadow: 0 0 5px #2196f3, 0 0 10px #2196f3, 0 0 15px #2196f3;
-}
-
-
-.explicit-badge {
-  background-color: #b50000;
-  color: white;
-  font-size: 0.55rem;          /* smaller text */
-  padding: 1px 4px;            /* tighter padding */
-  margin-left: 6px;
-  border-radius: 4px;
-  text-transform: uppercase;
-  font-weight: 600;
-  vertical-align: super;       /* move it slightly upward */
-}
-
-.explicit-badge.clean {
-  background-color: #3498db;
-}
-
-
+/* === Nav Tabs === */
 .artist-nav-tabs {
   display: flex;
   justify-content: center;
   gap: 1.5rem;
   background-color: #0a0f2c;
   padding: 1rem 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid rgba(255,255,255,0.05);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
 }
-
 .artist-tab {
   display: flex;
   flex-direction: column;
@@ -392,206 +227,90 @@ body {
   color: white;
   font-size: 0.8rem;
   font-weight: 500;
-  padding: 0.25rem 0.5rem;
   cursor: pointer;
   border-radius: 6px;
   transition: color 0.2s ease;
 }
-
-.artist-tab i {
-  font-size: 1rem;
-  transition: color 0.2s ease;
-}
-
-.artist-tab span {
-  font-size: 0.75rem;
-  transition: color 0.2s ease;
-}
-
-.artist-tab:hover {
-  color: #2196f3;
-}
-
-.artist-tab.active {
-  color: #2196f3;
-}
-
+.artist-tab i { font-size: 1rem; }
+.artist-tab span { font-size: 0.75rem; }
+.artist-tab:hover,
+.artist-tab.active,
 .artist-tab.active i,
-.artist-tab.active span {
-  color: #2196f3;
+.artist-tab.active span { color: #2196f3; }
+
+/* === Mobile Styles === */
+@media screen and (max-width: 600px) {
+  .artist-name { font-size: 2rem; }
+  .section { padding: 1rem; }
+  .song-info img { width: 40px; height: 40px; }
+  .song-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+    display: inline-block;
+  }
+  .albums-header-row { flex-direction: column; align-items: flex-start; }
+  .desktop-only { display: none; }
+  .mobile-only { display: block; margin-top: 1rem; text-align: center; }
 }
 
-.artist-tab.active {
-  color: #2196f3;
-}
-
-
-.postz {
-  background-color: #11152f;
-  border-radius: 12px;
-  padding: 1rem;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-}
-
-.post-headerz {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 0.75rem;
-}
-
-.post-pfpz {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.post-user-infoz {
-  display: flex;
-  flex-direction: column;
-}
-
-.post-usernamez {
-  font-weight: bold;
-  color: white;
-}
-
-.post-timez {
-  font-size: 0.85rem;
-  color: rgba(255,255,255,0.6);
-}
-
-.post-contentz p {
-  margin: 0 0 0.75rem;
-  color: white;
-}
-
-
-
-.post-actionsz {
-  display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
-  margin-top: 0.75rem;
-}
-
-.post-actionz button {
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 1.1rem;
-  cursor: pointer;
-  transition: color 0.2s ease;
-}
-
-.post-actionz button:hover {
-  color: #ffffff;
-}
-
-
-
-
-.post-actionsz {
-  display: flex;
-  gap: 1.2rem;
-  margin-top: 1rem;
-  justify-content: flex-end;
-  align-items: center;
-}
-
-.post-actionsz button {
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 1rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-  transition: color 0.2s ease, transform 0.2s ease;
-}
-
-.post-actionsz button:hover {
-  color: #1da1f2;
-  transform: scale(1.1);
-}
-
-.post-actionsz i {
-  font-size: 1.1rem;
-}
-
-.post-actionsz button span {
-  font-size: 0.95rem;
-}
-
-
-/* Collage styles */
-.post-collagez {
-  display: grid;
-  gap: 4px;
-  margin-top: 0.5rem;
-}
-
-.collage-1z {
-  grid-template-columns: 1fr;
-}
-
-.collage-2z {
-  grid-template-columns: repeat(2, 1fr);
-}
-
-.collage-3z {
-  grid-template-columns: 2fr 1fr;
-  grid-template-rows: repeat(2, 1fr);
-  grid-template-areas:
-    "big small1"
-    "big small2";
-}
-
-.collage-3z .collage-image-wrapperz:nth-child(1) {
-  grid-area: big;
-}
-.collage-3z .collage-image-wrapperz:nth-child(2) {
-  grid-area: small1;
-}
-.collage-3z .collage-image-wrapperz:nth-child(3) {
-  grid-area: small2;
-}
-
-.collage-4z {
-  grid-template-columns: repeat(2, 1fr);
-}
-
-.collage-image-wrapperz {
+/* === More Dropdown (Artist Header) === */
+.more-dropdown {
   position: relative;
-  aspect-ratio: 1/1;
-  overflow: hidden;
+  display: inline-block;
 }
 
-.collage-imagez {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  border-radius: 4px;
+.more-dropdown-toggle {
+  font-size: 1.1rem;
+  cursor: pointer;
+  color: rgba(255,255,255,0.8);
+  padding: 6px;
+  border-radius: 50%;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.more-dropdown-toggle:hover {
+  color: #1db954;
+  background: rgba(255,255,255,0.1);
 }
 
-.more-overlayz {
+.more-dropdown-menu {
   position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background-color: rgba(0,0,0,0.6);
-  color: white;
-  font-size: 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
+  top: 0;                /* align top edges first */
+  left: 100%;            /* push to the right of the ellipsis */
+  margin-left: 6px;      /* small gap */
+  
+  background-color: #111633;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  min-width: 160px;
+  padding: 0.25rem 0;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+  display: none;
+  z-index: 9999;
 }
 
 
-/* Layout for heading + button on desktop */
+.more-dropdown-menu a {
+  display: block;
+  padding: 0.6rem 1rem;
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.85);
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.more-dropdown-menu a:hover {
+  background-color: rgba(255,255,255,0.1);
+  color: #fff;
+}
+
+/* Show dropdown when parent has .open */
+.more-dropdown.open .more-dropdown-menu {
+  display: block;
+}
+
+
+/* === Albums Header Row === */
 .albums-header-row {
   display: flex;
   justify-content: space-between;
@@ -599,57 +318,36 @@ body {
   margin-bottom: 1rem;
 }
 
-.section-heading {
-  font-size: 1.5rem;
-  margin: 0;
-}
-
+/* See Discography Button */
 .see-discography-btn {
-  display: inline-block;
-  padding: 0.35rem 0.75rem; /* smaller padding */
-  font-size: 0.75rem;       /* smaller text */
-  font-weight: 500;
-  background-color: #2196f3;
-  color: white;
-  text-decoration: none;
+  padding: 0.5rem 1rem;
   border-radius: 999px;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  box-shadow: 0 0 8px rgba(33, 150, 243, 0.4); /* slightly smaller shadow */
+  background-color: #1db954;
+  color: white;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: background 0.2s ease;
+  white-space: nowrap;
 }
-
-
 .see-discography-btn:hover {
-  background-color: #1a7fc1;
-  transform: translateY(-1px);
+  background-color: #17a74a;
 }
 
-/* Hide mobile version by default */
-.mobile-only {
-  display: none;
-}
+/* Desktop / Mobile toggles */
+.desktop-only { display: inline-block; }
+.mobile-only { display: none; }
 
-.see-discography-mobile-wrapper {
-  margin-top: 1rem;
-  text-align: center;
-}
-
-/* Mobile styles */
 @media screen and (max-width: 600px) {
   .albums-header-row {
     flex-direction: column;
     align-items: flex-start;
   }
 
-  /* Hide desktop button, show mobile one */
-  .desktop-only {
-    display: none;
-  }
+  .desktop-only { display: none; }
+  .mobile-only { display: block; margin-top: 1rem; text-align: center; }
 
-  .mobile-only {
-    display: block;
-  }
-
-  .see-discography-btn {
-    margin: 0 auto;
+  .see-discography-mobile-wrapper {
+    width: 100%;
+    text-align: center; /* centers the button */
   }
 }
