@@ -327,16 +327,21 @@ body {
 .see-discography-btn {
   padding: 0.5rem 1rem;
   border-radius: 999px;
-  background-color: #1db954;
+  
   color: white;
   font-size: 0.9rem;
   text-decoration: none;
-  transition: background 0.2s ease;
+  transition: all 0.3s ease;
   white-space: nowrap;
+  box-shadow: 0 6px 20px rgba(0, 122, 255, 0.4); /* blue glow */
 }
+
 .see-discography-btn:hover {
-  background-color: #17a74a;
+  background-color: #0056cc; /* darker blue */
+  box-shadow: 0 8px 25px rgba(0, 122, 255, 0.6); /* stronger glow on hover */
+  transform: translateY(-2px);
 }
+
 
 /* Desktop / Mobile toggles */
 .desktop-only { display: inline-block; }
