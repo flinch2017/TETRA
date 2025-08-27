@@ -34,35 +34,62 @@
       flex-direction: column;
     }
 
-    /* Hero fills screen on mobile */
     .hero-section {
       min-height: 50vh;
     }
 
-    .card {
-      background: var(--glass-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 24px;
-      padding: 2.5rem 2rem;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
-      backdrop-filter: blur(14px);
-      text-align: center;
-      max-width: 650px;
-      width: 90%;
-      animation: fadeInUp 0.8s ease forwards;
+    .cardx {
+  background: var(--glass-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 24px;
+  padding: 2.5rem 2rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(14px);
+  text-align: center;
+  max-width: 650px;
+  width: 90%;
+  animation: fadeInUp 0.8s ease forwards;
 
-      /* Flex column with spacing */
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-    }
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  position: relative;
+  overflow: hidden; /* ensure glow doesn’t leak outside */
+}
 
-    
+/* Futuristic animated gradient behind card */
+.cardx::before {
+  content: "";
+  position: absolute;
+  inset: -2px; /* slightly bigger than card */
+  border-radius: inherit;
+  background: linear-gradient(
+    270deg,
+    #007aff,
+    #00ffe7,
+    #7b61ff,
+    #ff2fd6,
+    #007aff
+  );
+  background-size: 400% 400%;
+  animation: gradientFlow 12s ease infinite;
+  z-index: -1; /* sits behind content */
+  filter: blur(30px);
+  opacity: 0.6;
+}
+
+/* Animate gradient */
+@keyframes gradientFlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
 
     h1, h2 {
       font-weight: 700;
       letter-spacing: -0.5px;
-      text-shadow: 0 0 15px rgba(0, 122, 255, 0.2);
+      text-shadow: 0 0 15px rgba(0, 122, 255, 0.3);
       margin: 0;
     }
 
@@ -82,7 +109,7 @@
 
     .btn {
       display: inline-block;
-      background: var(--accent-blue);
+      background: black;
       color: white;
       font-weight: 600;
       padding: 0.9rem 2rem;
@@ -91,13 +118,41 @@
       cursor: pointer;
       text-decoration: none;
       transition: all 0.3s ease;
-      box-shadow: 0 6px 20px rgba(0, 122, 255, 0.4);
+      box-shadow: 0 8px 28px rgba(0, 122, 255, 0.6);
     }
 
     .btn:hover {
-      background: var(--accent-blue-hover);
+      background: white;
+      color: black;
       box-shadow: 0 8px 28px rgba(0, 122, 255, 0.6);
       transform: translateY(-2px);
+    }
+
+    /* Equalizer inside card */
+    .equalizer {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 4px;
+      height: 40px;
+    }
+
+    .bar {
+      width: 6px;
+      background: white;
+      border-radius: 3px;
+      animation: bounce 1s infinite ease-in-out;
+    }
+
+    .bar:nth-child(1) { animation-delay: 0s; }
+    .bar:nth-child(2) { animation-delay: 0.2s; }
+    .bar:nth-child(3) { animation-delay: 0.4s; }
+    .bar:nth-child(4) { animation-delay: 0.6s; }
+    .bar:nth-child(5) { animation-delay: 0.8s; }
+
+    @keyframes bounce {
+      0%, 100% { height: 10px; }
+      50% { height: 40px; }
     }
 
     footer {
@@ -125,92 +180,107 @@
       text-decoration: underline;
     }
 
-    /* Animations */
     @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Responsive */
     @media (max-width: 768px) {
-      section {
-        padding: 60px 16px;
-      }
-      .card {
-        padding: 2rem 1.5rem;
-        gap: 1.2rem;
-      }
-      h1 {
-        font-size: 2.1rem;
-      }
-      h2 {
-        font-size: 1.6rem;
-      }
-      p {
-        font-size: 1rem;
-      }
+      section { padding: 60px 16px; }
+      .cardx { padding: 2rem 1.5rem; gap: 1.2rem; margin-top: -40px; }
+      h1 { font-size: 2.1rem; }
+      h2 { font-size: 1.6rem; }
+      p { font-size: 1rem; }
     }
 
     @media (max-width: 480px) {
-      section {
-        padding: 50px 12px;
-      }
-      .card {
-        padding: 1.8rem 1.25rem;
-        gap: 1rem;
-      }
-      h1 {
-        font-size: 1.8rem;
-      }
-      h2 {
-        font-size: 1.3rem;
-      }
-      p {
-        font-size: 0.95rem;
-      }
-      .btn {
-        width: 90%;
-        font-size: 1rem;
-        padding: 1rem 1.2rem;
-      }
+      section { padding: 50px 12px; }
+      .cardx { padding: 1.8rem 1.25rem; gap: 1rem; margin-top: -40px; }
+      h1 { font-size: 1.8rem; }
+      h2 { font-size: 1.3rem; }
+      p { font-size: 0.95rem; }
+      .btn { width: 90%; font-size: 1rem; padding: 1rem 1.2rem; }
     }
+
+    .footer-links {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+  color: white;
+  font-size: 1.2rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.icon-btn:hover {
+  background: linear-gradient(135deg, #00ffe7, #7b61ff);
+  color: #fff;
+  transform: translateY(-3px) scale(1.1);
+  box-shadow: 0 0 12px rgba(123,97,255,0.6), 0 0 20px rgba(0,255,231,0.4);
+}
+
   </style>
 </head>
 <body>
 
   <!-- Hero Section -->
   <section class="hero-section">
-    <div class="card hero">
+    <div class="cardx hero">
       <h1>Welcome to <%= appName %></h1>
       <p>Stream, share, and discover your favorite music.</p>
+      <div class="equalizer">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
       <a href="/signup" class="btn">Get Started</a>
     </div>
   </section>
 
   <!-- Description Section -->
   <section>
-    <div class="card description">
+    <div class="cardx description">
       <h2>Why TETRA?</h2>
       <p>TETRA is your all-in-one platform for experiencing music like never before. Release singles, albums, and remixes, track your impact on charts, and connect with fans across the world. Whether you're a creator or a listener, this is your stage.</p>
+      <div class="equalizer">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
     </div>
   </section>
 
   <!-- Footer Section -->
   <footer>
-    <p>© 2025 Tetra Metropolis, under Dossier Software Development Services</p>
-    <p>
-      Contact:
-      <a href="mailto:contact@tetra.com">contact@tetra.com</a> |
-      <a href="https://twitter.com">X (formerly Twitter)</a> |
-      <a href="https://instagram.com">Instagram</a>
-    </p>
-  </footer>
+  <p>© 2025 Tetra Metropolis, under Dossier Software Development Services</p>
+  <div class="footer-links">
+    <a href="mailto:thedossiercreatives@gmail.com" class="icon-btn" title="Email">
+      <i class="fas fa-envelope"></i>
+    </a>
+    <a href="https://twitter.com" class="icon-btn" title="Twitter / X">
+      <i class="fab fa-x-twitter"></i>
+    </a>
+    <a href="https://instagram.com" class="icon-btn" title="Instagram">
+      <i class="fab fa-instagram"></i>
+    </a>
+  </div>
+</footer>
 
 </body>
 </html>
