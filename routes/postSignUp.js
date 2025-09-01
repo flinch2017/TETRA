@@ -20,12 +20,13 @@ const fetch = require('node-fetch');
 require('dotenv').config();
 
 
-let environment = new paypal.core.SandboxEnvironment(
-  "AcIAKpwvSCs9G682ZO2017hXgpnp25fyxmHhd5RUSPLLRcONWH9OOZidDo86DR7Mbs4k2Mo5oAkHa2lu",
-  "EB06p_eTqcc_faRqPdZKnnz36mOKrDVcVf9yelHL_5IIJLFwNwg7sI6Uh02PTF4BBvX9ASZbZjQ34WMf"
+let environment = new paypal.core.LiveEnvironment(
+  process.env.PAYPAL_CLIENT_ID,
+  process.env.PAYPAL_CLIENT_SECRET
 );
 
 const client = new paypal.core.PayPalHttpClient(environment);
+
 
 
 router.get('/auth', (req, res) => {
@@ -318,7 +319,7 @@ router.post('/create-paypal-order', async (req, res) => {
 
   // Define prices in PHP
   const prices = {
-    basic: "280.00", // Example PHP equivalent of $5
+    basic: "5.00", // Example PHP equivalent of $5
     mid: "560.00",   // Example PHP equivalent of $10
     pro: "1400.00"   // Example PHP equivalent of $25
   };
